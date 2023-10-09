@@ -4,9 +4,9 @@ from PyQt6.QtWidgets import QApplication, QMainWindow, QFileDialog, QMessageBox,
 import time
 import os
 from PyQt6 import QtGui, QtWidgets
-from Backend.Facade import Facade
-from Backend.Keywords import Keywords
-from GUI.Ui_HSIWebScraper import Ui_HSIWebScraper
+import Backend.Facade
+import Backend.Keywords
+from Ui_HSIWebScraper import Ui_HSIWebScraper
 
 # ---------------------------- Global Variable ----------------------------
 # used to display popup message after scraping
@@ -146,8 +146,8 @@ class MainWindow(QMainWindow):
         self.worker = None
         self.ui = Ui_HSIWebScraper()
         self.ui.setupUi(self)
-        self.keywords_instance = Keywords()
-        self.facade = Facade()
+        self.keywords_instance = Backend.Keywords()
+        self.facade = Backend.Facade()
 
         self.central_widget = self.ui.tabWidget
         self.setCentralWidget(self.ui.tabWidget)
