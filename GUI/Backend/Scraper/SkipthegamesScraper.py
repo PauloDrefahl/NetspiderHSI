@@ -4,7 +4,7 @@ import pandas as pd
 import undetected_chromedriver as uc
 from selenium.common import NoSuchElementException
 from selenium.webdriver.common.by import By
-from Backend.ScraperPrototype import ScraperPrototype
+from GUI.Backend.ScraperPrototype import ScraperPrototype
 
 
 class SkipthegamesScraper(ScraperPrototype):
@@ -95,7 +95,8 @@ class SkipthegamesScraper(ScraperPrototype):
         # Selenium Web Driver setup
         options = uc.ChromeOptions()
         # TODO - uncomment this to run headless
-        # options.add_argument('--headless')
+        # options.add_argument('--headless') This allows the code to run without opening up a new Chrome window
+        options.headless = False  # This opens up a new Chrome window
         self.driver = uc.Chrome(use_subprocess=True, options=options)
 
         # Open Webpage with URL

@@ -1,5 +1,5 @@
 from abc import ABC, abstractmethod
-from Backend.Keywords import Keywords
+from GUI.Backend.Keywords import Keywords
 
 
 class ScraperPrototype(ABC):

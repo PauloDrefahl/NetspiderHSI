@@ -4,7 +4,7 @@ from datetime import datetime
 import pandas as pd
 from selenium.common import NoSuchElementException
 from selenium.webdriver.common.by import By
-from Backend.ScraperPrototype import ScraperPrototype
+from GUI.Backend.ScraperPrototype import ScraperPrototype
 import undetected_chromedriver as uc
 
 
@@ -98,7 +98,8 @@ class EscortalligatorScraper(ScraperPrototype):
         # Selenium Web Driver setup
         options = uc.ChromeOptions()
         # TODO - uncomment this to run headless
-        # options.add_argument('--headless')
+        # options.add_argument('--headless') This allows the code to run without opening up a new Chrome window
+        options.headless = False  # This opens up a new Chrome window
         self.driver = uc.Chrome(subprocess=True, options=options)
 
         # Open Webpage with URL
