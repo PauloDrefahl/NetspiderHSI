@@ -239,6 +239,7 @@ class SkipthegamesScraper(ScraperPrototype):
             'number-of-keywords-found': self.number_of_keywords_found,
             'social-media-found': self.social_media_found
         }
+
         data = pd.DataFrame(titled_columns)
         data.to_csv(f'{self.main_page_path}/skipthegames-{self.date_time}.csv', index=False)
 
