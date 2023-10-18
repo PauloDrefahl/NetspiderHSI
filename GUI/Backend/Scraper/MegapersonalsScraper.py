@@ -277,7 +277,7 @@ class MegapersonalsScraper(ScraperPrototype):
         }
 
         data = pd.DataFrame(titled_columns)
-        data.to_csv(f'{self.scraper_directory}/megapersonals-{self.date_time}.csv', index=False, sep="\t")
+        data.to_csv(f'{self.scraper_directory}/megapersonals-{self.date_time}.csv', index=False)
 
     def reset_variables(self) -> None:
         self.description = []

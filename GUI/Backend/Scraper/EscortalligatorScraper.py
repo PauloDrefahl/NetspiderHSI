@@ -257,7 +257,7 @@ class EscortalligatorScraper(ScraperPrototype):
         }
 
         data = pd.DataFrame(titled_columns)
-        data.to_csv(f'{self.scraper_directory}/escortalligator-{self.date_time}.csv', index=False, sep="\t")
+        data.to_csv(f'{self.scraper_directory}/escortalligator-{self.date_time}.csv', index=False)
 
     def reset_variables(self) -> None:
         self.phone_number = []
