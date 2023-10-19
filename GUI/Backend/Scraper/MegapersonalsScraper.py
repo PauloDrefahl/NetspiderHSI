@@ -262,7 +262,7 @@ class MegapersonalsScraper(ScraperPrototype):
         self.check_for_social_media(description)
 
     def format_data_to_csv(self) -> None:
-        titled_columns = {
+        self.titled_columns = {
             'Post-identifier': self.post_identifier,
             'Link': self.link,
             'name': self.name,
