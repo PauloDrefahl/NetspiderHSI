@@ -95,8 +95,8 @@ class SkipthegamesScraper(ScraperPrototype):
         # Selenium Web Driver setup
         options = uc.ChromeOptions()
         # TODO - uncomment this to run headless
-        # options.add_argument('--headless') This allows the code to run without opening up a new Chrome window
-        options.headless = False  # This opens up a new Chrome window
+        # options.add_argument('--headless')
+        options.headless = False
         self.driver = uc.Chrome(use_subprocess=True, options=options)
 
         # Open Webpage with URL

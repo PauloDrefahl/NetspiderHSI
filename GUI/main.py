@@ -1,12 +1,12 @@
 # import qdarkstyle as qdarkstyle
 from PyQt6.QtCore import Qt, QThread
-from PyQt6.QtWidgets import QApplication, QMainWindow, QFileDialog, QMessageBox, QWidget
+from PyQt6.QtWidgets import QApplication, QMainWindow, QFileDialog, QMessageBox
 import time
 import os
 from PyQt6 import QtGui, QtWidgets
 import Backend.Facade
 import Backend.Keywords
-from Ui_HSIWebScraper import Ui_HSIWebScraper
+from GUI.Ui_HSIWebScraper import Ui_HSIWebScraper
 
 # ---------------------------- Global Variable ----------------------------
 # used to display popup message after scraping
@@ -112,6 +112,7 @@ class MainBackgroundThread(QThread, QMainWindow):
 
                 self.facade.initialize_yesbackpage_scraper(self.keywords_selected)
                 popup_message = "success"
+                
             except:
                 popup_message = "error"
             time.sleep(2)
