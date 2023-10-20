@@ -96,8 +96,8 @@ class MegapersonalsScraper(ScraperPrototype):
         # Selenium Web Driver setup
         options = uc.ChromeOptions()
         # TODO - uncomment this to run headless
-        # options.add_argument('--headless') This allows the code to run without opening up a new Chrome window
-        options.headless = False  # This opens up a new Chrome window
+        options.add_argument('--headless') #This allows the code to run without opening up a new Chrome window
+        # options.headless = False  # This opens up a new Chrome window
         self.driver = uc.Chrome(use_subprocess=True, options=options)
 
         # Open Webpage with URL
@@ -262,7 +262,7 @@ class MegapersonalsScraper(ScraperPrototype):
         self.check_for_social_media(description)
 
     def format_data_to_csv(self) -> None:
-        self.titled_columns = {
+        titled_columns = {
             'Post-identifier': self.post_identifier,
             'Link': self.link,
             'name': self.name,

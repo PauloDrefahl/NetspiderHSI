@@ -1,6 +1,7 @@
 import os
 from datetime import datetime
 import pandas as pd
+import time
 import undetected_chromedriver as uc
 from selenium.common import NoSuchElementException
 from selenium.webdriver.common.by import By
@@ -117,7 +118,19 @@ class SkipthegamesScraper(ScraperPrototype):
 
     def open_webpage(self) -> None:
         self.driver.implicitly_wait(10)
-        self.driver.get(self.url)
+        self.driver.execute_script(f'window.open("{self.url}", "_blank");')
+        original_window = self.driver.current_window_handle
+        time.sleep(5)
+        if len(self.driver.window_handles) >= 2:
+            # Switch to the new tab
+            self.driver.switch_to.window(self.driver.window_handles[-1])
+
+            # Close the original tab
+            self.driver.switch_to.window(original_window)
+            self.driver.close()
+
+            # Switch back to the new tab
+            self.driver.switch_to.window(self.driver.window_handles[-1])
         self.driver.maximize_window()
         assert "Page not found" not in self.driver.page_source
 

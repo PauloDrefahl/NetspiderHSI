@@ -10,8 +10,6 @@ import openpyxl
 
 class YesbackpageScraper(ScraperPrototype):
 
-
-
     def __init__(self):
         super().__init__()
         self.path = None
@@ -104,8 +102,8 @@ class YesbackpageScraper(ScraperPrototype):
 
         options = uc.ChromeOptions()
         # TODO - uncomment this line to run headless
-        # options.add_argument('--headless')
-        options.headless = False
+        options.add_argument('--headless')
+        # options.headless = False
         self.driver = uc.Chrome(subprocress=True, options=options)
 
         # Open Webpage with URL
@@ -298,7 +296,7 @@ class YesbackpageScraper(ScraperPrototype):
         self.check_for_social_media(description)
 
     def format_data_to_csv(self) -> None:
-        titled_columns = pd.DataFrame({
+        titled_columns = {
             'Post-identifier': self.post_identifier,
             'Phone-Number': self.phone_number,
             'Link': self.link,
@@ -312,7 +310,9 @@ class YesbackpageScraper(ScraperPrototype):
             'keywords-found': self.keywords_found,
             'number-of-keywords-found': self.number_of_keywords_found,
             'social-media-found': self.social_media_found
-        })
+        }
+        data = pd.DataFrame(titled_columns)
+        data.to_csv(f'{self.scraper_directory}/skipthegames-{self.date_time}.csv', index=False)
 
     def reset_variables(self) -> None:
         self.phone_number = []
