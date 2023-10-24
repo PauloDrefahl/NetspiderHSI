@@ -1,4 +1,5 @@
 # import qdarkstyle as qdarkstyle
+import webbrowser
 from PyQt6.QtCore import Qt, QThread
 from PyQt6.QtWidgets import QApplication, QMainWindow, QFileDialog, QMessageBox
 import time
@@ -34,7 +35,7 @@ python -m PyQt6.uic.pyuic -o Ui_HSIWebScraper.py -x Ui_HSIWebScraper.ui
 
 class MainBackgroundThread(QThread, QMainWindow):
     def __init__(self, ui, facade, website_selection, location, search_text, keywords_selected, inclusive_search,
-                 include_payment_method, keywordlistWidget):
+                 include_payment_method, keywordlistWidget, search_mode):
         QThread.__init__(self)
         self.ui = ui
         self.ui.keywordlistWidget = keywordlistWidget
@@ -45,6 +46,8 @@ class MainBackgroundThread(QThread, QMainWindow):
         self.inclusive_search = inclusive_search
         self.keywords_selected = keywords_selected
         self.location = location
+        self.search_mode = search_mode
+
 
     def run(self):
         self.keywords_selected = set()
@@ -111,6 +114,7 @@ class MainBackgroundThread(QThread, QMainWindow):
                     self.facade.set_yesbackpage_only_posts_with_payment_methods()
 
                 self.facade.initialize_yesbackpage_scraper(self.keywords_selected)
+                self.facade.set_search_mode(self.search_mode)
                 popup_message = "success"
                 
             except:
@@ -137,6 +141,7 @@ class MainBackgroundThread(QThread, QMainWindow):
         self.ui.keywordInclusivecheckBox.setChecked(False)
         self.ui.websiteSelectionDropdown.setEnabled(True)
         self.ui.setlocationDropdown.setEnabled(True)
+        self.ui.hideBrowserWhileRunningcheckBox.setEnabled(True)
 
 
 class MainWindow(QMainWindow):
@@ -157,6 +162,7 @@ class MainWindow(QMainWindow):
         self.website_selection = ''
         self.include_payment_method = False
         self.inclusive_search = False
+        self.search_mode = False
         self.search_text = ''
         self.keywords_selected = set()
         self.keys_to_add_to_new_set = []
@@ -194,6 +200,16 @@ class MainWindow(QMainWindow):
         # bind keywordInclusivecheckBox to keyword_inclusive_check_box function
         self.ui.keywordInclusivecheckBox.stateChanged.connect(self.keyword_inclusive_check_box)
         self.ui.keywordInclusivecheckBox.setEnabled(False)
+
+        self.ui.pushButton_2.clicked.connect(self.open_pdf_in_viewer)
+        self.ui.pushButton_3.clicked.connect(self.open_pdf_in_viewer)
+        self.ui.pushButton_4.clicked.connect(self.open_pdf_in_viewer)
+        self.ui.pushButton_5.clicked.connect(self.open_pdf_in_viewer)
+
+        # bind hideBrowserWhileRunningcheckBox to browser_mode function
+
+        self.ui.hideBrowserWhileRunningcheckBox.stateChanged.connect(self.browser_mode)
+        self.ui.hideBrowserWhileRunningcheckBox.setEnabled(True)
 
         # bind setSelectionDropdown to set_selection_dropdown function
         self.ui.setSelectionDropdown.currentIndexChanged.connect(self.set_selection_dropdown)
@@ -240,11 +256,13 @@ class MainWindow(QMainWindow):
     def enable_tabs(self):
         username = self.ui.lineEdit.text()
         password = self.ui.lineEdit_2.text()
-        if username == "admin" and password == "admin":
+        if username == "" and password == "":
             self.ui.tabWidget.setTabEnabled(1, True)
             self.ui.tabWidget.setTabEnabled(2, True)
             self.ui.tabWidget.setTabEnabled(3, True)
             self.ui.tabWidget.setCurrentIndex(1)
+
+# file buttons
 
     def storage_path_selection_button_clicked(self):
         file_dialog = QFileDialog()
@@ -260,17 +278,27 @@ class MainWindow(QMainWindow):
             self.ui.storagePathProgressBar.setValue(100)
 
             self.facade.set_storage_path(self.file_storage_path)
+            self.ui.tabWidget.setCurrentIndex(2)
+
+    def open_pdf_in_viewer(self):
+        webbrowser.open("NetSpider_quick_guide_v1.pdf", new=2)  # 'new=2' opens the file in a new tab or window
 
     def login_button_clicked(self):
+        self.test_std_keyword_file()
         self.enable_tabs()
+        self.test_std_set_selection_button_clicked()
+        self.test_std_set_file_path_button_clicked()
+
 
     def keyword_file_selection_button_clicked(self):
         file_dialog = QFileDialog()
         file_dialog.setNameFilter("Text files (*.txt)")
         file_dialog.setFileMode(QFileDialog.FileMode.ExistingFile)
+
         if file_dialog.exec() == QFileDialog.DialogCode.Accepted:
             file_path = file_dialog.selectedFiles()[0]
-            if 'keywords.txt' in file_path:
+
+            if '.txt' in file_path:
                 self.keyword_file_path = file_path
                 self.enable_tabs()
                 self.ui.keywordFilePathOutput.setText(self.keyword_file_path)
@@ -281,6 +309,20 @@ class MainWindow(QMainWindow):
                 self.initialize_keywords(self.keywords)
             else:
                 QMessageBox.warning(self, "Error", "Please select 'keywords.txt'.")
+
+    def test_std_keyword_file(self):
+        file_path = "keywords.txt"
+
+        self.keyword_file_path = file_path
+        self.enable_tabs()
+        self.ui.keywordFilePathOutput.setText(self.keyword_file_path)
+        self.ui.keywordFileProgressBar.setValue(100)
+
+        self.keywords_instance.set_keywords_path(self.keyword_file_path)
+        self.keywords = self.keywords_instance.get_keywords()
+        self.initialize_keywords(self.keywords)
+
+        self.test_std_set_selection_button_clicked()
 
     def set_file_selection_button_clicked(self):
         file_dialog = QFileDialog()
@@ -300,6 +342,33 @@ class MainWindow(QMainWindow):
                 self.initialize_keyword_sets(self.keyword_sets)
             else:
                 QMessageBox.warning(self, "Error", "Please select 'keyword_sets.txt'.")
+
+
+    def test_std_set_selection_button_clicked(self):
+        file_path = "keyword_sets.txt"
+
+        self.keyword_sets_file_path = file_path
+        self.enable_tabs()
+
+        self.ui.keywordSetsPathOutput.setText(self.keyword_sets_file_path)
+        self.ui.keywordSetsProgressBar.setValue(100)
+
+        self.keywords_instance.set_keywords_sets_path(self.keyword_sets_file_path)
+        self.keyword_sets = self.keywords_instance.get_set()
+        self.initialize_keyword_sets(self.keyword_sets)
+
+
+    def test_std_set_file_path_button_clicked(self):
+        save_path = "results"
+
+        self.file_storage_path = save_path
+        self.enable_tabs()
+
+        self.ui.storagePathOutput.setText(self.file_storage_path)
+        self.ui.storagePathProgressBar.setValue(100)
+
+        self.facade.set_storage_path(self.file_storage_path)
+
 
     # popup to confirm set removal
 
@@ -532,6 +601,12 @@ class MainWindow(QMainWindow):
         else:
             self.inclusive_search = False
 
+    def browser_mode(self):
+        if self.ui.hideBrowserWhileRunningcheckBox.isChecked():
+            self.search_mode = True
+        else:
+            self.search_mode = False
+
     # if checked, select all items in list widget
     def select_all_keywords_check_box(self):
         if self.ui.selectAllKeywordscheckBox.isChecked():
@@ -608,11 +683,22 @@ class MainWindow(QMainWindow):
 
         self.ui.websiteSelectionDropdown.setEnabled(False)
         self.ui.setlocationDropdown.setEnabled(False)
+        self.facade.yesbackpage.set_search_mode(self.search_mode)
+        """if self.location == 'yesbackpage':
+            self.facade.yesbackpage.set_search_mode(self.search_mode)
+        elif self.location == 'eros':
+            self.facade.eros.set_search_mode(self.search_mode)
+        elif self.location == 'escortalligator':
+            self.facade.escortalligator.set_search_mode(self.search_mode)
+        elif self.location == 'megapersonals':
+            self.facade.megapersonals.set_search_mode(self.search_mode)
+        elif self.location == 'skipthegames':
+            self.facade.skipthegames.set_search_mode(self.search_mode)"""
 
         self.worker = MainBackgroundThread(self.ui, self.facade, self.website_selection, self.location,
                                            self.search_text,
                                            self.keywords_selected, self.inclusive_search, self.include_payment_method,
-                                           self.ui.keywordlistWidget)
+                                           self.ui.keywordlistWidget, self.search_mode)
         self.worker.finished.connect(self.worker_finished)
         self.worker.start()
 

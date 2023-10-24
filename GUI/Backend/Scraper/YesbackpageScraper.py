@@ -51,6 +51,7 @@ class YesbackpageScraper(ScraperPrototype):
         self.scraper_directory = None
         self.screenshot_directory = None
         self.keywords = None
+        self.search_mode = False
 
         self.join_keywords = False
         self.number_of_keywords_in_post = 0
@@ -75,6 +76,7 @@ class YesbackpageScraper(ScraperPrototype):
         self.keywords_found = []
         self.social_media_found = []
 
+
     def get_cities(self) -> list:
         return list(self.cities.keys())
 
@@ -89,6 +91,10 @@ class YesbackpageScraper(ScraperPrototype):
 
     def set_path(self, path) -> None:
         self.path = path
+
+    def set_search_mode(self, search_mode) -> None:
+        self.search_mode = search_mode
+
 
     def initialize(self, keywords) -> None:
         # set keywords value

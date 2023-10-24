@@ -70,6 +70,9 @@ class Facade:
     def get_yesbackpage_cities(self):
         return self.yesbackpage.get_cities()
 
+    def set_search_mode(self, search_mode):
+        self.yesbackpage.set_search_mode(search_mode)
+
     def set_yesbackpage_only_posts_with_payment_methods(self):
         self.yesbackpage.set_only_posts_with_payment_methods()
 
