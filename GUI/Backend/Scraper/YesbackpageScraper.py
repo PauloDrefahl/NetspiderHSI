@@ -10,8 +10,6 @@ import openpyxl
 
 class YesbackpageScraper(ScraperPrototype):
 
-
-
     def __init__(self):
         super().__init__()
         self.path = None
@@ -101,11 +99,11 @@ class YesbackpageScraper(ScraperPrototype):
 
         # Format website URL based on state and city
         self.get_formatted_url()
-
+        self.set_search_mode(self.search_mode)
         options = uc.ChromeOptions()
         # TODO - uncomment this line to run headless
         # options.add_argument('--headless')
-        options.headless = False
+        options.headless = self.search_mode
         self.driver = uc.Chrome(subprocress=True, options=options)
 
         # Open Webpage with URL
