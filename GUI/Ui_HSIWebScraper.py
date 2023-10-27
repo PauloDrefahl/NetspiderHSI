@@ -959,7 +959,7 @@ class Ui_HSIWebScraper(object):
         self.pushButton_2.setGeometry(QtCore.QRect(1050, 570, 61, 61))
         self.pushButton_2.setText("")
         icon = QtGui.QIcon()
-        icon.addPixmap(QtGui.QPixmap("D:/Downloads/#09457b (1).png"), QtGui.QIcon.Mode.Normal, QtGui.QIcon.State.Off)
+        icon.addPixmap(QtGui.QPixmap("photos/#09457b (1).png"), QtGui.QIcon.Mode.Normal, QtGui.QIcon.State.Off)
         self.pushButton_2.setIcon(icon)
         self.pushButton_2.setIconSize(QtCore.QSize(50, 50))
         self.pushButton_2.setObjectName("pushButton_2")
@@ -4535,7 +4535,7 @@ class Ui_HSIWebScraper(object):
         self.tabWidget.addTab(self.EditKeywords, "")
 
         self.retranslateUi(HSIWebScraper)
-        self.tabWidget.setCurrentIndex(0)
+        self.tabWidget.setCurrentIndex(3)
         QtCore.QMetaObject.connectSlotsByName(HSIWebScraper)
 
     def retranslateUi(self, HSIWebScraper):

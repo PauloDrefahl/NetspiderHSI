@@ -471,7 +471,7 @@
 WindowText: #09457B;</string>
    </property>
    <property name="currentIndex">
-    <number>0</number>
+    <number>3</number>
    </property>
    <widget class="QWidget" name="Login">
     <attribute name="title">
@@ -2488,7 +2488,7 @@ WindowText: #09457B;</string>
      </property>
      <property name="icon">
       <iconset>
-       <normaloff>D:/Downloads/#09457b (1).png</normaloff>D:/Downloads/#09457b (1).png</iconset>
+       <normaloff>photos/#09457b (1).png</normaloff>photos/#09457b (1).png</iconset>
      </property>
      <property name="iconSize">
       <size>
@@ -6538,7 +6538,7 @@ WindowText: #09457B;</string>
      </property>
      <property name="icon">
       <iconset>
-       <normaloff>D:/Downloads/#09457b (1).png</normaloff>D:/Downloads/#09457b (1).png</iconset>
+       <normaloff>photos/#09457b (1).png</normaloff>photos/#09457b (1).png</iconset>
      </property>
      <property name="iconSize">
       <size>
@@ -10139,7 +10139,7 @@ WindowText: #09457B;</string>
      </property>
      <property name="icon">
       <iconset>
-       <normaloff>D:/Downloads/#09457b (1).png</normaloff>D:/Downloads/#09457b (1).png</iconset>
+       <normaloff>photos/#09457b (1).png</normaloff>photos/#09457b (1).png</iconset>
      </property>
      <property name="iconSize">
       <size>
@@ -13271,7 +13271,7 @@ WindowText: #09457B;</string>
      </property>
      <property name="icon">
       <iconset>
-       <normaloff>D:/Downloads/#09457b (1).png</normaloff>D:/Downloads/#09457b (1).png</iconset>
+       <normaloff>photos/#09457b (1).png</normaloff>photos/#09457b (1).png</iconset>
      </property>
      <property name="iconSize">
       <size>
