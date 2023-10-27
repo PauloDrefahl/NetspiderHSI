@@ -54,6 +54,7 @@ class MegapersonalsScraper(ScraperPrototype):
         self.only_posts_with_payment_methods = False
 
         self.join_keywords = False
+        self.search_mode = False
         self.number_of_keywords_in_post = 0
         self.keywords_found_in_post = []
 
@@ -86,6 +87,9 @@ class MegapersonalsScraper(ScraperPrototype):
     def set_path(self, path) -> None:
         self.path = path
 
+    def set_search_mode(self, search_mode) -> None:
+        self.search_mode = search_mode
+
     def initialize(self, keywords) -> None:
         # set keywords value
         self.keywords = keywords
@@ -96,8 +100,8 @@ class MegapersonalsScraper(ScraperPrototype):
         # Selenium Web Driver setup
         options = uc.ChromeOptions()
         # TODO - uncomment this to run headless
-        options.add_argument('--headless') #This allows the code to run without opening up a new Chrome window
-        # options.headless = False  # This opens up a new Chrome window
+        # options.add_argument('--headless') #This allows the code to run without opening up a new Chrome window
+        options.headless = self.search_mode  # This determines if you program runs headless or not
         self.driver = uc.Chrome(use_subprocess=True, options=options)
 
         # Open Webpage with URL
@@ -277,7 +281,20 @@ class MegapersonalsScraper(ScraperPrototype):
         }
 
         data = pd.DataFrame(titled_columns)
-        data.to_csv(f'{self.scraper_directory}/megapersonals-{self.date_time}.csv', index=False)
+        with pd.ExcelWriter(f'{self.scraper_directory}/megapersonals-{self.date_time}.xlsx', engine='openpyxl') as writer:
+            data.to_excel(writer, index=False)
+            worksheet = writer.sheets['Sheet1']
+            for col in worksheet.columns:
+                max_length = 0
+                col = [cell for cell in col]
+                for cell in col:
+                    try:
+                        if len(str(cell.value)) > max_length:
+                            max_length = len(str(cell.value))
+                    except:
+                        pass
+                adjusted_width = (max_length + 2)
+                worksheet.column_dimensions[col[0].column_letter].width = adjusted_width
 
     def reset_variables(self) -> None:
         self.description = []

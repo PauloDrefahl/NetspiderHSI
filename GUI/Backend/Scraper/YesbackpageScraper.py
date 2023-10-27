@@ -1,11 +1,11 @@
 import os
+import time
 from datetime import datetime
 import pandas as pd
 import undetected_chromedriver as uc
 from selenium.common import NoSuchElementException
 from selenium.webdriver.common.by import By
 from GUI.Backend.ScraperPrototype import ScraperPrototype
-import openpyxl
 
 
 class YesbackpageScraper(ScraperPrototype):
@@ -76,7 +76,6 @@ class YesbackpageScraper(ScraperPrototype):
         self.keywords_found = []
         self.social_media_found = []
 
-
     def get_cities(self) -> list:
         return list(self.cities.keys())
 
@@ -95,7 +94,6 @@ class YesbackpageScraper(ScraperPrototype):
     def set_search_mode(self, search_mode) -> None:
         self.search_mode = search_mode
 
-
     def initialize(self, keywords) -> None:
         # set keywords value
         self.keywords = keywords
@@ -105,11 +103,11 @@ class YesbackpageScraper(ScraperPrototype):
 
         # Format website URL based on state and city
         self.get_formatted_url()
-        self.set_search_mode(self.search_mode)
+        # self.set_search_mode(self.search_mode)
         options = uc.ChromeOptions()
         # TODO - uncomment this line to run headless
         # options.add_argument('--headless')
-        options.headless = self.search_mode
+        options.headless = self.search_mode  # This determines if you program runs headless or not
         self.driver = uc.Chrome(subprocress=True, options=options)
 
         # Open Webpage with URL
@@ -132,7 +130,22 @@ class YesbackpageScraper(ScraperPrototype):
 
     def open_webpage(self) -> None:
         self.driver.implicitly_wait(10)
-        self.driver.get(self.url)
+        if self.search_mode:
+            self.driver.get(self.url)
+        else:
+            self.driver.execute_script(f'window.open("{self.url}", "_blank");')
+            original_window = self.driver.current_window_handle
+            time.sleep(5)
+            if len(self.driver.window_handles) >= 2:
+                # Switch to the new tab
+                self.driver.switch_to.window(self.driver.window_handles[-1])
+
+                # Close the original tab
+                self.driver.switch_to.window(original_window)
+                self.driver.close()
+
+                # Switch back to the new tab
+                self.driver.switch_to.window(self.driver.window_handles[-1])
         self.driver.maximize_window()
         assert "Page not found" not in self.driver.page_source
 
@@ -317,6 +330,21 @@ class YesbackpageScraper(ScraperPrototype):
             'number-of-keywords-found': self.number_of_keywords_found,
             'social-media-found': self.social_media_found
         })
+        data = pd.DataFrame(titled_columns)
+        with pd.ExcelWriter(f'{self.scraper_directory}/yesbackpage-{self.date_time}.xlsx', engine='openpyxl') as writer:
+            data.to_excel(writer, index=False)
+            worksheet = writer.sheets['Sheet1']
+            for col in worksheet.columns:
+                max_length = 0
+                col = [cell for cell in col]
+                for cell in col:
+                    try:
+                        if len(str(cell.value)) > max_length:
+                            max_length = len(str(cell.value))
+                    except:
+                        pass
+                adjusted_width = (max_length + 2)
+                worksheet.column_dimensions[col[0].column_letter].width = adjusted_width
 
     def reset_variables(self) -> None:
         self.phone_number = []

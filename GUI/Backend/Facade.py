@@ -25,6 +25,9 @@ class Facade:
     def get_escortalligator_cities(self):
         return self.escortalligator.get_cities()
 
+    def escortalligator_set_search_mode(self, search_mode):
+        self.escortalligator.set_search_mode(search_mode)
+
     def set_escortalligator_only_posts_with_payment_methods(self):
         self.escortalligator.set_only_posts_with_payment_methods()
 
@@ -39,6 +42,9 @@ class Facade:
 
     def get_megapersonals_cities(self):
         return self.megapersonals.get_cities()
+
+    def megapersonals_set_search_mode(self, search_mode):
+        self.megapersonals.set_search_mode(search_mode)
 
     def set_megapersonal_only_posts_with_payment_methods(self):
         self.megapersonals.set_only_posts_with_payment_methods()
@@ -55,6 +61,9 @@ class Facade:
     def get_skipthegames_cities(self):
         return self.skipthegames.get_cities()
 
+    def skipthegames_set_search_mode(self, search_mode):
+        self.skipthegames.set_search_mode(search_mode)
+
     def set_skipthegames_only_posts_with_payment_methods(self):
         self.skipthegames.set_only_posts_with_payment_methods()
 
@@ -70,7 +79,7 @@ class Facade:
     def get_yesbackpage_cities(self):
         return self.yesbackpage.get_cities()
 
-    def set_search_mode(self, search_mode):
+    def yesbackpage_set_search_mode(self, search_mode):
         self.yesbackpage.set_search_mode(search_mode)
 
     def set_yesbackpage_only_posts_with_payment_methods(self):
@@ -87,6 +96,9 @@ class Facade:
 
     def get_eros_cities(self):
         return self.eros.get_cities()
+
+    def eros_set_search_mode(self, search_mode):
+        self.eros.set_search_mode(search_mode)
 
     def set_eros_only_posts_with_payment_methods(self):
         self.eros.set_only_posts_with_payment_methods()
