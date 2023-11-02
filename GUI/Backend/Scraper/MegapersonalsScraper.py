@@ -5,6 +5,7 @@ import undetected_chromedriver as uc
 from selenium.common import NoSuchElementException
 from selenium.webdriver.common.by import By
 from GUI.Backend.ScraperPrototype import ScraperPrototype
+import img2pdf
 
 
 class MegapersonalsScraper(ScraperPrototype):
@@ -49,6 +50,7 @@ class MegapersonalsScraper(ScraperPrototype):
         self.date_time = None
         self.scraper_directory = None
         self.screenshot_directory = None
+        self.pdf_filename = None
         self.keywords = None
 
         self.only_posts_with_payment_methods = False
@@ -119,6 +121,7 @@ class MegapersonalsScraper(ScraperPrototype):
         os.mkdir(self.scraper_directory)
 
         self.screenshot_directory = f'{self.scraper_directory}/screenshots'
+        self.pdf_filename = f'{self.screenshot_directory}/megapersonals.pdf'
         os.mkdir(self.screenshot_directory)
 
         self.get_data(links)
@@ -341,6 +344,12 @@ class MegapersonalsScraper(ScraperPrototype):
 
     def capture_screenshot(self, screenshot_name) -> None:
         self.driver.save_screenshot(f'{self.screenshot_directory}/{screenshot_name}')
+        self.create_pdf()
+
+    def create_pdf(self) -> None:
+        screenshot_files = [os.path.join(self.screenshot_directory, filename) for filename in os.listdir(self.screenshot_directory) if filename.endswith('.png')]
+        with open(self.pdf_filename, "wb") as f:
+            f.write(img2pdf.convert(screenshot_files))
 
     def check_keywords(self, data) -> bool:
         for key in self.keywords:

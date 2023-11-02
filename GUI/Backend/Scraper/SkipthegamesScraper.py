@@ -6,6 +6,7 @@ import undetected_chromedriver as uc
 from selenium.common import NoSuchElementException
 from selenium.webdriver.common.by import By
 from GUI.Backend.ScraperPrototype import ScraperPrototype
+import img2pdf
 
 
 class SkipthegamesScraper(ScraperPrototype):
@@ -49,6 +50,7 @@ class SkipthegamesScraper(ScraperPrototype):
         self.date_time = None
         self.main_page_path = None
         self.screenshot_directory = None
+        self.pdf_filename = None
         self.keywords = None
 
         self.join_keywords = False
@@ -114,6 +116,7 @@ class SkipthegamesScraper(ScraperPrototype):
         self.main_page_path = f'{self.path}/skipthegames_{self.date_time}'
         os.mkdir(self.main_page_path)
         self.screenshot_directory = f'{self.main_page_path}/screenshots'
+        self.pdf_filename = f'{self.screenshot_directory}/skipthegames.pdf'
         os.mkdir(self.screenshot_directory)
 
         self.get_data(links)
@@ -319,6 +322,12 @@ class SkipthegamesScraper(ScraperPrototype):
 
     def capture_screenshot(self, screenshot_name) -> None:
         self.driver.save_screenshot(f'{self.screenshot_directory}/{screenshot_name}')
+        self.create_pdf()
+
+    def create_pdf(self) -> None:
+        screenshot_files = [os.path.join(self.screenshot_directory, filename) for filename in os.listdir(self.screenshot_directory) if filename.endswith('.png')]
+        with open(self.pdf_filename, "wb") as f:
+            f.write(img2pdf.convert(screenshot_files))
 
     def check_keywords(self, data) -> bool:
         for key in self.keywords:

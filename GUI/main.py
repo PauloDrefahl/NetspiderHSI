@@ -4,6 +4,7 @@ from PyQt6.QtCore import Qt, QThread
 from PyQt6.QtWidgets import QApplication, QMainWindow, QFileDialog, QMessageBox
 import time
 import os
+import subprocess
 from PyQt6 import QtGui, QtWidgets
 import GUI.Backend.Facade
 import GUI.Backend.Keywords
@@ -278,7 +279,7 @@ class MainWindow(QMainWindow):
             self.ui.tabWidget.setCurrentIndex(2)
 
     def open_pdf_in_viewer(self):
-        webbrowser.open("NetSpider_quick_guide_v1.pdf", new=2)  # 'new=2' opens the file in a new tab or window
+        subprocess.Popen('NetSpider_quick_guide_v1.pdf', shell=True)
 
     def login_button_clicked(self):
         self.test_std_keyword_file()
