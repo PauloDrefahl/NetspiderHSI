@@ -7,6 +7,7 @@ from selenium.common import NoSuchElementException
 from selenium.webdriver.common.by import By
 from GUI.Backend.ScraperPrototype import ScraperPrototype
 import img2pdf
+from openpyxl.styles import PatternFill
 
 
 class SkipthegamesScraper(ScraperPrototype):
@@ -48,17 +49,18 @@ class SkipthegamesScraper(ScraperPrototype):
                                    ' tg ', 'tiktok', 'tik tok']
 
         self.date_time = None
-        self.main_page_path = None
+        self.scraper_directory = None
         self.screenshot_directory = None
         self.pdf_filename = None
         self.keywords = None
+        self.flagged_keywords = None
 
         self.join_keywords = False
         self.search_mode = False
         self.number_of_keywords_in_post = 0
         self.keywords_found_in_post = []
 
-        # lists to store data and then send to csv file
+        # lists to store data and then send to excel file
         self.link = []
         self.about_info = []
         self.description = []
@@ -89,11 +91,14 @@ class SkipthegamesScraper(ScraperPrototype):
     def set_search_mode(self, search_mode) -> None:
         self.search_mode = search_mode
 
+    def set_flagged_keywords(self, flagged_keywords) -> None:
+        self.flagged_keywords = flagged_keywords
+
     def initialize(self, keywords) -> None:
         # set keywords value
         self.keywords = keywords
 
-        # set up directories to save screenshots and csv file.
+        # set up directories to save screenshots and excel file.
         self.date_time = str(datetime.today())[0:19].replace(' ', '_').replace(':', '-')
 
         # Format website URL based on state and city
@@ -112,10 +117,10 @@ class SkipthegamesScraper(ScraperPrototype):
         # Find links of posts
         links = self.get_links()
 
-        # create directories for screenshot and csv
-        self.main_page_path = f'{self.path}/skipthegames_{self.date_time}'
-        os.mkdir(self.main_page_path)
-        self.screenshot_directory = f'{self.main_page_path}/screenshots'
+        # create directories for screenshot and excel
+        self.scraper_directory = f'{self.path}/skipthegames_{self.date_time}'
+        os.mkdir(self.scraper_directory)
+        self.screenshot_directory = f'{self.scraper_directory}/screenshots'
         self.pdf_filename = f'{self.screenshot_directory}/skipthegames.pdf'
         os.mkdir(self.screenshot_directory)
 
@@ -223,7 +228,7 @@ class SkipthegamesScraper(ScraperPrototype):
                     self.capture_screenshot(screenshot_name)
                     counter += 1
 
-            self.format_data_to_csv()
+            self.format_data_to_excel()
 
     def append_data(self, about_info, counter, description, link, services):
         self.post_identifier.append(counter)
@@ -250,7 +255,7 @@ class SkipthegamesScraper(ScraperPrototype):
         self.check_and_append_keywords(services)
         self.check_and_append_keywords(description)
 
-    def format_data_to_csv(self) -> None:
+    def format_data_to_excel(self) -> None:
         titled_columns = {
             'Post-identifier': self.post_identifier,
             'Link': self.link,
@@ -264,20 +269,40 @@ class SkipthegamesScraper(ScraperPrototype):
         }
 
         data = pd.DataFrame(titled_columns)
-        with pd.ExcelWriter(f'{self.main_page_path}/skipthegames-{self.date_time}.xlsx', engine='openpyxl') as writer:
+        with pd.ExcelWriter(
+                f'{self.scraper_directory}/skipthegames-{self.date_time}.xlsx',
+                engine='openpyxl') as writer:
             data.to_excel(writer, index=False)
             worksheet = writer.sheets['Sheet1']
-            for col in worksheet.columns:
+
+            for col in worksheet.iter_cols(min_row=2,
+                                           max_row=worksheet.max_row,
+                                           min_col=11,
+                                           max_col=11):  # iterate over keywords found column
+                for cell in col:  # iterate over each cell in the keywords found column
+                    keywords = cell.value.split(
+                        ', ')  # set the keywords var to each keyword in the cell
+                    for keyword in keywords:
+                        if keyword in self.flagged_keywords:  # highlight post and keywords found cell to red if a flagged keyword is found in cell
+                            post_identifier_cell = worksheet.cell(row=cell.row,
+                                                                  column=1)
+                            post_identifier_cell.fill = PatternFill(
+                                fill_type='solid',
+                                start_color='ff0000',
+                                end_color='ff0000')
+                            cell.fill = PatternFill(fill_type='solid',
+                                                    start_color='ff0000',
+                                                    end_color='ff0000')
+
+            for col in worksheet.columns:  # dynamically adjust column sizes based on content of cell
                 max_length = 0
                 col = [cell for cell in col]
                 for cell in col:
-                    try:
-                        if len(str(cell.value)) > max_length:
-                            max_length = len(str(cell.value))
-                    except:
-                        pass
+                    if len(str(cell.value)) > max_length:
+                        max_length = len(str(cell.value))
                 adjusted_width = (max_length + 2)
-                worksheet.column_dimensions[col[0].column_letter].width = adjusted_width
+                worksheet.column_dimensions[
+                    col[0].column_letter].width = adjusted_width
 
     def reset_variables(self) -> None:
         self.link = []
@@ -360,4 +385,3 @@ class SkipthegamesScraper(ScraperPrototype):
 
             return counter + 1
         return counter
-

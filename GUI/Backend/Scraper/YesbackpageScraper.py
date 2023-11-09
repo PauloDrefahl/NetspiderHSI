@@ -7,6 +7,7 @@ from selenium.common import NoSuchElementException
 from selenium.webdriver.common.by import By
 from GUI.Backend.ScraperPrototype import ScraperPrototype
 import img2pdf
+from openpyxl.styles import PatternFill
 
 
 class YesbackpageScraper(ScraperPrototype):
@@ -54,6 +55,7 @@ class YesbackpageScraper(ScraperPrototype):
         self.pdf_filename = None
         self.pdf = None
         self.keywords = None
+        self.flagged_keywords = None
         self.search_mode = False
 
         self.join_keywords = False
@@ -97,10 +99,14 @@ class YesbackpageScraper(ScraperPrototype):
     def set_search_mode(self, search_mode) -> None:
         self.search_mode = search_mode
 
+    def set_flagged_keywords(self, flagged_keywords) -> None:
+        self.flagged_keywords = flagged_keywords
+
     def initialize(self, keywords) -> None:
         # set keywords value
         self.keywords = keywords
-
+        print("Flagged keywords: ", self.flagged_keywords)
+        print("Selected keywords: ", self.keywords)
         # set up directories to save screenshots and csv file.
         self.date_time = str(datetime.today())[0:19].replace(' ', '_').replace(':', '-')
 
@@ -281,7 +287,7 @@ class YesbackpageScraper(ScraperPrototype):
                     screenshot_name = str(counter) + ".png"
                     self.capture_screenshot(screenshot_name)
                     counter += 1
-            self.format_data_to_csv()
+            self.format_data_to_excel()
 
     def join_with_payment_methods(self, counter, description, email, link, location, name, phone_number,
                                   services, sex) -> int:
@@ -318,7 +324,9 @@ class YesbackpageScraper(ScraperPrototype):
         self.number_of_keywords_found.append(self.number_of_keywords_in_post or 'N/A')
         self.check_for_social_media(description)
 
-    def format_data_to_csv(self) -> None:
+    from openpyxl.styles import PatternFill
+
+    def format_data_to_excel(self) -> None:
         titled_columns = pd.DataFrame({
             'Post-identifier': self.post_identifier,
             'Phone-Number': self.phone_number,
@@ -335,20 +343,38 @@ class YesbackpageScraper(ScraperPrototype):
             'social-media-found': self.social_media_found
         })
         data = pd.DataFrame(titled_columns)
-        with pd.ExcelWriter(f'{self.scraper_directory}/yesbackpage-{self.date_time}.xlsx', engine='openpyxl') as writer:
+        with pd.ExcelWriter(
+                f'{self.scraper_directory}/yesbackpage-{self.date_time}.xlsx',
+                engine='openpyxl') as writer:
             data.to_excel(writer, index=False)
             worksheet = writer.sheets['Sheet1']
-            for col in worksheet.columns:
+
+            for col in worksheet.iter_cols(min_row=2,
+                                           max_row=worksheet.max_row,
+                                           min_col=11, max_col=11):  # iterate over keywords found column
+                for cell in col:  # iterate over each cell in the keywords found column
+                    keywords = cell.value.split(', ')  # set the keywords var to each keyword in the cell
+                    for keyword in keywords:
+                        if keyword in self.flagged_keywords:  # highlight post and keywords found cell to red if a flagged keyword is found in cell
+                            post_identifier_cell = worksheet.cell(row=cell.row,
+                                                                  column=1)
+                            post_identifier_cell.fill = PatternFill(
+                                fill_type='solid',
+                                start_color='ff0000',
+                                end_color='ff0000')
+                            cell.fill = PatternFill(fill_type='solid',
+                                                    start_color='ff0000',
+                                                    end_color='ff0000')
+
+            for col in worksheet.columns:  # dynamically adjust column sizes based on content of cell
                 max_length = 0
                 col = [cell for cell in col]
                 for cell in col:
-                    try:
-                        if len(str(cell.value)) > max_length:
-                            max_length = len(str(cell.value))
-                    except:
-                        pass
+                    if len(str(cell.value)) > max_length:
+                        max_length = len(str(cell.value))
                 adjusted_width = (max_length + 2)
-                worksheet.column_dimensions[col[0].column_letter].width = adjusted_width
+                worksheet.column_dimensions[
+                    col[0].column_letter].width = adjusted_width
 
     def reset_variables(self) -> None:
         self.phone_number = []

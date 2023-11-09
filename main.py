@@ -3,8 +3,8 @@ from PyQt6.QtCore import Qt, QThread
 from PyQt6.QtWidgets import QApplication, QMainWindow, QFileDialog, QMessageBox
 import time
 import os
-import subprocess
 from PyQt6 import QtGui, QtWidgets
+from PyQt6.QtGui import QBrush, QColor
 import GUI.Backend.Facade
 import GUI.Backend.Keywords
 from GUI.Ui_HSIWebScraper import Ui_HSIWebScraper
@@ -60,7 +60,6 @@ class MainBackgroundThread(QThread, QMainWindow):
         for i in range(self.ui.keywordlistWidget.count()):
             if self.ui.keywordlistWidget.item(i).isSelected():
                 self.keywords_selected.add(self.ui.keywordlistWidget.item(i).text())
-
         if self.search_text:
             self.keywords_selected.add(self.search_text)
 
@@ -165,6 +164,7 @@ class MainWindow(QMainWindow):
         self.search_mode = False
         self.search_text = ''
         self.keywords_selected = set()
+        self.flagged_keywords = set()
         self.keys_to_add_to_new_set = []
         self.manual_keyword_selection = set()
         self.keywords_of_selected_set = set()
@@ -196,6 +196,7 @@ class MainWindow(QMainWindow):
 
         # bind keywordlistWidget to keyword_list_widget function
         self.ui.keywordlistWidget.itemClicked.connect(self.keyword_list_widget)
+        self.ui.keywordlistWidget.itemDoubleClicked.connect(self.flag_keywords)
 
         # bind keywordInclusivecheckBox to keyword_inclusive_check_box function
         self.ui.keywordInclusivecheckBox.stateChanged.connect(self.keyword_inclusive_check_box)
@@ -281,7 +282,7 @@ class MainWindow(QMainWindow):
             self.ui.tabWidget.setCurrentIndex(2)
 
     def open_pdf_in_viewer(self):
-        subprocess.Popen('NetSpider_quick_guide_v1.pdf', shell=True)
+        os.startfile(os.path.realpath("NetSpider_quick_guide_v1.pdf"))
 
     def login_button_clicked(self):
         self.test_std_keyword_file()
@@ -531,7 +532,7 @@ class MainWindow(QMainWindow):
     # handle list of keywords to be searched
     def keyword_list_widget(self):
         for item in self.ui.keywordlistWidget.selectedItems():
-            if item.text() not in self.keywords_of_selected_set:
+            if item.text() not in self.keywords_of_selected_set and item.text() not in self.flagged_keywords:
                 self.manual_keyword_selection.add(item.text())
 
         if len(self.manual_keyword_selection) > 1:
@@ -539,12 +540,29 @@ class MainWindow(QMainWindow):
 
         # if a keyword is unselected, remove it from the set
         for item in range(self.ui.keywordlistWidget.count()):
+            keyword = self.ui.keywordlistWidget.item(item).text()
             if not self.ui.keywordlistWidget.item(item).isSelected():
-                if item not in self.keywords_of_selected_set:
-                    self.manual_keyword_selection.discard(self.ui.keywordlistWidget.item(item).text())
+                if keyword not in self.keywords_of_selected_set and keyword not in self.flagged_keywords:
+                    self.manual_keyword_selection.discard(keyword)
 
         if not self.manual_keyword_selection and not self.search_text and not self.set_keyword_selection:
             self.ui.keywordInclusivecheckBox.setEnabled(False)
+
+    def flag_keywords(self, item):
+        keyword = item.text()
+
+        # If the keyword is not already in the flagged keywords list, add it and highlight it
+        if keyword not in self.flagged_keywords:
+            self.flagged_keywords.add(keyword)
+            self.keywords_selected.add(keyword)
+            item.setSelected(True)
+            item.setBackground(QBrush(QColor(255, 0, 0)))  # red background
+        else:
+            # If it's already flagged, remove it from the flagged keywords list and reset the background color
+            self.flagged_keywords.remove(keyword)
+            self.keywords_selected.remove(keyword)
+            item.setSelected(False)
+            item.setBackground(QBrush(QColor(255, 255, 255)))  # White background
 
     # handle dropdown menu for keyword sets
     def set_selection_dropdown(self):
@@ -615,7 +633,9 @@ class MainWindow(QMainWindow):
             # deselect all items in list widget
             for i in range(self.ui.keywordlistWidget.count()):
                 self.ui.keywordlistWidget.item(i).setSelected(False)
-
+                if self.ui.keywordlistWidget.item(i).text() in self.flagged_keywords:
+                    self.flagged_keywords.remove(self.ui.keywordlistWidget.item(i).text())
+                    self.ui.keywordlistWidget.item(i).setBackground(QBrush(QColor(255, 255, 255)))
             self.ui.keywordInclusivecheckBox.setEnabled(False)
 
         # enable checkbox after it's unchecked
@@ -670,21 +690,26 @@ class MainWindow(QMainWindow):
 
     # scrape website selected when search button is clicked
     def search_button_clicked(self):
+        start = time.time()
         self.ui.searchButton.setEnabled(False)
         self.ui.tabWidget.setTabEnabled(0, False)
-
         self.ui.websiteSelectionDropdown.setEnabled(False)
         self.ui.setlocationDropdown.setEnabled(False)
         if self.website_selection == "yesbackpage":
             self.facade.yesbackpage_set_search_mode(self.search_mode)
+            self.facade.set_yesbackpage_flagged_keywords(self.flagged_keywords)
         elif self.website_selection == "escortalligator":
             self.facade.escortalligator_set_search_mode(self.search_mode)
+            self.facade.set_escortalligator_flagged_keywords(self.flagged_keywords)
         elif self.website_selection == "skipthegames":
             self.facade.skipthegames_set_search_mode(self.search_mode)
+            self.facade.set_skipthegames_flagged_keywords(self.flagged_keywords)
         elif self.website_selection == "eros":
             self.facade.eros_set_search_mode(self.search_mode)
+            self.facade.set_eros_flagged_keywords(self.flagged_keywords)
         elif self.website_selection == "megapersonals":
             self.facade.megapersonals_set_search_mode(self.search_mode)
+            self.facade.set_megapersonals_flagged_keywords(self.flagged_keywords)
 
         self.worker = MainBackgroundThread(self.ui, self.facade, self.website_selection, self.location,
                                            self.search_text,

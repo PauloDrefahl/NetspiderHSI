@@ -7,6 +7,7 @@ import pandas as pd
 import undetected_chromedriver as uc
 import os
 import img2pdf
+from openpyxl.styles import PatternFill
 
 
 class ErosScraper(ScraperPrototype):
@@ -37,6 +38,7 @@ class ErosScraper(ScraperPrototype):
         self.screenshot_directory = None
         self.pdf_filename = None
         self.keywords = None
+        self.flagged_keywords = None
 
         self.join_keywords = False
         self.search_mode = False
@@ -46,7 +48,7 @@ class ErosScraper(ScraperPrototype):
         self.only_posts_with_payment_methods = False
         self.social_media_found = []
 
-        # lists to store data and then send to csv file
+        # lists to store data and then send to excel file
         self.post_identifier = []
         self.link = []
         self.profile_header = []
@@ -75,6 +77,9 @@ class ErosScraper(ScraperPrototype):
 
     def set_search_mode(self, search_mode) -> None:
         self.search_mode = search_mode
+
+    def set_flagged_keywords(self, flagged_keywords) -> None:
+        self.flagged_keywords = flagged_keywords
 
     def initialize(self, keywords) -> None:
         # set keywords value
@@ -226,7 +231,7 @@ class ErosScraper(ScraperPrototype):
                     self.capture_screenshot(screenshot_name)
                     counter += 1
 
-            self.format_data_to_csv()
+            self.format_data_to_excel()
 
     def join_with_payment_methods(self, contact_details, counter, description, info_details, link, profile_header):
         if self.check_for_payment_methods(description) and len(self.keywords) == len(set(self.keywords_found_in_post)):
@@ -255,7 +260,7 @@ class ErosScraper(ScraperPrototype):
         self.keywords_found.append(', '.join(self.keywords_found_in_post) or 'N/A')
         self.number_of_keywords_found.append(self.number_of_keywords_in_post or 'N/A')
 
-    def format_data_to_csv(self) -> None:
+    def format_data_to_excel(self) -> None:
         titled_columns = {
             'Post-identifier': self.post_identifier,
             'link': self.link,
@@ -270,20 +275,40 @@ class ErosScraper(ScraperPrototype):
         }
 
         data = pd.DataFrame(titled_columns)
-        with pd.ExcelWriter(f'{self.scraper_directory}/eros-{self.date_time}.xlsx', engine='openpyxl') as writer:
+        with pd.ExcelWriter(
+                f'{self.scraper_directory}/eros-{self.date_time}.xlsx',
+                engine='openpyxl') as writer:
             data.to_excel(writer, index=False)
             worksheet = writer.sheets['Sheet1']
-            for col in worksheet.columns:
+
+            for col in worksheet.iter_cols(min_row=2,
+                                           max_row=worksheet.max_row,
+                                           min_col=11,
+                                           max_col=11):  # iterate over keywords found column
+                for cell in col:  # iterate over each cell in the keywords found column
+                    keywords = cell.value.split(
+                        ', ')  # set the keywords var to each keyword in the cell
+                    for keyword in keywords:
+                        if keyword in self.flagged_keywords:  # highlight post and keywords found cell to red if a flagged keyword is found in cell
+                            post_identifier_cell = worksheet.cell(row=cell.row,
+                                                                  column=1)
+                            post_identifier_cell.fill = PatternFill(
+                                fill_type='solid',
+                                start_color='ff0000',
+                                end_color='ff0000')
+                            cell.fill = PatternFill(fill_type='solid',
+                                                    start_color='ff0000',
+                                                    end_color='ff0000')
+
+            for col in worksheet.columns:  # dynamically adjust column sizes based on content of cell
                 max_length = 0
                 col = [cell for cell in col]
                 for cell in col:
-                    try:
-                        if len(str(cell.value)) > max_length:
-                            max_length = len(str(cell.value))
-                    except:
-                        pass
+                    if len(str(cell.value)) > max_length:
+                        max_length = len(str(cell.value))
                 adjusted_width = (max_length + 2)
-                worksheet.column_dimensions[col[0].column_letter].width = adjusted_width
+                worksheet.column_dimensions[
+                    col[0].column_letter].width = adjusted_width
 
     def reset_variables(self) -> None:
         self.post_identifier = []
