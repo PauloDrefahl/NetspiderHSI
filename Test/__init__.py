@@ -4,7 +4,7 @@ from .test_yesbackpage import Test_YesbackpageScraper
 from .test_megapersonals import Test_Megapersonals
 from .test_escortalligator import Test_EscortalligatorScraper
 from .test_eros import Test_ErosScraper
-from GUI import main
+import main
 
 Test_Keywords = Test_Keywords
 Test_Facade = Test_Facade

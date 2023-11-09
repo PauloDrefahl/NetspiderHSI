@@ -1,5 +1,4 @@
 # import qdarkstyle as qdarkstyle
-import webbrowser
 from PyQt6.QtCore import Qt, QThread
 from PyQt6.QtWidgets import QApplication, QMainWindow, QFileDialog, QMessageBox
 import time
@@ -30,6 +29,9 @@ Then run the following command to convert the .ui file to .py:
 pyuic6 Ui_HSIWebScraper.ui -o Ui_HSIWebScraper.py
 OR
 python -m PyQt6.uic.pyuic -o Ui_HSIWebScraper.py -x Ui_HSIWebScraper.ui
+
+To make executable:
+pyinstaller main.py --onefile --windowed --icon=ns.ico --name=NetSpider
 
 '''
 
@@ -306,7 +308,7 @@ class MainWindow(QMainWindow):
                 QMessageBox.warning(self, "Error", "Please select 'keywords.txt'.")
 
     def test_std_keyword_file(self):
-        file_path = "../keywords.txt"
+        file_path = "keywords.txt"
 
         self.keyword_file_path = file_path
         self.enable_tabs()
@@ -337,7 +339,7 @@ class MainWindow(QMainWindow):
                 QMessageBox.warning(self, "Error", "Please select 'keyword_sets.txt'.")
 
     def test_std_set_selection_button_clicked(self):
-        file_path = "../keyword_sets.txt"
+        file_path = "keyword_sets.txt"
 
         self.keyword_sets_file_path = file_path
         self.enable_tabs()
@@ -351,7 +353,7 @@ class MainWindow(QMainWindow):
         self.test_std_set_file_path_button_clicked()
 
     def test_std_set_file_path_button_clicked(self):
-        save_path = "../results"
+        save_path = "Results"
         self.file_storage_path = save_path
         self.enable_tabs()
 
@@ -707,7 +709,7 @@ class MainWindow(QMainWindow):
 # ---------------------------- GUI Main ----------------------------
 if __name__ == "__main__":
     app = QApplication([])
-    app.setWindowIcon(QtGui.QIcon(os.path.join(basedir, "../ns.ico")))
+    app.setWindowIcon(QtGui.QIcon(os.path.realpath("ns.ico")))
     window = MainWindow()
     window.show()
     app.exec()

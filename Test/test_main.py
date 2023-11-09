@@ -3,7 +3,7 @@ import unittest
 from unittest.mock import MagicMock
 from PyQt6.QtWidgets import QApplication, QListWidgetItem
 
-from GUI.main import MainWindow
+from main import MainWindow
 
 app = QApplication(sys.argv)
 class TestMainWindow(unittest.TestCase):
