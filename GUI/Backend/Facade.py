@@ -16,6 +16,9 @@ class Facade:
     def initialize_escortalligator_scraper(self, keywords):
         self.escortalligator.initialize(keywords)
 
+    def set_escortalligator_flagged_keywords(self, flagged_keywords):
+        self.escortalligator.set_flagged_keywords(flagged_keywords)
+
     def set_escortalligator_city(self, city):
         self.escortalligator.set_city(city)
 
@@ -33,6 +36,9 @@ class Facade:
 
     def initialize_megapersonals_scraper(self, keywords):
         self.megapersonals.initialize(keywords)
+
+    def set_megapersonals_flagged_keywords(self, flagged_keywords):
+        self.megapersonals.set_flagged_keywords(flagged_keywords)
 
     def set_megapersonals_city(self, city):
         self.megapersonals.set_city(city)
@@ -52,6 +58,9 @@ class Facade:
     def initialize_skipthegames_scraper(self, keywords):
         self.skipthegames.initialize(keywords)
 
+    def set_skipthegames_flagged_keywords(self, flagged_keywords):
+        self.skipthegames.set_flagged_keywords(flagged_keywords)
+
     def set_skipthegames_city(self, city):
         self.skipthegames.set_city(city)
 
@@ -70,6 +79,9 @@ class Facade:
     def initialize_yesbackpage_scraper(self, keywords):
         self.yesbackpage.initialize(keywords)
 
+    def set_yesbackpage_flagged_keywords(self, flagged_keywords):
+        self.yesbackpage.set_flagged_keywords(flagged_keywords)
+
     def set_yesbackpage_city(self, city):
         self.yesbackpage.set_city(city)
 
@@ -87,6 +99,9 @@ class Facade:
 
     def initialize_eros_scraper(self, keywords):
         self.eros.initialize(keywords)
+
+    def set_eros_flagged_keywords(self, flagged_keywords):
+        self.eros.set_flagged_keywords(flagged_keywords)
 
     def set_eros_city(self, city):
         self.eros.set_city(city)
