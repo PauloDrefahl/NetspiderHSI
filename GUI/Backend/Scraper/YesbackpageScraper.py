@@ -105,8 +105,6 @@ class YesbackpageScraper(ScraperPrototype):
     def initialize(self, keywords) -> None:
         # set keywords value
         self.keywords = keywords
-        print("Flagged keywords: ", self.flagged_keywords)
-        print("Selected keywords: ", self.keywords)
         # set up directories to save screenshots and csv file.
         self.date_time = str(datetime.today())[0:19].replace(' ', '_').replace(':', '-')
 
@@ -323,8 +321,6 @@ class YesbackpageScraper(ScraperPrototype):
         self.keywords_found.append(', '.join(self.keywords_found_in_post) or 'N/A')
         self.number_of_keywords_found.append(self.number_of_keywords_in_post or 'N/A')
         self.check_for_social_media(description)
-
-    from openpyxl.styles import PatternFill
 
     def format_data_to_excel(self) -> None:
         titled_columns = pd.DataFrame({

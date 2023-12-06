@@ -8,6 +8,7 @@ from PyQt6.QtGui import QBrush, QColor
 import GUI.Backend.Facade
 import GUI.Backend.Keywords
 from GUI.Ui_HSIWebScraper import Ui_HSIWebScraper
+import chromedriver_autoinstaller_fix
 
 # ---------------------------- Global Variable ----------------------------
 # used to display popup message after scraping
@@ -733,6 +734,7 @@ class MainWindow(QMainWindow):
 
 # ---------------------------- GUI Main ----------------------------
 if __name__ == "__main__":
+    chromedriver_autoinstaller_fix.install()
     app = QApplication([])
     app.setWindowIcon(QtGui.QIcon(os.path.realpath("ns.ico")))
     window = MainWindow()
