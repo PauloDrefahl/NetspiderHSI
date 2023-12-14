@@ -105,7 +105,7 @@ class YesbackpageScraper(ScraperPrototype):
     def initialize(self, keywords) -> None:
         # set keywords value
         self.keywords = keywords
-        # set up directories to save screenshots and csv file.
+        # set up directories to save screenshots and Excel file.
         self.date_time = str(datetime.today())[0:19].replace(' ', '_').replace(':', '-')
 
         # Format website URL based on state and city
@@ -131,7 +131,6 @@ class YesbackpageScraper(ScraperPrototype):
         self.screenshot_directory = f'{self.scraper_directory}/screenshots'
         self.pdf_filename = f'{self.screenshot_directory}/yesbackpage.pdf'
         os.mkdir(self.screenshot_directory)
-
         self.get_data(links)
         self.close_webpage()
         self.reset_variables()
