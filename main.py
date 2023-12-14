@@ -1,5 +1,5 @@
 # import qdarkstyle as qdarkstyle
-from PyQt6.QtCore import Qt, QThread
+from PyQt6.QtCore import Qt, QThread, QTimer
 from PyQt6.QtWidgets import QApplication, QMainWindow, QFileDialog, QMessageBox
 import time
 import os
@@ -145,10 +145,12 @@ class MainBackgroundThread(QThread, QMainWindow):
 
 
 class MainWindow(QMainWindow):
-
     def __init__(self):
         super().__init__()
 
+        self.timer = QTimer(self)  # Create a QTimer instance
+        self.timer.timeout.connect(self.update_timer)  # Connect the timeout signal to the update_timer method
+        self.elapsed_time = 0  # Variable to store elapsed time
         self.worker = None
         self.ui = Ui_HSIWebScraper()
         self.ui.setupUi(self)
@@ -174,7 +176,12 @@ class MainWindow(QMainWindow):
         self.keywords = ''
         self.keyword_sets = ''
 
+
+
+
         # self.setStyleSheet(qdarkstyle.load_stylesheet('pyqt6'))
+
+        self.ui.searchButton_2.clicked.connect(self.search_button_clicked)
 
         ''' Bind GUI components to functions: '''
         # bind websiteSelectionDropdown to website_selection_dropdown function
@@ -197,7 +204,7 @@ class MainWindow(QMainWindow):
         # bind keywordlistWidget to keyword_list_widget function
         self.ui.keywordlistWidget.itemClicked.connect(self.keyword_list_widget)
 
-        # bind keywordInclusivecheckBox to keyword_inclusive_check_box function
+        # bind keywordInclusivecheckBox to keyword_inclusive_chesck_box function
         self.ui.keywordInclusivecheckBox.stateChanged.connect(self.keyword_inclusive_check_box)
         self.ui.keywordInclusivecheckBox.setEnabled(False)
 
@@ -241,6 +248,7 @@ class MainWindow(QMainWindow):
         self.file_storage_path = ''
         self.ui.storagePathSelectionButton.clicked.connect(self.storage_path_selection_button_clicked)
 
+
         # self.keywords_instance.set_file_storage_path(self.file_storage_path)
 
         self.ui.pushButton.clicked.connect(self.login_button_clicked)
@@ -250,6 +258,8 @@ class MainWindow(QMainWindow):
         self.ui.tabWidget.setTabEnabled(1, False)
         self.ui.tabWidget.setTabEnabled(2, False)
         self.ui.tabWidget.setTabEnabled(3, False)
+
+        self.ui.searchButton_3.clicked.connect(self.open_results_folder)
 
     ''' Functions used to handle events: '''
 
@@ -263,6 +273,8 @@ class MainWindow(QMainWindow):
             self.ui.tabWidget.setCurrentIndex(1)
 
 # file buttons
+    def open_results_folder(self):
+        os.startfile(os.path.realpath(self.file_storage_path))
 
     def storage_path_selection_button_clicked(self):
         file_dialog = QFileDialog()
@@ -353,7 +365,7 @@ class MainWindow(QMainWindow):
         self.test_std_set_file_path_button_clicked()
 
     def test_std_set_file_path_button_clicked(self):
-        save_path = "Results"
+        save_path = "result"
         self.file_storage_path = save_path
         self.enable_tabs()
 
@@ -670,6 +682,7 @@ class MainWindow(QMainWindow):
 
     # scrape website selected when search button is clicked
     def search_button_clicked(self):
+
         self.ui.searchButton.setEnabled(False)
         self.ui.tabWidget.setTabEnabled(0, False)
 
@@ -690,13 +703,15 @@ class MainWindow(QMainWindow):
                                            self.search_text,
                                            self.keywords_selected, self.inclusive_search, self.include_payment_method,
                                            self.ui.keywordlistWidget)
+
         self.worker.finished.connect(self.worker_finished)
         self.worker.start()
 
     def worker_finished(self):
         # success/fail message box
         global popup_message
-
+        self.stop_timer()
+        self.ui.keywordListLabel_4.setText("00:00:00")
         if popup_message == "success":
             QtWidgets.QMessageBox.information(self, "Success", "Success: Scraping completed successfully!")
         else:
@@ -705,6 +720,54 @@ class MainWindow(QMainWindow):
 
         popup_message = ''
 
+    def search_button_clicked(self):
+        self.elapsed_time = 0  # Reset elapsed time when the search button is pressed
+        self.update_timer_label()  # Update the timer label with the initial value (0 seconds)
+        self.timer.start(1000)
+        start_time = time.time()  # Get the current time when the button is pressed
+        self.ui.label_35.setPixmap(QtGui.QPixmap("GUI/photos/statusON.png"))
+        self.ui.keywordListLabel_6.setText("ON")
+
+        self.ui.searchButton.setEnabled(False)
+        self.ui.tabWidget.setTabEnabled(0, False)
+        self.ui.websiteSelectionDropdown.setEnabled(False)
+        self.ui.setlocationDropdown.setEnabled(False)
+
+        # Set the search mode for the selected website (assuming you have the necessary code for this)
+
+        self.worker = MainBackgroundThread(self.ui, self.facade, self.website_selection, self.location,
+                                           self.search_text, self.keywords_selected, self.inclusive_search,
+                                           self.include_payment_method, self.ui.keywordlistWidget)
+
+        self.worker.finished.connect(self.worker_finished)
+        self.worker.start()
+
+        end_time = time.time()  # Get the current time when the scraping is completed
+        elapsed_time = end_time - start_time  # Calculate the elapsed time
+
+        print(f"Scraping started at: {start_time}")
+        print(f"Scraping completed at: {end_time}")
+        print(f"Elapsed time: {elapsed_time} seconds")
+
+    def update_timer(self):
+        self.elapsed_time += 1  # Increment elapsed time by 1 second
+        self.update_timer_label()  # Update the timer label with the new elapsed time
+
+    def update_timer_label(self):
+        hours = self.elapsed_time // 3600
+        minutes = (self.elapsed_time % 3600) // 60
+        seconds = self.elapsed_time % 60
+
+        # Format the time as HH:MM:SS
+        formatted_time = f"{hours:02}:{minutes:02}:{seconds:02}"
+        # Update the timer label in your GUI with the current elapsed time (self.elapsed_time)
+        # For example, if you have a QLabel called self.timerLabel:
+        self.ui.keywordListLabel_4.setText(f"{formatted_time}")
+
+    def stop_timer(self):
+        self.timer.stop()  # Stop the timer manually (you can call this method when the user cancels the operation)
+        self.ui.label_35.setPixmap(QtGui.QPixmap("GUI/photos/statusOFF2.png"))
+        self.ui.keywordListLabel_6.setText("OFFf")
 
 # ---------------------------- GUI Main ----------------------------
 if __name__ == "__main__":
