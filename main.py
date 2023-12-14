@@ -1,10 +1,10 @@
 # import qdarkstyle as qdarkstyle
-from PyQt6.QtCore import Qt, QThread
+from PyQt6.QtCore import Qt, QThread, QTimer
 from PyQt6.QtWidgets import QApplication, QMainWindow, QFileDialog, QMessageBox
 import time
 import os
+import subprocess
 from PyQt6 import QtGui, QtWidgets
-from PyQt6.QtGui import QBrush, QColor
 import GUI.Backend.Facade
 import GUI.Backend.Keywords
 from GUI.Ui_HSIWebScraper import Ui_HSIWebScraper
@@ -61,6 +61,7 @@ class MainBackgroundThread(QThread, QMainWindow):
         for i in range(self.ui.keywordlistWidget.count()):
             if self.ui.keywordlistWidget.item(i).isSelected():
                 self.keywords_selected.add(self.ui.keywordlistWidget.item(i).text())
+
         if self.search_text:
             self.keywords_selected.add(self.search_text)
 
@@ -145,10 +146,12 @@ class MainBackgroundThread(QThread, QMainWindow):
 
 
 class MainWindow(QMainWindow):
-
     def __init__(self):
         super().__init__()
 
+        self.timer = QTimer(self)  # Create a QTimer instance
+        self.timer.timeout.connect(self.update_timer)  # Connect the timeout signal to the update_timer method
+        self.elapsed_time = 0  # Variable to store elapsed time
         self.worker = None
         self.ui = Ui_HSIWebScraper()
         self.ui.setupUi(self)
@@ -165,7 +168,6 @@ class MainWindow(QMainWindow):
         self.search_mode = False
         self.search_text = ''
         self.keywords_selected = set()
-        self.flagged_keywords = set()
         self.keys_to_add_to_new_set = []
         self.manual_keyword_selection = set()
         self.keywords_of_selected_set = set()
@@ -175,7 +177,12 @@ class MainWindow(QMainWindow):
         self.keywords = ''
         self.keyword_sets = ''
 
+
+
+
         # self.setStyleSheet(qdarkstyle.load_stylesheet('pyqt6'))
+
+        self.ui.searchButton_2.clicked.connect(self.search_button_clicked)
 
         ''' Bind GUI components to functions: '''
         # bind websiteSelectionDropdown to website_selection_dropdown function
@@ -197,9 +204,8 @@ class MainWindow(QMainWindow):
 
         # bind keywordlistWidget to keyword_list_widget function
         self.ui.keywordlistWidget.itemClicked.connect(self.keyword_list_widget)
-        self.ui.keywordlistWidget.itemDoubleClicked.connect(self.flag_keywords)
 
-        # bind keywordInclusivecheckBox to keyword_inclusive_check_box function
+        # bind keywordInclusivecheckBox to keyword_inclusive_chesck_box function
         self.ui.keywordInclusivecheckBox.stateChanged.connect(self.keyword_inclusive_check_box)
         self.ui.keywordInclusivecheckBox.setEnabled(False)
 
@@ -243,6 +249,7 @@ class MainWindow(QMainWindow):
         self.file_storage_path = ''
         self.ui.storagePathSelectionButton.clicked.connect(self.storage_path_selection_button_clicked)
 
+
         # self.keywords_instance.set_file_storage_path(self.file_storage_path)
 
         self.ui.pushButton.clicked.connect(self.login_button_clicked)
@@ -252,6 +259,8 @@ class MainWindow(QMainWindow):
         self.ui.tabWidget.setTabEnabled(1, False)
         self.ui.tabWidget.setTabEnabled(2, False)
         self.ui.tabWidget.setTabEnabled(3, False)
+
+        self.ui.searchButton_3.clicked.connect(self.open_results_folder)
 
     ''' Functions used to handle events: '''
 
@@ -265,6 +274,8 @@ class MainWindow(QMainWindow):
             self.ui.tabWidget.setCurrentIndex(1)
 
 # file buttons
+    def open_results_folder(self):
+        os.startfile(os.path.realpath(self.file_storage_path))
 
     def storage_path_selection_button_clicked(self):
         file_dialog = QFileDialog()
@@ -283,7 +294,7 @@ class MainWindow(QMainWindow):
             self.ui.tabWidget.setCurrentIndex(2)
 
     def open_pdf_in_viewer(self):
-        os.startfile(os.path.realpath("NetSpider_quick_guide_v1.pdf"))
+        subprocess.Popen('NetSpider_quick_guide_v1.pdf', shell=True)
 
     def login_button_clicked(self):
         self.test_std_keyword_file()
@@ -355,7 +366,7 @@ class MainWindow(QMainWindow):
         self.test_std_set_file_path_button_clicked()
 
     def test_std_set_file_path_button_clicked(self):
-        save_path = "Results"
+        save_path = "result"
         self.file_storage_path = save_path
         self.enable_tabs()
 
@@ -533,7 +544,7 @@ class MainWindow(QMainWindow):
     # handle list of keywords to be searched
     def keyword_list_widget(self):
         for item in self.ui.keywordlistWidget.selectedItems():
-            if item.text() not in self.keywords_of_selected_set and item.text() not in self.flagged_keywords:
+            if item.text() not in self.keywords_of_selected_set:
                 self.manual_keyword_selection.add(item.text())
 
         if len(self.manual_keyword_selection) > 1:
@@ -541,29 +552,12 @@ class MainWindow(QMainWindow):
 
         # if a keyword is unselected, remove it from the set
         for item in range(self.ui.keywordlistWidget.count()):
-            keyword = self.ui.keywordlistWidget.item(item).text()
             if not self.ui.keywordlistWidget.item(item).isSelected():
-                if keyword not in self.keywords_of_selected_set and keyword not in self.flagged_keywords:
-                    self.manual_keyword_selection.discard(keyword)
+                if item not in self.keywords_of_selected_set:
+                    self.manual_keyword_selection.discard(self.ui.keywordlistWidget.item(item).text())
 
         if not self.manual_keyword_selection and not self.search_text and not self.set_keyword_selection:
             self.ui.keywordInclusivecheckBox.setEnabled(False)
-
-    def flag_keywords(self, item):
-        keyword = item.text()
-
-        # If the keyword is not already in the flagged keywords list, add it and highlight it
-        if keyword not in self.flagged_keywords:
-            self.flagged_keywords.add(keyword)
-            self.keywords_selected.add(keyword)
-            item.setSelected(True)
-            item.setBackground(QBrush(QColor(255, 0, 0)))  # red background
-        else:
-            # If it's already flagged, remove it from the flagged keywords list and reset the background color
-            self.flagged_keywords.remove(keyword)
-            self.keywords_selected.remove(keyword)
-            item.setSelected(False)
-            item.setBackground(QBrush(QColor(255, 255, 255)))  # White background
 
     # handle dropdown menu for keyword sets
     def set_selection_dropdown(self):
@@ -634,9 +628,7 @@ class MainWindow(QMainWindow):
             # deselect all items in list widget
             for i in range(self.ui.keywordlistWidget.count()):
                 self.ui.keywordlistWidget.item(i).setSelected(False)
-                if self.ui.keywordlistWidget.item(i).text() in self.flagged_keywords:
-                    self.flagged_keywords.remove(self.ui.keywordlistWidget.item(i).text())
-                    self.ui.keywordlistWidget.item(i).setBackground(QBrush(QColor(255, 255, 255)))
+
             self.ui.keywordInclusivecheckBox.setEnabled(False)
 
         # enable checkbox after it's unchecked
@@ -691,38 +683,36 @@ class MainWindow(QMainWindow):
 
     # scrape website selected when search button is clicked
     def search_button_clicked(self):
-        start = time.time()
+
         self.ui.searchButton.setEnabled(False)
         self.ui.tabWidget.setTabEnabled(0, False)
+
         self.ui.websiteSelectionDropdown.setEnabled(False)
         self.ui.setlocationDropdown.setEnabled(False)
         if self.website_selection == "yesbackpage":
             self.facade.yesbackpage_set_search_mode(self.search_mode)
-            self.facade.set_yesbackpage_flagged_keywords(self.flagged_keywords)
         elif self.website_selection == "escortalligator":
             self.facade.escortalligator_set_search_mode(self.search_mode)
-            self.facade.set_escortalligator_flagged_keywords(self.flagged_keywords)
         elif self.website_selection == "skipthegames":
             self.facade.skipthegames_set_search_mode(self.search_mode)
-            self.facade.set_skipthegames_flagged_keywords(self.flagged_keywords)
         elif self.website_selection == "eros":
             self.facade.eros_set_search_mode(self.search_mode)
-            self.facade.set_eros_flagged_keywords(self.flagged_keywords)
         elif self.website_selection == "megapersonals":
             self.facade.megapersonals_set_search_mode(self.search_mode)
-            self.facade.set_megapersonals_flagged_keywords(self.flagged_keywords)
 
         self.worker = MainBackgroundThread(self.ui, self.facade, self.website_selection, self.location,
                                            self.search_text,
                                            self.keywords_selected, self.inclusive_search, self.include_payment_method,
                                            self.ui.keywordlistWidget)
+
         self.worker.finished.connect(self.worker_finished)
         self.worker.start()
 
     def worker_finished(self):
         # success/fail message box
         global popup_message
-
+        self.stop_timer()
+        self.ui.keywordListLabel_4.setText("00:00:00")
         if popup_message == "success":
             QtWidgets.QMessageBox.information(self, "Success", "Success: Scraping completed successfully!")
         else:
@@ -731,6 +721,54 @@ class MainWindow(QMainWindow):
 
         popup_message = ''
 
+    def search_button_clicked(self):
+        self.elapsed_time = 0  # Reset elapsed time when the search button is pressed
+        self.update_timer_label()  # Update the timer label with the initial value (0 seconds)
+        self.timer.start(1000)
+        start_time = time.time()  # Get the current time when the button is pressed
+        self.ui.label_35.setPixmap(QtGui.QPixmap("GUI/photos/statusON.png"))
+        self.ui.keywordListLabel_6.setText("ON")
+
+        self.ui.searchButton.setEnabled(False)
+        self.ui.tabWidget.setTabEnabled(0, False)
+        self.ui.websiteSelectionDropdown.setEnabled(False)
+        self.ui.setlocationDropdown.setEnabled(False)
+
+        # Set the search mode for the selected website (assuming you have the necessary code for this)
+
+        self.worker = MainBackgroundThread(self.ui, self.facade, self.website_selection, self.location,
+                                           self.search_text, self.keywords_selected, self.inclusive_search,
+                                           self.include_payment_method, self.ui.keywordlistWidget)
+
+        self.worker.finished.connect(self.worker_finished)
+        self.worker.start()
+
+        end_time = time.time()  # Get the current time when the scraping is completed
+        elapsed_time = end_time - start_time  # Calculate the elapsed time
+
+        print(f"Scraping started at: {start_time}")
+        print(f"Scraping completed at: {end_time}")
+        print(f"Elapsed time: {elapsed_time} seconds")
+
+    def update_timer(self):
+        self.elapsed_time += 1  # Increment elapsed time by 1 second
+        self.update_timer_label()  # Update the timer label with the new elapsed time
+
+    def update_timer_label(self):
+        hours = self.elapsed_time // 3600
+        minutes = (self.elapsed_time % 3600) // 60
+        seconds = self.elapsed_time % 60
+
+        # Format the time as HH:MM:SS
+        formatted_time = f"{hours:02}:{minutes:02}:{seconds:02}"
+        # Update the timer label in your GUI with the current elapsed time (self.elapsed_time)
+        # For example, if you have a QLabel called self.timerLabel:
+        self.ui.keywordListLabel_4.setText(f"{formatted_time}")
+
+    def stop_timer(self):
+        self.timer.stop()  # Stop the timer manually (you can call this method when the user cancels the operation)
+        self.ui.label_35.setPixmap(QtGui.QPixmap("GUI/photos/statusOFF2.png"))
+        self.ui.keywordListLabel_6.setText("OFFf")
 
 # ---------------------------- GUI Main ----------------------------
 if __name__ == "__main__":
