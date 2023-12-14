@@ -135,6 +135,9 @@ class YesbackpageScraper(ScraperPrototype):
         self.close_webpage()
         self.reset_variables()
 
+    def stop_scraper(self) -> None:
+        self.driver.close()
+
     def open_webpage(self) -> None:
         self.driver.implicitly_wait(10)
         if self.search_mode:
@@ -387,6 +390,7 @@ class YesbackpageScraper(ScraperPrototype):
         self.join_keywords = False
         self.keywords_found = []
         self.social_media_found = []
+
 
     def check_for_payment_methods(self, description) -> bool:
         for payment in self.known_payment_methods:

@@ -184,7 +184,10 @@ class MainWindow(QMainWindow):
 
         # self.setStyleSheet(qdarkstyle.load_stylesheet('pyqt6'))
 
-        self.ui.searchButton_2.clicked.connect(self.search_button_clicked)
+        # disable button until website is selected
+        self.ui.searchButton_2.setEnabled(False)
+        # bind websiteSelectionDropdown to website_selection_dropdown function
+        self.ui.searchButton_2.clicked.connect(self.stop_button_clicked)
 
         ''' Bind GUI components to functions: '''
         # bind websiteSelectionDropdown to website_selection_dropdown function
@@ -730,6 +733,7 @@ class MainWindow(QMainWindow):
 
         self.ui.searchButton.setEnabled(False)
         self.ui.tabWidget.setTabEnabled(0, False)
+        self.ui.searchButton_2.setEnabled(True)
         self.ui.websiteSelectionDropdown.setEnabled(False)
         self.ui.setlocationDropdown.setEnabled(False)
 
@@ -767,6 +771,30 @@ class MainWindow(QMainWindow):
         print(f"Scraping started at: {start_time}")
         print(f"Scraping completed at: {end_time}")
         print(f"Elapsed time: {elapsed_time} seconds")
+
+    def stop_button_clicked(self):
+        self.ui.searchButton_2.setEnabled(False)
+        if self.website_selection == 'yesbackpage':
+            self.facade.stop_yesbackpage_scraper()
+            self.worker_finished()
+
+        elif self.website_selection == 'escortalligator':
+            self.facade.stop_escortalligator_scraper()
+            self.worker_finished()
+
+        elif self.website_selection == 'skipthegames':
+            self.facade.stop_skipthegames_scraper()
+            self.worker_finished()
+
+        elif self.website_selection == 'megapersonals':
+            self.facade.stop_megapersonals_scraper()
+            self.worker_finished()
+
+        elif self.website_selection == 'eros':
+            self.facade.stop_eros_scraper()
+            self.facade.stop_eros_scraper()
+            self.worker_finished()
+
 
     def update_timer(self):
         self.elapsed_time += 1  # Increment elapsed time by 1 second
