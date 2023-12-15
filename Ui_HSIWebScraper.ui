@@ -10,7 +10,7 @@
     <x>0</x>
     <y>0</y>
     <width>1142</width>
-    <height>756</height>
+    <height>758</height>
    </rect>
   </property>
   <property name="sizePolicy">
@@ -483,7 +483,7 @@
 WindowText: #09457B;</string>
      </property>
      <property name="currentIndex">
-      <number>2</number>
+      <number>3</number>
      </property>
      <widget class="QWidget" name="Login">
       <attribute name="title">
@@ -12017,7 +12017,7 @@ WindowText: #09457B;</string>
        <property name="geometry">
         <rect>
          <x>150</x>
-         <y>540</y>
+         <y>550</y>
          <width>221</width>
          <height>31</height>
         </rect>
@@ -14357,7 +14357,7 @@ WindowText: #09457B;</string>
        <property name="geometry">
         <rect>
          <x>380</x>
-         <y>540</y>
+         <y>550</y>
          <width>21</width>
          <height>31</height>
         </rect>
@@ -14408,22 +14408,6 @@ WindowText: #09457B;</string>
        </property>
        <property name="scaledContents">
         <bool>true</bool>
-       </property>
-      </widget>
-      <widget class="QFrame" name="frame_6">
-       <property name="geometry">
-        <rect>
-         <x>60</x>
-         <y>90</y>
-         <width>120</width>
-         <height>80</height>
-        </rect>
-       </property>
-       <property name="frameShape">
-        <enum>QFrame::StyledPanel</enum>
-       </property>
-       <property name="frameShadow">
-        <enum>QFrame::Raised</enum>
        </property>
       </widget>
      </widget>
