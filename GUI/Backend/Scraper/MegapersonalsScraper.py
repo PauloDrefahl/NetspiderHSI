@@ -134,7 +134,10 @@ class MegapersonalsScraper(ScraperPrototype):
         self.reset_variables()
 
     def stop_scraper(self) -> None:
-        self.driver.close()
+        if self.search_mode:
+            self.driver.quit()
+        else:
+            self.driver.close()
 
     def open_webpage(self) -> None:
         self.driver.implicitly_wait(10)

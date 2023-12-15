@@ -3,6 +3,8 @@ from PyQt6.QtCore import Qt, QThread, QTimer
 from PyQt6.QtWidgets import QApplication, QMainWindow, QFileDialog, QMessageBox
 import time
 import os
+import sys
+import io
 import subprocess
 from PyQt6 import QtGui, QtWidgets
 from PyQt6.QtGui import QBrush, QColor
@@ -178,7 +180,6 @@ class MainWindow(QMainWindow):
         self.location = ''
         self.keywords = ''
         self.keyword_sets = ''
-
 
 
 
@@ -503,6 +504,7 @@ class MainWindow(QMainWindow):
         if not confirmation:
             return
 
+        # keyword = keyword.encode('utf-8').decode('utf-8')
         self.remove_keyword(keyword)
 
         # loop through sets and remove keyword from each set
@@ -795,7 +797,6 @@ class MainWindow(QMainWindow):
             self.facade.stop_eros_scraper()
             self.worker_finished()
 
-
     def update_timer(self):
         self.elapsed_time += 1  # Increment elapsed time by 1 second
         self.update_timer_label()  # Update the timer label with the new elapsed time
@@ -820,6 +821,7 @@ class MainWindow(QMainWindow):
 # ---------------------------- GUI Main ----------------------------
 if __name__ == "__main__":
     chromedriver_autoinstaller_fix.install()
+    sys.stdout = io.TextIOWrapper(sys.stdout.detach(), encoding='utf-8')
     app = QApplication([])
     app.setWindowIcon(QtGui.QIcon(os.path.realpath("ns.ico")))
     window = MainWindow()
