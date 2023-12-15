@@ -3,8 +3,6 @@ from PyQt6.QtCore import Qt, QThread, QTimer
 from PyQt6.QtWidgets import QApplication, QMainWindow, QFileDialog, QMessageBox
 import time
 import os
-import sys
-import io
 import subprocess
 from PyQt6 import QtGui, QtWidgets
 from PyQt6.QtGui import QBrush, QColor
@@ -821,7 +819,6 @@ class MainWindow(QMainWindow):
 # ---------------------------- GUI Main ----------------------------
 if __name__ == "__main__":
     chromedriver_autoinstaller_fix.install()
-    sys.stdout = io.TextIOWrapper(sys.stdout.detach(), encoding='utf-8')
     app = QApplication([])
     app.setWindowIcon(QtGui.QIcon(os.path.realpath("ns.ico")))
     window = MainWindow()

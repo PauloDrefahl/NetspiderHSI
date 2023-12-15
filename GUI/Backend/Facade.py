@@ -69,6 +69,7 @@ class Facade:
 
     def stop_skipthegames_scraper(self):
         self.skipthegames.stop_scraper()
+
     def set_skipthegames_city(self, city):
         self.skipthegames.set_city(city)
 
