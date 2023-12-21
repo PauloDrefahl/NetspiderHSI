@@ -718,6 +718,7 @@ class MainWindow(QMainWindow):
         if popup_message == "success":
             QtWidgets.QMessageBox.information(self, "Success", "Success: Scraping completed successfully!")
         else:
+            self.ui.searchButton_2.setEnabled(False)
             QtWidgets.QMessageBox.critical(self, "Error", "Error: Scraping not completed. Please try again.\n (Make "
                                                           "sure the latest version of Chrome is installed.)")
 

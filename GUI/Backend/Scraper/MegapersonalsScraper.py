@@ -144,6 +144,7 @@ class MegapersonalsScraper(ScraperPrototype):
         self.driver.get(self.url)
         self.driver.maximize_window()
         assert "Page not found" not in self.driver.page_source
+        self.driver.find_element(By.XPATH, '//*[@id="checkbox-agree"]').click()
         self.driver.find_element(By.CLASS_NAME, 'btn').click()
         self.driver.find_element(By.XPATH, '//*[@id="choseCityContainer"]/div[3]/label').click()
         self.driver.find_element(By.XPATH, '//*[@id="choseCityContainer"]/div[3]/article/div[10]/label').click()
