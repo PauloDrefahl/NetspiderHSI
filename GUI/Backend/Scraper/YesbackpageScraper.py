@@ -137,6 +137,7 @@ class YesbackpageScraper(ScraperPrototype):
 
     def stop_scraper(self) -> None:
         if self.search_mode:
+            self.driver.close()
             self.driver.quit()
         else:
             self.driver.close()

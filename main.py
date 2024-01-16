@@ -553,6 +553,10 @@ class MainWindow(QMainWindow):
             if item.text() not in self.keywords_of_selected_set and item.text() not in self.flagged_keywords:
                 self.manual_keyword_selection.add(item.text())
 
+        if (len(self.manual_keyword_selection) > 0 or len(self.keywords_selected) > 0) and self.website_selection != "":
+            self.ui.searchButton.setEnabled(True)
+        else:
+            self.ui.searchButton.setEnabled(False)
         if len(self.manual_keyword_selection) > 1:
             self.ui.keywordInclusivecheckBox.setEnabled(True)
 
@@ -563,8 +567,9 @@ class MainWindow(QMainWindow):
                 if keyword not in self.keywords_of_selected_set and keyword not in self.flagged_keywords:
                     self.manual_keyword_selection.discard(keyword)
 
-        if not self.manual_keyword_selection and not self.search_text and not self.set_keyword_selection:
+        if not self.manual_keyword_selection and not self.search_text and not self.set_keyword_selection and not self.flagged_keywords:
             self.ui.keywordInclusivecheckBox.setEnabled(False)
+            self.ui.searchButton.setEnabled(False)
 
     def flag_keywords(self, item):
         keyword = item.text()
@@ -581,12 +586,18 @@ class MainWindow(QMainWindow):
             self.keywords_selected.remove(keyword)
             item.setSelected(False)
             item.setBackground(QBrush(QColor(255, 255, 255)))  # White background
+        if self.website_selection != "" and (len(self.flagged_keywords) > 0 or len(self.keywords_selected) > 0 or len(self.keywords_of_selected_set) > 0):
+            self.ui.searchButton.setEnabled(True)
+        else:
+            self.ui.searchButton.setEnabled(False)
 
     # handle dropdown menu for keyword sets
     def set_selection_dropdown(self):
         selected_set = self.ui.setSelectionDropdown.currentText()
 
         if selected_set:
+            if self.website_selection != "":
+                self.ui.searchButton.setEnabled(True)
             self.ui.keywordInclusivecheckBox.setEnabled(True)
             self.set_keyword_selection = True
 
@@ -600,6 +611,8 @@ class MainWindow(QMainWindow):
             if not self.manual_keyword_selection and not self.search_text:
                 self.ui.keywordInclusivecheckBox.setEnabled(False)
                 self.set_keyword_selection = False
+            if len(self.keywords_selected) == 0:
+                self.ui.searchButton.setEnabled(False)
 
             return
 
@@ -659,6 +672,10 @@ class MainWindow(QMainWindow):
                     self.ui.keywordlistWidget.item(i).setBackground(
                         QBrush(QColor(255, 255, 255)))
             self.ui.keywordInclusivecheckBox.setEnabled(False)
+        if self.website_selection != "" and len(self.keywords_selected) > 0:
+            self.ui.searchButton.setEnabled(True)
+        else:
+            self.ui.searchButton.setEnabled(False)
 
         # enable checkbox after it's unchecked
         self.ui.selectAllKeywordscheckBox.setEnabled(True)
@@ -679,7 +696,7 @@ class MainWindow(QMainWindow):
 
         self.website_selection = self.ui.websiteSelectionDropdown.currentText()
 
-        if self.website_selection != '':
+        if self.website_selection != '' and (len(self.keywords_selected) > 0 or len(self.keywords_of_selected_set) > 0):
             self.ui.searchButton.setEnabled(True)
         else:
             self.ui.searchButton.setEnabled(False)
