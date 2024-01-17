@@ -569,6 +569,9 @@ class MainWindow(QMainWindow):
 
         if not self.manual_keyword_selection and not self.search_text and not self.set_keyword_selection and not self.flagged_keywords:
             self.ui.keywordInclusivecheckBox.setEnabled(False)
+        if self.website_selection != "" and (len(self.keywords_selected) > 0 or len(self.keywords_of_selected_set) > 0):
+            self.ui.searchButton.setEnabled(True)
+        else:
             self.ui.searchButton.setEnabled(False)
 
     def flag_keywords(self, item):
@@ -596,8 +599,6 @@ class MainWindow(QMainWindow):
         selected_set = self.ui.setSelectionDropdown.currentText()
 
         if selected_set:
-            if self.website_selection != "":
-                self.ui.searchButton.setEnabled(True)
             self.ui.keywordInclusivecheckBox.setEnabled(True)
             self.set_keyword_selection = True
 
@@ -613,7 +614,11 @@ class MainWindow(QMainWindow):
                 self.set_keyword_selection = False
             if len(self.keywords_selected) == 0:
                 self.ui.searchButton.setEnabled(False)
-
+            if self.website_selection != "" and (
+                    len(self.keywords_selected) > 0 or len(self.keywords_of_selected_set) > 0):
+                self.ui.searchButton.setEnabled(True)
+            else:
+                self.ui.searchButton.setEnabled(False)
             return
 
         # get keywords from selected set from keywords class
@@ -626,6 +631,10 @@ class MainWindow(QMainWindow):
 
             elif self.ui.keywordlistWidget.item(i).text() not in self.manual_keyword_selection:
                 self.ui.keywordlistWidget.item(i).setSelected(False)
+        if self.website_selection != "" and (len(self.keywords_selected) > 0 or len(self.keywords_of_selected_set) > 0):
+            self.ui.searchButton.setEnabled(True)
+        else:
+            self.ui.searchButton.setEnabled(False)
 
     # scrape using text box input
     def search_text_box(self):
@@ -660,6 +669,7 @@ class MainWindow(QMainWindow):
 
             self.ui.keywordInclusivecheckBox.setEnabled(True)
         else:
+            self.ui.setSelectionDropdown.setCurrentIndex(0)
             self.ui.selectAllKeywordscheckBox.setEnabled(False)
             self.keywords_selected = set()
             # deselect all items in list widget
