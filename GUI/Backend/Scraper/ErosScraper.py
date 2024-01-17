@@ -288,24 +288,15 @@ class ErosScraper(ScraperPrototype):
             data.to_excel(writer, index=False)
             worksheet = writer.sheets['Sheet1']
 
-            for col in worksheet.iter_cols(min_row=2,
-                                           max_row=worksheet.max_row,
-                                           min_col=11,
-                                           max_col=11):  # iterate over keywords found column
-                for cell in col:  # iterate over each cell in the keywords found column
-                    keywords = cell.value.split(
-                        ', ')  # set the keywords var to each keyword in the cell
-                    for keyword in keywords:
-                        if keyword in self.flagged_keywords:  # highlight post and keywords found cell to red if a flagged keyword is found in cell
-                            post_identifier_cell = worksheet.cell(row=cell.row,
-                                                                  column=1)
-                            post_identifier_cell.fill = PatternFill(
-                                fill_type='solid',
-                                start_color='ff0000',
-                                end_color='ff0000')
-                            cell.fill = PatternFill(fill_type='solid',
-                                                    start_color='ff0000',
-                                                    end_color='ff0000')
+            for i in range(2, worksheet.max_row):
+                keywords = worksheet["G" + str(i)].value  # set the keywords var to each keyword in the cell
+                if keywords in self.flagged_keywords:
+                    worksheet["G" + str(i)].fill = PatternFill(fill_type='solid',
+                                                               start_color='ff0000',
+                                                               end_color='ff0000')
+                    worksheet["A" + str(i)].fill = PatternFill(fill_type='solid',
+                                                               start_color='ff0000',
+                                                               end_color='ff0000')
 
             for col in worksheet.columns:  # dynamically adjust column sizes based on content of cell
                 max_length = 0

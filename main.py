@@ -13,7 +13,7 @@ import chromedriver_autoinstaller_fix
 
 # ---------------------------- Global Variable ----------------------------
 # used to display popup message after scraping
-popup_message = None
+popup_message = ''
 
 # ---------------------------- Code to Show Icon on Windows Taskbar ----------------------------
 
@@ -76,8 +76,8 @@ class MainBackgroundThread(QThread, QMainWindow):
 
                 self.facade.initialize_escortalligator_scraper(self.keywords_selected)
                 popup_message = "success"
-            except:
-                popup_message = "error"
+            except Exception as e:
+                popup_message = str(e)
             time.sleep(2)
 
         if self.website_selection == 'megapersonals':
@@ -90,8 +90,8 @@ class MainBackgroundThread(QThread, QMainWindow):
 
                 self.facade.initialize_megapersonals_scraper(self.keywords_selected)
                 popup_message = "success"
-            except:
-                popup_message = "error"
+            except Exception as e:
+                popup_message = str(e)
             time.sleep(2)
 
         if self.website_selection == 'skipthegames':
@@ -104,8 +104,8 @@ class MainBackgroundThread(QThread, QMainWindow):
 
                 self.facade.initialize_skipthegames_scraper(self.keywords_selected)
                 popup_message = "success"
-            except:
-                popup_message = "error"
+            except Exception as e:
+                popup_message = str(e)
             time.sleep(2)
 
         if self.website_selection == 'yesbackpage':
@@ -119,8 +119,8 @@ class MainBackgroundThread(QThread, QMainWindow):
                 self.facade.initialize_yesbackpage_scraper(self.keywords_selected)
                 popup_message = "success"
 
-            except:
-                popup_message = "error"
+            except Exception as e:
+                popup_message = str(e)
             time.sleep(2)
 
         if self.website_selection == 'eros':
@@ -133,8 +133,8 @@ class MainBackgroundThread(QThread, QMainWindow):
 
                 self.facade.initialize_eros_scraper(self.keywords_selected)
                 popup_message = "success"
-            except:
-                popup_message = "error"
+            except Exception as e:
+                popup_message = str(e)
             time.sleep(2)
 
         # enable search button & settings tab
@@ -143,7 +143,11 @@ class MainBackgroundThread(QThread, QMainWindow):
         self.ui.keywordInclusivecheckBox.setChecked(False)
         self.ui.websiteSelectionDropdown.setEnabled(True)
         self.ui.setlocationDropdown.setEnabled(True)
-        self.ui.hideBrowserWhileRunningcheckBox.setEnabled(True)
+        if self.website_selection == 'escortalligator' or self.website_selection == 'skipthegames':
+            self.ui.hideBrowserWhileRunningcheckBox.setEnabled(False)
+            self.ui.hideBrowserWhileRunningcheckBox.setChecked(False)
+        else:
+            self.ui.hideBrowserWhileRunningcheckBox.setEnabled(True)
 
 
 class MainWindow(QMainWindow):
@@ -222,7 +226,7 @@ class MainWindow(QMainWindow):
         # bind hideBrowserWhileRunningcheckBox to browser_mode function
 
         self.ui.hideBrowserWhileRunningcheckBox.stateChanged.connect(self.browser_mode)
-        self.ui.hideBrowserWhileRunningcheckBox.setEnabled(True)
+        self.ui.hideBrowserWhileRunningcheckBox.setEnabled(False)
 
         # bind setSelectionDropdown to set_selection_dropdown function
         self.ui.setSelectionDropdown.currentIndexChanged.connect(self.set_selection_dropdown)
@@ -716,26 +720,33 @@ class MainWindow(QMainWindow):
             self.locations = self.facade.get_eros_cities()
             self.set_location()
             self.initialize_location_dropdown()
+            self.ui.hideBrowserWhileRunningcheckBox.setEnabled(True)
 
         if self.website_selection == 'escortalligator':
             self.locations = self.facade.get_escortalligator_cities()
             self.set_location()
             self.initialize_location_dropdown()
+            self.ui.hideBrowserWhileRunningcheckBox.setEnabled(False)
+            self.ui.hideBrowserWhileRunningcheckBox.setChecked(False)
 
         if self.website_selection == 'yesbackpage':
             self.locations = self.facade.get_yesbackpage_cities()
             self.set_location()
             self.initialize_location_dropdown()
+            self.ui.hideBrowserWhileRunningcheckBox.setEnabled(True)
 
         if self.website_selection == 'megapersonals':
             self.locations = self.facade.get_megapersonals_cities()
             self.set_location()
             self.initialize_location_dropdown()
+            self.ui.hideBrowserWhileRunningcheckBox.setEnabled(True)
 
         if self.website_selection == 'skipthegames':
             self.locations = self.facade.get_skipthegames_cities()
             self.set_location()
             self.initialize_location_dropdown()
+            self.ui.hideBrowserWhileRunningcheckBox.setEnabled(False)
+            self.ui.hideBrowserWhileRunningcheckBox.setChecked(False)
 
     def worker_finished(self):
         # success/fail message box
@@ -743,11 +754,13 @@ class MainWindow(QMainWindow):
         self.stop_timer()
         self.ui.keywordListLabel_4.setText("00:00:00")
         if popup_message == "success":
+            self.ui.searchButton_2.setEnabled(False)
             QtWidgets.QMessageBox.information(self, "Success", "Success: Scraping completed successfully!")
         else:
             self.ui.searchButton_2.setEnabled(False)
             QtWidgets.QMessageBox.critical(self, "Error", "Error: Scraping not completed. Please try again.\n (Make "
-                                                          "sure the latest version of Chrome is installed.)")
+                                                          "sure the latest version of Chrome is installed.)\n "
+                                                          "Exact Error: "+popup_message)
 
         popup_message = ''
 

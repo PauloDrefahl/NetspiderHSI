@@ -54,7 +54,7 @@ class EscortalligatorScraper(ScraperPrototype):
         self.scraper_directory = None
         self.screenshot_directory = None
         self.pdf_filename = None
-        self.keywords = None
+        self.keywords = ""
         self.flagged_keywords = None
         self.only_posts_with_payment_methods = False
 
@@ -109,8 +109,9 @@ class EscortalligatorScraper(ScraperPrototype):
         # Selenium Web Driver setup
         options = uc.ChromeOptions()
         # TODO - uncomment this to run headless
-        # options.add_argument('--headless')# This allows the code to run without opening up a new Chrome window
-        options.headless = self.search_mode  # This determines if you program runs headless or not
+        if self.search_mode:
+            options.add_argument('--headless=new')  # This allows the code to run without opening up a new Chrome window
+        # options.headless = self.search_mode  # This determines if you program runs headless or not
         self.driver = uc.Chrome(subprocess=True, options=options)
 
         # Open Webpage with URL
@@ -288,32 +289,22 @@ class EscortalligatorScraper(ScraperPrototype):
             'number-of-keywords-found': self.number_of_keywords_found,
             'social-media-found': self.social_media_found
         }
-
+        # count = 2
         data = pd.DataFrame(titled_columns)
         with pd.ExcelWriter(
                 f'{self.scraper_directory}/escortalligator-{self.date_time}.xlsx',
                 engine='openpyxl') as writer:
             data.to_excel(writer, index=False)
             worksheet = writer.sheets['Sheet1']
-
-            for col in worksheet.iter_cols(min_row=2,
-                                           max_row=worksheet.max_row,
-                                           min_col=11,
-                                           max_col=11):  # iterate over keywords found column
-                for cell in col:  # iterate over each cell in the keywords found column
-                    keywords = cell.value.split(
-                        ', ')  # set the keywords var to each keyword in the cell
-                    for keyword in keywords:
-                        if keyword in self.flagged_keywords:  # highlight post and keywords found cell to red if a flagged keyword is found in cell
-                            post_identifier_cell = worksheet.cell(row=cell.row,
-                                                                  column=1)
-                            post_identifier_cell.fill = PatternFill(
-                                fill_type='solid',
-                                start_color='ff0000',
-                                end_color='ff0000')
-                            cell.fill = PatternFill(fill_type='solid',
-                                                    start_color='ff0000',
-                                                    end_color='ff0000')
+            for i in range(2, worksheet.max_row):
+                keywords = worksheet["G" + str(i)].value  # set the keywords var to each keyword in the cell
+                if keywords in self.flagged_keywords:
+                    worksheet["G" + str(i)].fill = PatternFill(fill_type='solid',
+                                                               start_color='ff0000',
+                                                               end_color='ff0000')
+                    worksheet["A"+str(i)].fill = PatternFill(fill_type='solid',
+                                                             start_color='ff0000',
+                                                             end_color='ff0000')\
 
             for col in worksheet.columns:  # dynamically adjust column sizes based on content of cell
                 max_length = 0
@@ -372,7 +363,8 @@ class EscortalligatorScraper(ScraperPrototype):
 
     def create_pdf(self) -> None:
         screenshot_files = [
-            os.path.join(self.screenshot_directory, filename) for filename in os.listdir(self.screenshot_directory) if filename.endswith('.png')]
+            os.path.join(self.screenshot_directory, filename) for filename in os.listdir(self.screenshot_directory) if
+            filename.endswith('.png')]
         with open(self.pdf_filename, "wb") as f:
             f.write(img2pdf.convert(screenshot_files))
 
@@ -405,4 +397,3 @@ class EscortalligatorScraper(ScraperPrototype):
 
             return counter + 1
         return counter
-
