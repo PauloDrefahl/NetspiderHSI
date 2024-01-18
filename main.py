@@ -573,7 +573,7 @@ class MainWindow(QMainWindow):
 
         if not self.manual_keyword_selection and not self.search_text and not self.set_keyword_selection and not self.flagged_keywords:
             self.ui.keywordInclusivecheckBox.setEnabled(False)
-        if self.website_selection != "" and (len(self.keywords_selected) > 0 or len(self.keywords_of_selected_set) > 0):
+        if self.website_selection != "" and (len(self.keywords_selected) > 0 or len(self.keywords_of_selected_set) > 0 or len(self.manual_keyword_selection) > 0):
             self.ui.searchButton.setEnabled(True)
         else:
             self.ui.searchButton.setEnabled(False)
@@ -619,7 +619,7 @@ class MainWindow(QMainWindow):
             if len(self.keywords_selected) == 0:
                 self.ui.searchButton.setEnabled(False)
             if self.website_selection != "" and (
-                    len(self.keywords_selected) > 0 or len(self.keywords_of_selected_set) > 0):
+                    len(self.keywords_selected) > 0 or len(self.keywords_of_selected_set) > 0 or len(self.manual_keyword_selection) > 0):
                 self.ui.searchButton.setEnabled(True)
             else:
                 self.ui.searchButton.setEnabled(False)

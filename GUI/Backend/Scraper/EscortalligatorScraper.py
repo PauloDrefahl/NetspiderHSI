@@ -297,14 +297,18 @@ class EscortalligatorScraper(ScraperPrototype):
             data.to_excel(writer, index=False)
             worksheet = writer.sheets['Sheet1']
             for i in range(2, worksheet.max_row):
-                keywords = worksheet["G" + str(i)].value  # set the keywords var to each keyword in the cell
-                if keywords in self.flagged_keywords:
-                    worksheet["G" + str(i)].fill = PatternFill(fill_type='solid',
-                                                               start_color='ff0000',
-                                                               end_color='ff0000')
-                    worksheet["A"+str(i)].fill = PatternFill(fill_type='solid',
-                                                             start_color='ff0000',
-                                                             end_color='ff0000')\
+                keywords = worksheet["G" + str(
+                    i)].value  # set the keywords var to each keyword in the cell
+                for flagged_keyword in self.flagged_keywords:
+                    if flagged_keyword in keywords:
+                        worksheet["G" + str(i)].fill = PatternFill(
+                            fill_type='solid',
+                            start_color='ff0000',
+                            end_color='ff0000')
+                        worksheet["A" + str(i)].fill = PatternFill(
+                            fill_type='solid',
+                            start_color='ff0000',
+                            end_color='ff0000')
 
             for col in worksheet.columns:  # dynamically adjust column sizes based on content of cell
                 max_length = 0
