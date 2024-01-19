@@ -4,7 +4,7 @@ from datetime import datetime
 import pandas as pd
 from selenium.common import NoSuchElementException
 from selenium.webdriver.common.by import By
-from GUI.Backend.ScraperPrototype import ScraperPrototype
+from Backend.ScraperPrototype import ScraperPrototype
 import undetected_chromedriver as uc
 import img2pdf
 from openpyxl.styles import PatternFill

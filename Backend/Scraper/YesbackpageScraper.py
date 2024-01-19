@@ -5,7 +5,7 @@ import pandas as pd
 import undetected_chromedriver as uc
 from selenium.common import NoSuchElementException
 from selenium.webdriver.common.by import By
-from GUI.Backend.ScraperPrototype import ScraperPrototype
+from Backend.ScraperPrototype import ScraperPrototype
 import img2pdf
 from openpyxl.styles import PatternFill
 
@@ -54,8 +54,8 @@ class YesbackpageScraper(ScraperPrototype):
         self.screenshot_directory = None
         self.pdf_filename = None
         self.pdf = None
-        self.keywords = None
-        self.flagged_keywords = None
+        self.keywords = set()
+        self.flagged_keywords = set()
         self.search_mode = False
 
         self.join_keywords = False
@@ -110,6 +110,8 @@ class YesbackpageScraper(ScraperPrototype):
 
         # Format website URL based on state and city
         self.get_formatted_url()
+        print(self.url)
+        print(type(self.url))
         # self.set_search_mode(self.search_mode)
         options = uc.ChromeOptions()
         # TODO - uncomment this line to run headless
