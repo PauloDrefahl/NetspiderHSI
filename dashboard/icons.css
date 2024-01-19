@@ -1,0 +1,31 @@
+#navbar .icon {
+    max-width: 15px; 
+    margin-right: 3px; 
+    max-height: 15px; 
+    margin: 0;
+    margin-right: 8px;
+}
+
+/* Styles for the icon inside the <a> in the navbar */
+#navbar a:focus .icon,
+#navbar a.focus .icon {
+    filter: invert(1); /* Invert the color to change it */
+}
+
+#navbar a:hover .icon{
+    filter: invert(29%) sepia(39%) saturate(1238%) hue-rotate(163deg) brightness(95%) contrast(101%);
+}
+
+
+#content-wrapper .icon {
+    max-height: 20px;
+    filter: invert(29%) sepia(39%) saturate(1238%) hue-rotate(163deg) brightness(95%) contrast(101%);
+    margin: 0;
+    margin-right: 8px;
+}
+
+/* Styles for the icon inside the <a> in the navbar */
+#content-wrapper a:focus .icon,
+#content-wrapper a.focus .icon {
+    filter: invert(1); /* Invert the color to change it */
+}

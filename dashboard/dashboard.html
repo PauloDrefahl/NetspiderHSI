@@ -1,0 +1,90 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Vertical Navigation Bar</title>
+    <link rel="stylesheet" href="dashboard.css">
+    <script src="main.js" defer></script>
+    <link rel="stylesheet" href="icons.css">
+</head>
+<body>
+
+<div id="navbar">
+    <img src="photos/logo-hsi.png">
+    <h1>Homeland Security Netspider</h1>
+    <a href="#" id="settings-link"  ><img src="./icons/gear-solid.svg" class="icon"/>Settings</a>
+    <a href="#" id="netspider-link"><img src="./icons/spider-solid.svg" class="icon"/>Netspider</a>
+    <a href="#"><img src="./icons/key-solid.svg" class="icon"/>Keyword</a>
+    <a href="#"><img src="./icons/circle-question-solid.svg" class="icon"/>Help</a>
+    <a href="#" id="logout-link" class="last-child-divider"><img src="./icons/right-from-bracket-solid.svg" class="icon"/>Logout</a>
+    <img src="photos/fgcu-logo.png" class="fgcu-logo">
+    <div class="divider"></div>
+</div>
+
+<div id="content">
+    <!-- New div with margin on the left -->
+    <div id="content-wrapper">
+        <div class="box">
+            <h2><img src="./icons/file-regular.svg" class="icon"/> Select Keywords File</h2>
+            <input type="file" id="file1" name="file1" class="file-input">
+        </div>
+        <div class="box">
+            <h2><img src="./icons/book-solid.svg" class="icon"/> Select Keysets File</h2>
+            <input type="file" id="file2" name="file2" class="file-input">
+        </div>
+        <div class="box">
+            <h2><img src="./icons/folder-open-regular.svg" class="icon"/>Select Results Folder</h2>
+            <input type="file" id="file3" name="file3" class="file-input">
+        </div>
+
+        <!-- Big box under the three existing boxes -->
+        <div id="big-box">
+            <div class="column">
+                <h2><img src="./icons/pager-solid.svg" class="icon"/>Select Website:</h2>
+                <!-- Add content for column 1 here -->
+                <div class="radio-buttons">
+                    <input type="radio" id="website1" name="website" checked>
+                    <label for="website1">Escort Alligator</label>
+
+                    <input type="radio" id="website2" name="website">
+                    <label for="website2">Mega Personals</label>
+
+                    <input type="radio" id="website3" name="website">
+                    <label for="website3">Skip The Games</label>
+
+                    <input type="radio" id="website4" name="website">
+                    <label for="website4">Yes Back Page</label>
+
+                    <input type="radio" id="website5" name="website">
+                    <label for="website5">Eros</label>
+                </div>
+                <h2 style="margin-top: 50px;">Select Location:</h2>
+                <!-- Add the following within the #navbar div, after the last <a> tag -->
+                    <div class="dropdown">
+                        <a href="#" class="dropdown-item">Select Location</a>
+                        <div class="dropdown-content">
+                            <a href="#" class="dropdown-item">Florida</a>
+                            <a href="#" class="dropdown-item">Fort Myers</a>
+                            <a href="#" class="dropdown-item">Naples
+                            </a>
+                        </div>
+                    </div>
+
+            </div>
+            <div class="column">
+                <h2>Select Keywords:</h2>
+                <!-- Add content for column 2 here -->
+            </div>
+            <div class="column">
+                <h2>Scrapper Settings:</h2>
+                <!-- Add content for column 3 here -->
+            </div>
+        </div>
+    </div>
+</div>
+
+
+
+</body>
+</html>

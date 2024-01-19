@@ -23,8 +23,8 @@
 <!--===============================================================================================-->	
 	<link rel="stylesheet" type="text/css" href="vendor/daterangepicker/daterangepicker.css">
 <!--===============================================================================================-->
-	<link rel="stylesheet" type="text/css" href="css/util.css">
-	<link rel="stylesheet" type="text/css" href="css/main.css">
+	<link rel="stylesheet" type="text/css" href="./login-dependecies/css/util.css">
+	<link rel="stylesheet" type="text/css" href="./login-dependecies/css/main.css">
 <!--===============================================================================================-->
 </head>
 <body>
@@ -33,7 +33,7 @@
 		<div class="container-login100" style="background-image: url('images/bg-02.jpg');">
 			<div class="wrap-login100">
 				<form class="login100-form validate-form">
-					<img class="logo" src="./images/logo.png">
+					<img class="logo" src="./login-dependecies/images/logo.png">
 
 					<span class="login100-form-title p-b-34 p-t-27">
 						Homeland Security Netspider
@@ -62,7 +62,7 @@
 					</div>
 				</form>
 			</div>
-			<img src="images/fgcu-logo.png" class="fgcu-logo">
+			<img src="./login-dependecies/images/fgcu-logo.png" class="fgcu-logo">
 		</div>
 	</div>
 	
@@ -77,11 +77,13 @@
             console.log(username, password);
             if (username === 'admin' && password === 'admin') {
         	console.log('Login successful!');
-        	window.location.href = 'src/html/index.html';
+			window.location.href = 'dashboard/dashboard.html';
+			window.resizeTo(1920, 1080);
     } else {
         console.log('Login failed. Invalid credentials.');
     }
         }
+		
     </script>	
 <!--===============================================================================================-->
 	<script src="vendor/jquery/jquery-3.2.1.min.js"></script>
@@ -94,11 +96,11 @@
 	<script src="vendor/select2/select2.min.js"></script>
 <!--===============================================================================================-->
 	<script src="vendor/daterangepicker/moment.min.js"></script>
-	<script src="vendor/daterangepicker/daterangepicker.js"></script>
+	<script src="./login-dependecies/vendor/daterangepicker/daterangepicker.js"></script>
 <!--===============================================================================================-->
 	<script src="vendor/countdowntime/countdowntime.js"></script>
 <!--===============================================================================================-->
-	<script src="js/main.js"></script>
+	<script src="./login-dependecies/js/main.js"></script>
 
 </body>
 </html>
