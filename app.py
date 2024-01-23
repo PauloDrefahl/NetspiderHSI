@@ -156,6 +156,7 @@ def start_scraper():
 
 @app.route("/stop_scraper")
 def stop_scraper():
+    print("stop scraper function")
     return scraper_manager.stop_scraper()
 
 
