@@ -102,16 +102,14 @@ class YesbackpageScraper(ScraperPrototype):
     def set_flagged_keywords(self, flagged_keywords) -> None:
         self.flagged_keywords = flagged_keywords
 
-    def initialize(self, keywords) -> None:
+    def initialize(self) -> None:
         # set keywords value
-        self.keywords = keywords
+        # self.keywords = keywords
         # set up directories to save screenshots and Excel file.
         self.date_time = str(datetime.today())[0:19].replace(' ', '_').replace(':', '-')
 
         # Format website URL based on state and city
         self.get_formatted_url()
-        print(self.url)
-        print(type(self.url))
         # self.set_search_mode(self.search_mode)
         options = uc.ChromeOptions()
         # TODO - uncomment this line to run headless

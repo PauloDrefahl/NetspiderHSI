@@ -1,4 +1,5 @@
-import psutil
+import threading
+import time
 from flask import Flask, request
 from flask_cors import CORS
 from waitress import serve
@@ -11,8 +12,84 @@ app = Flask(__name__)
 CORS(app)
 
 
+class ScraperManager:
+    def __init__(self):
+        self.scraper_thread = None
+
+    def start_scraper(self, kwargs):
+        if self.scraper_thread is None or not self.scraper_thread.is_alive():
+            self.scraper_thread = ScraperThread(kwargs)
+            self.scraper_thread.start()
+            return {"Response": "Scraper Thread Started"}
+        else:
+            return {"Response": "Scraper Thread is already running"}
+
+    def stop_scraper(self):
+
+        if self.scraper_thread and self.scraper_thread.is_alive():
+            print("here 0")
+            self.scraper_thread.stop()
+            print("here attempting join")
+            self.scraper_thread.join_with_timeout()  # Wait for the thread to finish
+            print("here 2")
+            return {"Response": "Scraper Thread Stopped"}
+        else:
+            return {"Response": "No active Scraper Thread"}
+
+
+class ScraperThread(threading.Thread):
+    def __init__(self, kwargs):
+        super(ScraperThread, self).__init__()
+        if kwargs['website'] == 'eros':
+            self.scraper = ErosScraper()
+        elif kwargs['website'] == 'escortalligator':
+            self.scraper = EscortalligatorScraper()
+        elif kwargs['website'] == 'megapersonals':
+            self.scraper = MegapersonalsScraper()
+        elif kwargs['website'] == 'skipthegames':
+            self.scraper = SkipthegamesScraper()
+        elif kwargs['website'] == 'yesbackpage':
+            self.scraper = YesbackpageScraper()
+        self.scraper.keywords = kwargs['keywords']
+        self.scraper.set_path(kwargs['path'])
+        self.scraper.set_flagged_keywords(kwargs['flagged_keywords'])
+        if kwargs['inclusive_search']:
+            self.scraper.set_join_keywords()
+        self.scraper.set_search_mode(kwargs['search_mode'])
+        self.scraper.keywords.add(kwargs['search_text'])
+        self.scraper.set_city(kwargs['city'])
+        # self.scraper.initialize(kwargs['keywords'])
+        self._stop_event = threading.Event()
+
+    def run(self):
+        while not self._stop_event.is_set():
+            self.scraper.initialize()  # Assuming a method named 'run' in your scraper class
+            # time.sleep(60)  # Adjust the sleep time as needed
+
+    def stop(self):
+        self.scraper.stop_scraper()
+        self._stop_event.set()
+
+    def join_with_timeout(self, timeout=10):
+        print("join attempt in function")
+        self.join(timeout)
+        print("after join")
+        if self.is_alive():
+            print("Warning: ScraperThread did not terminate in time.")
+
+        # if self.is_alive():
+        #     self._stop_event.clear()
+
+    def stopped(self):
+        return self._stop_event.is_set()
+
+
+scraper_manager = ScraperManager()
+
+
 def get_params():
     return {
+        "website": get_website(),
         "city": get_city(),
         "keywords": get_keywords(),
         "flagged_keywords": get_flagged_keywords(),
@@ -21,6 +98,10 @@ def get_params():
         "inclusive_search": get_inclusive_search(),
         "path": get_path(),
     }
+
+
+def get_website():
+    return request.args.get("website", default="yesbackpage", type=str).strip()
 
 
 def get_path():
@@ -67,34 +148,15 @@ def run_scraper(scraper_class, **kwargs):
     return {"Response": "Scraper Start"}
 
 
-@app.route("/eros_scraper")
-def eros_scraper():
+@app.route("/start_scraper")
+def start_scraper():
     params = get_params()
-    return run_scraper(ErosScraper, **params)
+    return scraper_manager.start_scraper(params)
 
 
-@app.route("/escortalligator_scraper")
-def escortalligator_scraper():
-    params = get_params()
-    return run_scraper(EscortalligatorScraper, **params)
-
-
-@app.route("/megapersonals_scraper")
-def megapersonals_scraper():
-    params = get_params()
-    return run_scraper(MegapersonalsScraper, **params)
-
-
-@app.route("/skipthegames_scraper")
-def skipthegames_scraper():
-    params = get_params()
-    return run_scraper(SkipthegamesScraper, **params)
-
-
-@app.route("/yesbackpage_scraper")
-def yesbackpage_scraper():
-    params = get_params()
-    return run_scraper(YesbackpageScraper, **params)
+@app.route("/stop_scraper")
+def stop_scraper():
+    return scraper_manager.stop_scraper()
 
 
 @app.errorhandler(Exception)
