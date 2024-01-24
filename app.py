@@ -1,10 +1,15 @@
 import threading
 import time
+import logging
+
 from flask import Flask, request
 from flask_cors import CORS
 from waitress import serve
 from Backend.Scraper import MegapersonalsScraper, SkipthegamesScraper, YesbackpageScraper, EscortalligatorScraper, \
     ErosScraper
+
+# At the beginning of your file
+logging.basicConfig(level=logging.INFO, format='%(asctime)s - %(levelname)s - %(message)s')
 
 # pyinstaller app.py --onefile --name=NetSpiderServer --hidden-import pyimod02_importers
 
@@ -12,6 +17,7 @@ app = Flask(__name__)
 CORS(app)
 
 
+# manages the scraper and its thread
 class ScraperManager:
     def __init__(self):
         self.scraper_thread = None
@@ -37,6 +43,7 @@ class ScraperManager:
             return {"Response": "No active Scraper Thread"}
 
 
+# the child thread of the main thread made by scraper manager to run the scraping process
 class ScraperThread(threading.Thread):
     def __init__(self, kwargs):
         super(ScraperThread, self).__init__()
@@ -62,9 +69,24 @@ class ScraperThread(threading.Thread):
         self._stop_event = threading.Event()
 
     def run(self):
-        while not self._stop_event.is_set():
-            self.scraper.initialize()  # Assuming a method named 'run' in your scraper class
-            # time.sleep(60)  # Adjust the sleep time as needed
+        logging.info("ScraperThread started")
+        try:
+            while not self._stop_event.is_set():
+                self.scraper.initialize()
+                logging.info("ScraperThread loop iteration")
+                # Your scraping logic here
+                logging.info("Scraping logic executed")
+                time.sleep(1)
+        except Exception as e:
+            logging.error(f"Exception in ScraperThread: {e}", exc_info=True)
+        finally:
+            logging.info("ScraperThread stopping")
+            if self.scraper:
+                self.scraper.stop_scraper()
+
+    def force_stop(self):
+        self.scraper.stop_scraper()
+        self._stop_event.set()
 
     def stop(self):
         self.scraper.stop_scraper()
@@ -105,7 +127,7 @@ def get_website():
 
 
 def get_path():
-    return request.args.get("path", default='C:\\Users\\Zach\\PycharmProjects\\flaskTest\\result', type=str).strip()
+    return request.args.get("path", default='C:\\Users\\kskos\\PycharmProjects\\HSI_Back_Test3\\result', type=str).strip()
 
 
 def get_inclusive_search():
@@ -169,4 +191,5 @@ def handle_error(e):
 
 if __name__ == "__main__":
     # start server
-    serve(app, host='127.0.0.1', port=5000)
+    #serve(app, host='127.0.0.1', port=3000)
+    app.run(port=3030)
