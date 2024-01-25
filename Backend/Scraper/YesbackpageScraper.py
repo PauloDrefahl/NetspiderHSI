@@ -353,7 +353,7 @@ class YesbackpageScraper(ScraperPrototype):
         })
         data = pd.DataFrame(titled_columns)
         with pd.ExcelWriter(
-                f'{self.scraper_directory}/yesbackpage-{self.date_time}.xlsx',
+                f'{self.scraper_directory}/yesbackpage-{self.city}-{self.date_time}.xlsx',
                 engine='openpyxl') as writer:
             data.to_excel(writer, index=False)
             worksheet = writer.sheets['Sheet1']

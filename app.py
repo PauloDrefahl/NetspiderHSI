@@ -39,9 +39,10 @@ class ScraperManager:
             print("here attempting join")
             # self.scraper_thread.join_with_timeout()  # Wait for the thread to finish
             print("here 2")
-            return {"Response": "Scraper Thread Stopped"}
+            print("final thread", self.scraper_thread.is_alive())
+            return {"Response": "Scraper Thread Stopped Gracefully"}
         else:
-            return {"Response": "No active Scraper Thread"}
+            return {"Response": "No active Scraper Thread, Graceful Stop Attempted"}
 
 
 class ScraperThread(threading.Thread):
