@@ -57,6 +57,7 @@ class YesbackpageScraper(ScraperPrototype):
         self.keywords = set()
         self.flagged_keywords = set()
         self.search_mode = False
+        self.completed = False
 
         self.join_keywords = False
         self.number_of_keywords_in_post = 0
@@ -132,8 +133,14 @@ class YesbackpageScraper(ScraperPrototype):
         self.pdf_filename = f'{self.screenshot_directory}/yesbackpage.pdf'
         os.mkdir(self.screenshot_directory)
         self.get_data(links)
+        print("get data done")
+        # time.sleep(5)
         self.close_webpage()
+        print("closed webpage")
         self.reset_variables()
+        print("reset variables")
+        self.completed = True
+        print("done scraping")
 
     def stop_scraper(self) -> None:
         if self.search_mode:

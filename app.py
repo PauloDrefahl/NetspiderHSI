@@ -24,13 +24,20 @@ class ScraperManager:
         else:
             return {"Response": "Scraper Thread is already running"}
 
-    def stop_scraper(self):
+    def force_stop(self):
+        if self.scraper_thread and self.scraper_thread.is_alive():
+            self.scraper_thread.force_stop()
+            self.scraper_thread.join_with_timeout()
+            return {"Response": "Scraper Thread Force Stopped"}
+        else:
+            return {"Response": "No active Scraper Thread, Force Stop Attempted"}
 
+    def stop_scraper(self):
         if self.scraper_thread and self.scraper_thread.is_alive():
             print("here 0")
             self.scraper_thread.stop()
             print("here attempting join")
-            self.scraper_thread.join_with_timeout()  # Wait for the thread to finish
+            # self.scraper_thread.join_with_timeout()  # Wait for the thread to finish
             print("here 2")
             return {"Response": "Scraper Thread Stopped"}
         else:
@@ -62,15 +69,24 @@ class ScraperThread(threading.Thread):
         self._stop_event = threading.Event()
 
     def run(self):
-        while not self._stop_event.is_set():
-            self.scraper.initialize()  # Assuming a method named 'run' in your scraper class
-            # time.sleep(60)  # Adjust the sleep time as needed
+        while not self._stop_event.is_set() and not self.scraper.completed:
+            self.scraper.initialize()
+            print(self.is_alive(), "1")
+        print(self.scraper.completed, "scraper completed")
+        print(self.is_alive(), "thread is alive")
+        if self.scraper.completed:
+            print("scraper done")
+            scraper_manager.stop_scraper()
+            print(self.is_alive(), "2")
 
-    def stop(self):
+    def force_stop(self):
         self.scraper.stop_scraper()
         self._stop_event.set()
 
-    def join_with_timeout(self, timeout=10):
+    def stop(self):
+        self._stop_event.set()
+
+    def join_with_timeout(self, timeout=1):
         print("join attempt in function")
         self.join(timeout)
         print("after join")
@@ -134,20 +150,6 @@ def get_keywords():
     return set(keywords_str.split(',')) if keywords_str else set()
 
 
-def run_scraper(scraper_class, **kwargs):
-    scraper = scraper_class()
-    scraper.set_path(kwargs['path'])
-    print(scraper.path)
-    scraper.set_flagged_keywords(kwargs['flagged_keywords'])
-    if kwargs['inclusive_search']:
-        scraper.set_join_keywords()
-    scraper.set_search_mode(kwargs['search_mode'])
-    scraper.keywords.add(kwargs['search_text'])
-    scraper.set_city(kwargs['city'])
-    scraper.initialize(kwargs['keywords'])
-    return {"Response": "Scraper Start"}
-
-
 @app.route("/start_scraper")
 def start_scraper():
     params = get_params()
@@ -157,7 +159,7 @@ def start_scraper():
 @app.route("/stop_scraper")
 def stop_scraper():
     print("stop scraper function")
-    return scraper_manager.stop_scraper()
+    return scraper_manager.force_stop()
 
 
 @app.errorhandler(Exception)
