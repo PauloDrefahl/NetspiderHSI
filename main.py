@@ -1,4 +1,5 @@
 # import qdarkstyle as qdarkstyle
+import psutil
 from PyQt6.QtCore import Qt, QThread, QTimer
 from PyQt6.QtWidgets import QApplication, QMainWindow, QFileDialog, QMessageBox
 import time
@@ -158,6 +159,7 @@ class MainWindow(QMainWindow):
         self.timer.timeout.connect(self.update_timer)  # Connect the timeout signal to the update_timer method
         self.elapsed_time = 0  # Variable to store elapsed time
         self.worker = None
+        self.worker_thread = None
         self.ui = Ui_HSIWebScraper()
         self.ui.setupUi(self)
         self.keywords_instance = GUI.Backend.Keywords()
@@ -760,7 +762,7 @@ class MainWindow(QMainWindow):
             self.ui.searchButton_2.setEnabled(False)
             QtWidgets.QMessageBox.critical(self, "Error", "Error: Scraping not completed. Please try again.\n (Make "
                                                           "sure the latest version of Chrome is installed.)\n "
-                                                          "Exact Error: "+popup_message)
+                                                          "Exact Error: "+ popup_message)
 
         popup_message = ''
 
@@ -805,7 +807,6 @@ class MainWindow(QMainWindow):
 
         self.worker.finished.connect(self.worker_finished)
         self.worker.start()
-
         end_time = time.time()  # Get the current time when the scraping is completed
         elapsed_time = end_time - start_time  # Calculate the elapsed time
 
@@ -833,8 +834,15 @@ class MainWindow(QMainWindow):
 
         elif self.website_selection == 'eros':
             self.facade.stop_eros_scraper()
-            self.facade.stop_eros_scraper()
             self.worker_finished()
+        self.worker.quit()
+        for proc in psutil.process_iter(['pid', 'name']):
+            if proc.info['name'] == 'undetected_chromedriver.exe':
+                try:
+                    process = psutil.Process(proc.info['pid'])
+                    process.terminate()
+                except psutil.NoSuchProcess:
+                    pass
 
     def update_timer(self):
         self.elapsed_time += 1  # Increment elapsed time by 1 second
