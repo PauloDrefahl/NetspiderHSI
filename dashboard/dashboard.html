@@ -201,6 +201,27 @@
                 <h2><img src="./icons/gear-solid.svg" class="icon"/>Scrapper Settings:</h2>
 >>>>>>> 19c1d8064faf02244477609f32ce506ac3188f67
                 <!-- Add content for column 3 here -->
+                <p>Enter Text to Scrape:</p>
+                <textarea id="scraperTextbox" name="scraperTextbox"></textarea>
+
+                <div class="checkboxes" style="margin-top: 10px;">
+                    <input type="checkbox" id="all_keywords" name="all_keywords">
+                    <p>Search For Page with all Keywords Included</p>
+                    
+                    <input type="checkbox" id="payment_method" name="payment_method">
+                    <p>Find Posts Only with Payment Methods</p>
+                    
+                    <input type="checkbox" id="hide_browser" name="hide_browser">
+                    <p>Hide Browser while Running</p>
+                </div>
+
+                <div class="radio-buttons">
+                    
+                    <label onclick="startClock()" id="startButton">Start</label>
+                    <label onclick="stopClock()" id="stopButton">Stop</label>
+                </div>
+            
+                <div id="clock"> </div>
             </div>
         </div>
         <div id="med-box">
