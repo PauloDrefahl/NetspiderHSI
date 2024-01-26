@@ -8,6 +8,7 @@ from selenium.webdriver.common.by import By
 from Backend.ScraperPrototype import ScraperPrototype
 import img2pdf
 from openpyxl.styles import PatternFill
+import threading
 
 
 class YesbackpageScraper(ScraperPrototype):
@@ -125,17 +126,18 @@ class YesbackpageScraper(ScraperPrototype):
         links = self.get_links()
 
         # Create directory for search data
-        self.scraper_directory = f'{self.path}/yesbackpage_{self.date_time}'
+        self.scraper_directory = f'{self.path}/yesbackpage_{self.city}_{self.date_time}'
         os.mkdir(self.scraper_directory)
 
         # Create directory for search screenshots
         self.screenshot_directory = f'{self.scraper_directory}/screenshots'
         self.pdf_filename = f'{self.screenshot_directory}/yesbackpage.pdf'
         os.mkdir(self.screenshot_directory)
+        print("number of threads while running: ", threading.active_count())
         self.get_data(links)
         print("get data done")
         # time.sleep(5)
-        self.close_webpage()
+        self.stop_scraper()
         print("closed webpage")
         self.reset_variables()
         print("reset variables")
@@ -143,11 +145,9 @@ class YesbackpageScraper(ScraperPrototype):
         print("done scraping")
 
     def stop_scraper(self) -> None:
-        if self.search_mode:
-            self.driver.close()
-            self.driver.quit()
-        else:
-            self.driver.close()
+        self.reset_variables()
+        self.driver.close()
+        self.driver.quit()
 
     def open_webpage(self) -> None:
         self.driver.implicitly_wait(10)

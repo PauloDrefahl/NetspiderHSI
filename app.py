@@ -24,25 +24,15 @@ class ScraperManager:
         else:
             return {"Response": "Scraper Thread is already running"}
 
-    def force_stop(self):
+    def manage_stop_scraper(self):
         if self.scraper_thread and self.scraper_thread.is_alive():
-            self.scraper_thread.force_stop()
-            self.scraper_thread.join_with_timeout()
-            return {"Response": "Scraper Thread Force Stopped"}
+            self.scraper_thread.stop_thread()
+            self.scraper_thread.join_with_timeout()  # Wait for the thread to finish
+            # thread_id = threading.get_native_id()
+            return {"Response": "Scraper Thread Stopped Forcefully"}
         else:
-            return {"Response": "No active Scraper Thread, Force Stop Attempted"}
-
-    def stop_scraper(self):
-        if self.scraper_thread and self.scraper_thread.is_alive():
-            print("here 0")
-            self.scraper_thread.stop()
-            print("here attempting join")
-            # self.scraper_thread.join_with_timeout()  # Wait for the thread to finish
-            print("here 2")
-            print("final thread", self.scraper_thread.is_alive())
-            return {"Response": "Scraper Thread Stopped Gracefully"}
-        else:
-            return {"Response": "No active Scraper Thread, Graceful Stop Attempted"}
+            print("number of threads: ", threading.active_count())
+            return {"Response": "No active Scraper Thread, Forceful Stop Attempted"}
 
 
 class ScraperThread(threading.Thread):
@@ -66,36 +56,38 @@ class ScraperThread(threading.Thread):
         self.scraper.set_search_mode(kwargs['search_mode'])
         self.scraper.keywords.add(kwargs['search_text'])
         self.scraper.set_city(kwargs['city'])
-        # self.scraper.initialize(kwargs['keywords'])
         self._stop_event = threading.Event()
 
     def run(self):
+        print("number of threads before: ", threading.active_count())
         while not self._stop_event.is_set() and not self.scraper.completed:
+            thread_id = threading.get_native_id()
+            print("start thread id", thread_id)
             self.scraper.initialize()
             print(self.is_alive(), "1")
         print(self.scraper.completed, "scraper completed")
         print(self.is_alive(), "thread is alive")
         if self.scraper.completed:
             print("scraper done")
-            scraper_manager.stop_scraper()
+            self.stop_thread()
+            print("stopping thread")
+            # self.join_with_timeout()
             print(self.is_alive(), "2")
 
-    def force_stop(self):
-        self.scraper.stop_scraper()
+    def stop_thread(self):
+        if not self.scraper.completed:
+            self.scraper.stop_scraper()
         self._stop_event.set()
 
-    def stop(self):
-        self._stop_event.set()
-
-    def join_with_timeout(self, timeout=1):
-        print("join attempt in function")
-        self.join(timeout)
-        print("after join")
-        if self.is_alive():
-            print("Warning: ScraperThread did not terminate in time.")
-
-        # if self.is_alive():
-        #     self._stop_event.clear()
+    def join_with_timeout(self, timeout=10):
+        if not self.scraper.completed:
+            print("join attempt in function")
+            self.join(timeout)
+            print("after join")
+            if self.is_alive():
+                print("Warning: ScraperThread did not terminate in time.")
+        else:
+            print("scraper is completed not joining")
 
     def stopped(self):
         return self._stop_event.is_set()
@@ -122,7 +114,7 @@ def get_website():
 
 
 def get_path():
-    return request.args.get("path", default='C:\\Users\\Zach\\PycharmProjects\\flaskTest\\result', type=str).strip()
+    return request.args.get("path", default='C:\\Users\\Zach\\PycharmProjects\\NetSpiderHSI\\result', type=str).strip()
 
 
 def get_inclusive_search():
@@ -160,7 +152,7 @@ def start_scraper():
 @app.route("/stop_scraper")
 def stop_scraper():
     print("stop scraper function")
-    return scraper_manager.force_stop()
+    return scraper_manager.manage_stop_scraper()
 
 
 @app.errorhandler(Exception)
