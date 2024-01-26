@@ -242,6 +242,68 @@ input[type="file"].file-selected {
     left: 0;
 }
 
+/* CSS for Select All button */
+#select-all-btn {
+    width: 100%;
+    margin-top: 20px;
+    text-align: center;
+    padding: 15px;
+    border: 2px solid #09558B;
+    border-radius: 0px;
+    background-color: #fff;
+    color: #09558B;
+    transition: background-color 0.3s, color 0.3s, border-color 0.3s;
+    box-shadow: 0 6px 8px 0 rgba(0,0,0,0.24),0 8.5px 25px 0 rgba(0,0,0,0.19);
+    cursor: pointer;
+}
+
+/* Hover effect for Select All button */
+#select-all-btn:hover {
+    background-color: #09558B;
+    color: white;
+    border-color: #09558B;
+    transition: background-color 0.3s, color 0.3s, border-color 0.3s;
+}
+
+#select-all-btn.clicked {
+    background-color: #09558B;
+    color: white;
+    border-color: #09558B;
+}
+
+/* Adjust hover effect to make it smoother */
+#select-all-btn:hover {
+    transition: background-color 0.3s, color 0.3s, border-color 0.3s;
+}
+
+/* CSS for Open Results Folder button */
+#open-results-folder-btn {
+    width: 100%;
+    margin-top: 20px;
+    margin-bottom: 10px;
+    text-align: center;
+    padding: 5px;
+    border: 2px solid #09558B;
+    border-radius: 0px;
+    color: #09558B;
+    background-color: #fff;
+    transition: background-color 0.3s, color 0.3s, border-color 0.3s;
+    box-shadow: 0 6px 8px 0 rgba(0,0,0,0.24),0 8.5px 25px 0 rgba(0,0,0,0.19);
+    cursor: pointer;
+}
+
+/* Hover effect for Open Results Folder button */
+#open-results-folder-btn:hover {
+    background-color: #09558B;
+    color: white;
+    border-color: #09558B;
+    transition: background-color 0.3s, color 0.3s, border-color 0.3s;
+}
+
+#open-results-folder-btn:hover {
+    transition: background-color 0.3s, color 0.3s, border-color 0.3s;
+}
+
 /* Add this CSS for radio buttons */
 /* Updated CSS for radio buttons */
 /* Updated CSS for radio buttons */
@@ -323,5 +385,186 @@ input[type="file"].file-selected {
 .dropdown-item:hover {
     background-color: #09558B;
     color: white;
+}
+
+/* Styles for the buttons */
+.listbox-area {
+    display: grid;
+    grid-gap: 2em;
+    grid-template-columns: repeat(1, 1fr);
+    padding: 20px;
+    border: 1px solid white;
+    border-radius: 4px;
+    background: #eee;
+    overflow: hidden; /* Hide overflowing content */
+    position: relative; /* Positioning context for absolute positioning */
+}
+
+[role="listbox"] {
+    display: flex;
+    flex-direction: column;
+    margin: 1em 0 0;
+    padding: 0;
+    min-height: 18em;
+    border: 1px solid #aaa;
+    background: white;
+    overflow-y: auto; /* Add vertical scrollbar when needed */
+    position: absolute; /* Position listbox absolutely */
+    top: 0; /* Align to the top of the listbox area */
+    bottom: 0; /* Align to the bottom of the listbox area */
+    left: 0; /* Align to the left of the listbox area */
+    right: 0; /* Align to the right of the listbox area */
+}
+
+[role="listbox"]#ss_elem_list {
+    display: flex;
+    flex-direction: column;
+    position: relative;
+    max-height: 18em;
+    overflow-y: auto;
+    width: 100%; /* Ensure the listbox fills the entire width of the column */
+    max-width: 100%; /* Ensure the listbox does not extend past the width of the column */
+}
+
+[role="listbox"] + *,
+.listbox-label + * {
+    margin-top: .2em;
+}
+
+[role="group"] {
+    margin: 0;
+    padding: 0;
+}
+
+[role="group"] > [role="presentation"] {
+    display: block;
+    margin: 0;
+    padding: 0 0.5em;
+    font-weight: bold;
+    line-height: 1;
+    background-color: #ccc;
+}
+
+[role="option"] {
+    position: relative;
+    display: block;
+    margin: .5px 2px;
+    border-radius: 10px;
+    padding: 2px 1em 2px 1.5em;
+    line-height: 1.8em;
+    cursor: pointer;
+    transition: background-color 0.3s, color 0.3s; /* Added transition for smooth hover effect */
+    background-color: white; /* Set default background color to white */
+}
+
+[role="listbox"]:focus [role="option"].focused {
+    background: #bde4ff;
+}
+[role="option"]:hover {
+    background-color: #accaf34d; /* Lighter shade for hover effect */
+    color: #09558B; /* Change text color to the original color when hovering */
+    border-radius: 10px;
+}
+
+.move-right-btn span.checkmark::after {
+    content: " →";
+}
+
+.move-left-btn span.checkmark::before {
+    content: "← ";
+}
+
+[role="option"]:not(.selected):hover,
+[role="option"]:not(.selected):focus {
+    background-color: #accaf34d; /* Lighter shade for hover effect */
+    color: #09558B; /* Change text color to the original color when hovering */
+}
+
+button[aria-haspopup="listbox"] {
+    position: relative;
+    padding: 5px 10px;
+    width: 150px;
+    border-radius: 0;
+    text-align: left;
+}
+
+button[aria-haspopup="listbox"]::after {
+    position: absolute;
+    right: 5px;
+    top: 10px;
+    width: 0;
+    height: 0;
+    border: 8px solid transparent;
+    border-top-color: currentcolor;
+    border-bottom: 0;
+    content: "";
+}
+
+button[aria-haspopup="listbox"][aria-expanded="true"]::after {
+    position: absolute;
+    right: 5px;
+    top: 10px;
+    width: 0;
+    height: 0;
+    border: 8px solid transparent;
+    border-top: 0;
+    border-bottom-color: currentcolor;
+    content: "";
+}
+
+button[aria-haspopup="listbox"] + [role="listbox"] {
+    position: absolute;
+    margin: 0;
+    width: 9.5em;
+    max-height: 10em;
+    border-top: 0;
+    overflow-y: auto;
+}
+
+[role="toolbar"] {
+    display: flex;
+}
+
+[role="toolbar"] > * {
+    border: 1px solid #aaa;
+    background: #ccc;
+}
+
+[role="toolbar"] > [aria-disabled="false"]:focus {
+    background-color: #eee;
+}
+
+button {
+    font-size: inherit;
+}
+
+button[aria-disabled="true"] {
+    opacity: 0.5;
+}
+
+.annotate {
+    color: #366ed4;
+    font-style: italic;
+}
+
+.hidden {
+    display: none;
+}
+
+.offscreen {
+    position: absolute;
+    width: 1px;
+    height: 1px;
+    overflow: hidden;
+    clip: rect(1px 1px 1px 1px);
+    clip: rect(1px, 1px, 1px, 1px);
+    font-size: 14px;
+    white-space: nowrap;
+}
+
+/* Added to match existing styles */
+[role="option"] + [role="option"],
+[role="listbox"]:not(#ss_elem_list) + [role="listbox"] {
+    margin-top: 1em;
 }
 
