@@ -93,12 +93,24 @@ body {
     border-color: white ;
 }
 
+
+#navbar #fgcu-logo::before {
+    content: "";
+    position: absolute;
+    width: 100%;
+    height: 1px;
+    background-color: #ddd;
+    bottom: 0;
+    left: 0;
+}
+
 .divider {
     width: 100%;
     height: 1px;
     background-color: #ddd;
     margin-top: 20px;
 }
+
 
 /* Styles for the main content area */
 #content {
@@ -116,6 +128,8 @@ body {
     display: flex;
     flex-wrap: wrap;
 }
+
+
 
 /* Styles for individual boxes in the content area */
 .box {
@@ -144,6 +158,8 @@ body {
     transform: scale(1.05);
 }
 
+
+
 /* Styles for file input */
 input[type="file"] {
     width: 100%;
@@ -171,6 +187,8 @@ input[type="file"].file-selected {
    linear-gradient(to bottom, #09558B, green 49%, green) border-box; 
    border: 2px dashed #fff;
 }
+
+
 
 /* Big box under the three existing boxes */
 #big-box {
@@ -232,15 +250,55 @@ input[type="file"].file-selected {
     transform: scale(1.05);
 }
 
-#navbar #fgcu-logo::before {
-    content: "";
-    position: absolute;
+
+
+/* Medium box under the Big box w/ 3 sections */
+#med-box {
     width: 100%;
-    height: 1px;
-    background-color: #ddd;
-    bottom: 0;
-    left: 0;
+    margin-left: 15px;
+    margin-top: 40px;
+    padding: 30px; /* Increased padding */
+    background-color: #fff;
+    border-left: 2px solid #ddd; /* Left border */
+    border-right: 2px solid #ddd; /* Right border */
+    border-radius: 12px; /* Rounded corners */
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    height: 500px;
+    transition: box-shadow 0.3s, transform 0.3s;
+    box-shadow: 0 8px 16px rgba(0, 0, 0, 0.1); /* Improved box shadow */
 }
+
+#med-box:hover {
+    box-shadow: 0 8px 16px rgba(0, 0, 0, 0.2); /* Enhanced box shadow on hover */
+    transform: scale(1.05);
+}
+
+/* Add this CSS for the big box hover effect */
+#med-box.hover-effect {
+    box-shadow: 0 8px 16px rgba(0, 0, 0, 0.2); /* Enhanced box shadow on hover */
+    transform: scale(1.05);
+}
+
+/* Specifically for bottom warning in medium box*/
+#med-box h3 {
+    color: #09558B;
+    text-align: center;
+    margin-bottom: 15px;
+}
+
+/* Text within the medium box */
+#med-box p {
+    margin-left: 5px;
+    margin-right: 5px;
+    color: #09558B;
+    text-align: center;
+    font-size: 17px;
+    margin-bottom: 20px;
+}
+
+
 
 /* Add this CSS for radio buttons */
 /* Updated CSS for radio buttons */
@@ -285,6 +343,7 @@ input[type="file"].file-selected {
     transform: scale(1.1);
     box-shadow: 0 12px 16px 0 rgba(0,0,0,0.24),0 17px 50px 0 rgba(0,0,0,0.19);
 }
+
 
 /* Styles for the dropdown menu */
 .dropdown {
