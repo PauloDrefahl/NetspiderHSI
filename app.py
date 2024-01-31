@@ -1,6 +1,9 @@
+import os
 import threading
+import socket
 import time
 from flask import Flask, request
+from flask_socketio import SocketIO
 from flask_cors import CORS
 from waitress import serve
 from Backend.Scraper import MegapersonalsScraper, SkipthegamesScraper, YesbackpageScraper, EscortalligatorScraper, \
@@ -10,6 +13,7 @@ from Backend.Scraper import MegapersonalsScraper, SkipthegamesScraper, Yesbackpa
 
 app = Flask(__name__)
 CORS(app)
+socketio = SocketIO(app, cors_allowed_origins="*")
 
 
 class ScraperManager:
@@ -29,6 +33,7 @@ class ScraperManager:
             self.scraper_thread.stop_thread()
             self.scraper_thread.join_with_timeout()  # Wait for the thread to finish
             # thread_id = threading.get_native_id()
+            print("thread count after stop: ", threading.active_count())
             return {"Response": "Scraper Thread Stopped Forcefully"}
         else:
             print("number of threads: ", threading.active_count())
@@ -37,6 +42,8 @@ class ScraperManager:
 
 class ScraperThread(threading.Thread):
     def __init__(self, kwargs):
+        keywords = set(kwargs['keywords'].split(','))
+        flagged_keywords = set(kwargs['flagged_keywords'].split(','))
         super(ScraperThread, self).__init__()
         if kwargs['website'] == 'eros':
             self.scraper = ErosScraper()
@@ -48,9 +55,9 @@ class ScraperThread(threading.Thread):
             self.scraper = SkipthegamesScraper()
         elif kwargs['website'] == 'yesbackpage':
             self.scraper = YesbackpageScraper()
-        self.scraper.keywords = kwargs['keywords']
+        self.scraper.keywords = keywords
         self.scraper.set_path(kwargs['path'])
-        self.scraper.set_flagged_keywords(kwargs['flagged_keywords'])
+        self.scraper.set_flagged_keywords(flagged_keywords)
         if kwargs['inclusive_search']:
             self.scraper.set_join_keywords()
         self.scraper.set_search_mode(kwargs['search_mode'])
@@ -63,6 +70,7 @@ class ScraperThread(threading.Thread):
         while not self._stop_event.is_set() and not self.scraper.completed:
             thread_id = threading.get_native_id()
             print("start thread id", thread_id)
+            socketio.emit('scraper_update', {'status': 'running'})
             self.scraper.initialize()
             print(self.is_alive(), "1")
         print(self.scraper.completed, "scraper completed")
@@ -73,6 +81,7 @@ class ScraperThread(threading.Thread):
             print("stopping thread")
             # self.join_with_timeout()
             print(self.is_alive(), "2")
+        socketio.emit('scraper_update', {'status': 'completed'})
 
     def stop_thread(self):
         if not self.scraper.completed:
@@ -96,66 +105,38 @@ class ScraperThread(threading.Thread):
 scraper_manager = ScraperManager()
 
 
-def get_params():
-    return {
-        "website": get_website(),
-        "city": get_city(),
-        "keywords": get_keywords(),
-        "flagged_keywords": get_flagged_keywords(),
-        "search_mode": get_search_mode(),
-        "search_text": get_search_text(),
-        "inclusive_search": get_inclusive_search(),
-        "path": get_path(),
-    }
+def find_open_port():
+    s = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
+    s.bind(('127.0.0.1', 0))
+    port = s.getsockname()[1]
+    s.close()
+    # os.environ['NETSPIDER_PORT'] = str(port)
+    return port
 
 
-def get_website():
-    return request.args.get("website", default="yesbackpage", type=str).strip()
+@socketio.on('connection')
+def connected():
+    print("connected")
 
 
-def get_path():
-    return request.args.get("path", default='C:\\Users\\Zach\\PycharmProjects\\NetSpiderHSI\\result', type=str).strip()
+@socketio.on('start_scraper')
+def start_scraper(data):
+    # print(data)
+    socketio.emit('scraper_update', {'status': 'started'})
+    response = scraper_manager.start_scraper(data)
+
+    return {'Response': response}
 
 
-def get_inclusive_search():
-    return request.args.get("inclusive_search", default=False, type=bool)
-
-
-def get_search_text():
-    return request.args.get("search_text", default="", type=str).strip()
-
-
-def get_search_mode():
-    return request.args.get("search_mode", default=False, type=bool)
-
-
-def get_flagged_keywords():
-    flagged_keywords_str = request.args.get("flagged_keywords", default="", type=str).strip()
-    return set(flagged_keywords_str.split(',')) if flagged_keywords_str else set()
-
-
-def get_city():
-    return request.args.get("city", type=str).strip()
-
-
-def get_keywords():
-    keywords_str = request.args.get("keywords", default="", type=str).strip()
-    return set(keywords_str.split(',')) if keywords_str else set()
-
-
-@app.route("/start_scraper")
-def start_scraper():
-    params = get_params()
-    return scraper_manager.start_scraper(params)
-
-
-@app.route("/stop_scraper")
+@socketio.on('stop_scraper')
 def stop_scraper():
-    print("stop scraper function")
-    return scraper_manager.manage_stop_scraper()
+
+    response = scraper_manager.manage_stop_scraper()
+    socketio.emit('scraper_update', {'status': 'stopped'})
+    return {'Response': response}
 
 
-@app.errorhandler(Exception)
+@socketio.on_error('scraper_error')
 def handle_error(e):
     print(f"An error occurred: {str(e)}")
     response = {"error": str(e)}
@@ -164,4 +145,8 @@ def handle_error(e):
 
 if __name__ == "__main__":
     # start server
-    serve(app, host='127.0.0.1', port=5000)
+    # serve(app, host='127.0.0.1', port=5000)
+    print("active threads: ", threading.active_count())
+    open_port = find_open_port()
+    print(os.environ)
+    socketio.run(app, host='127.0.0.1', port=5000, allow_unsafe_werkzeug=True)
