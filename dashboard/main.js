@@ -1,5 +1,7 @@
 'use strict'; 
 var aria = aria || {}; 
+const vs = require('fs');
+
 
 document.addEventListener("DOMContentLoaded", function () {
     var settingsLink = document.getElementById("settings-link");

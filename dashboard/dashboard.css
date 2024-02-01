@@ -129,8 +129,6 @@ body {
     flex-wrap: wrap;
 }
 
-
-
 /* Styles for individual boxes in the content area */
 .box {
     width: calc(29.33% - 20px);
@@ -157,7 +155,6 @@ body {
     box-shadow: 0 8px 16px rgba(0, 0, 0, 0.2); /* Enhanced box shadow on hover */
     transform: scale(1.05);
 }
-
 
 
 /* Styles for file input */
@@ -203,7 +200,7 @@ input[type="file"].file-selected {
     display: flex;
     justify-content: space-between;
     align-items: center;
-    height: 600px;
+    height: 620px;
     transition: box-shadow 0.3s, transform 0.3s;
     box-shadow: 0 8px 16px rgba(0, 0, 0, 0.1); /* Improved box shadow */
 }
@@ -212,9 +209,12 @@ input[type="file"].file-selected {
 .column {
     flex: 1;
     margin: 30px; /* Increased margin */
-    padding: 20px; /* Increased padding */
+    margin-top: 0%;
+    padding: 30px; /* Increased padding */
+    padding-top: 0;;
     height: 90%;
     box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1); /* Improved box shadow */;
+    transition: transform 1.5s, box-shadow 1.5s;
 }
 
 .column h2{
@@ -233,10 +233,11 @@ input[type="file"].file-selected {
 }
 
 /* Big box hover effect */
-#big-box:hover {
-    box-shadow: 0 8px 16px rgba(0, 0, 0, 0.2); /* Enhanced box shadow on hover */
+.column:hover {
+    box-shadow: 0 8px 16px rgba(0, 0, 0, 0.2);
     transform: scale(1.05);
 }
+
 
 /* Add this CSS for the hover effect */
 .box.hover-effect {
@@ -254,7 +255,7 @@ input[type="file"].file-selected {
 
 /* Medium box under the Big box w/ 3 sections */
 #med-box {
-    width: 100%;
+    width: 45%;
     margin-left: 15px;
     margin-top: 40px;
     padding: 30px; /* Increased padding */
@@ -276,10 +277,10 @@ input[type="file"].file-selected {
     margin-top: 20px;
     text-align: center;
     padding: 15px;
-    border: 2px solid #09558B;
-    border-radius: 0px;
-    background-color: #fff;
-    color: #09558B;
+    border: 2px solid #000000;
+    border-radius: 0px; /* Rounded corners */
+    background-color: #09558B;
+    color: #fff;
     transition: background-color 0.3s, color 0.3s, border-color 0.3s;
     box-shadow: 0 6px 8px 0 rgba(0,0,0,0.24),0 8.5px 25px 0 rgba(0,0,0,0.19);
     cursor: pointer;
@@ -287,14 +288,14 @@ input[type="file"].file-selected {
 
 /* Hover effect for Select All button */
 #select-all-btn:hover {
-    background-color: #09558B;
+    color: #09558B;
     color: white;
     border-color: #09558B;
     transition: background-color 0.3s, color 0.3s, border-color 0.3s;
 }
 
 #select-all-btn.clicked {
-    background-color: #09558B;
+    background-color: #0a6fc1;
     color: white;
     border-color: #09558B;
 }
@@ -302,6 +303,7 @@ input[type="file"].file-selected {
 /* Adjust hover effect to make it smoother */
 #select-all-btn:hover {
     transition: background-color 0.3s, color 0.3s, border-color 0.3s;
+    background-color: #0a6fc1;
 }
 
 /* CSS for Open Results Folder button */
@@ -311,10 +313,10 @@ input[type="file"].file-selected {
     margin-bottom: 10px;
     text-align: center;
     padding: 5px;
-    border: 2px solid #09558B;
-    border-radius: 0px;
-    color: #09558B;
-    background-color: #fff;
+    border: 2px solid #000000;
+    border-radius: 12px; /* Rounded corners */
+    background-color: #09558B;
+    color: #fff;
     transition: background-color 0.3s, color 0.3s, border-color 0.3s;
     box-shadow: 0 6px 8px 0 rgba(0,0,0,0.24),0 8.5px 25px 0 rgba(0,0,0,0.19);
     cursor: pointer;
@@ -322,7 +324,7 @@ input[type="file"].file-selected {
 
 /* Hover effect for Open Results Folder button */
 #open-results-folder-btn:hover {
-    background-color: #09558B;
+    background-color: #0a6fc1;
     color: white;
     border-color: #09558B;
     transition: background-color 0.3s, color 0.3s, border-color 0.3s;
@@ -387,19 +389,24 @@ input[type="file"].file-selected {
     justify-content: center;
     margin: 0;
     padding: 8px;
-    border: 2px solid #09558B;
+    background-color: #09558B;
+    color: #fff;
+    border: 2px solid #000000;
     border-radius: 8px;
     transition: background-color 0.3s, color 0.3s, transform 0.3s;
     box-sizing: border-box;
+    
 }
 
 .column label:hover {
-    background-color: #09558B;
     color: white;
+    background-color: #0a6fc1;
+    transform: scale(1.05);
+    box-shadow: 0 8px 16px rgba(0, 0, 0, 0.2);
 }
 
 .column input[type="radio"]:checked + label {
-    background-color: #09558B;
+    background-color: #0a6fc1;
     color: white;
     transform: scale(1.1);
     box-shadow: 0 12px 16px 0 rgba(0,0,0,0.24),0 17px 50px 0 rgba(0,0,0,0.19);
@@ -626,3 +633,75 @@ button[aria-disabled="true"] {
     margin-top: 1em;
 }
 
+#scraperTextbox{
+    width: 90%;
+    max-height: 2%;
+    padding: 15px;
+    border: 2px solid #09558B;
+    border-radius: 8px;
+    background-color: #fff;
+    transition: background-color 0.3s, color 0.3s, border-color 0.3s;
+    box-shadow: 0 6px 8px 0 rgba(0,0,0,0.24),0 8.5px 25px 0 rgba(0,0,0,0.19);
+    cursor: pointer;
+}
+
+.checkboxes{
+    text-align: left ;
+    margin-right: 2%;
+    margin-bottom: 8%;
+}
+
+#startButton,
+#stopButton {
+    display: flex;
+    flex-direction: column;
+    text-align: center;
+    gap: 12px;
+    background-color: #09558B;
+    color: #fff;
+    margin: 10px;
+    border: #080b0f 2px solid;
+    cursor: pointer;
+    transition: background-color 0.3s, transform 0.3s, box-shadow 0.3s;
+}
+
+#startButton:hover,
+#stopButton:hover {
+    background-color: #0a6fc1;
+    transform: scale(1.05);
+    box-shadow: 0 8px 16px rgba(0, 0, 0, 0.2);
+}
+
+
+#additionalDiv {
+    display: flex;
+    justify-content: space-between;
+    margin-top: 20px;
+}
+
+#additionalDiv .column-s {
+    flex: 1;
+    height: fit-content;
+    justify-self: center;
+    padding: 5%;
+    border: 1px solid #ddd;
+    background-color: #fff;
+    text-align: center;
+    border-radius: 12px;
+    box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+    transition: transform 0.3s, box-shadow 0.3s;
+
+}
+
+#additionalDiv .column-s:hover {
+    box-shadow: 0 8px 16px rgba(0, 0, 0, 0.2);
+    transform: scale(1.05);
+}
+
+#additionalDiv .column-s h2 {
+    margin: 0 auto; 
+    text-align: center;
+    justify-content: center;
+    color: #09558B;
+    height: fit-content;
+}
