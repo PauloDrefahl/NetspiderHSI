@@ -1,4 +1,3 @@
-import os
 import threading
 import socket
 import time
@@ -24,6 +23,8 @@ class ScraperManager:
         if self.scraper_thread is None or not self.scraper_thread.is_alive():
             self.scraper_thread = ScraperThread(kwargs)
             self.scraper_thread.start()
+            self.scraper_thread.join()
+            print("starting thread: ", threading.main_thread())
             return {"Response": "Scraper Thread Started"}
         else:
             return {"Response": "Scraper Thread is already running"}
@@ -32,12 +33,19 @@ class ScraperManager:
         if self.scraper_thread and self.scraper_thread.is_alive():
             self.scraper_thread.stop_thread()
             self.scraper_thread.join_with_timeout()  # Wait for the thread to finish
-            # thread_id = threading.get_native_id()
             print("thread count after stop: ", threading.active_count())
             return {"Response": "Scraper Thread Stopped Forcefully"}
         else:
             print("number of threads: ", threading.active_count())
             return {"Response": "No active Scraper Thread, Forceful Stop Attempted"}
+
+    def get_scraper_status(self):
+        print("scraper alive", self.scraper_thread.is_alive())
+        print("scraper thread id:", self.scraper_thread.get_native_id())
+        if self.scraper_thread and self.scraper_thread.is_alive():
+            socketio.emit('scraper_update', {'status': 'scraper thread alive'})
+        else:
+            socketio.emit('scraper_update', {'status': 'scraper thread not alive'})
 
 
 class ScraperThread(threading.Thread):
@@ -55,13 +63,16 @@ class ScraperThread(threading.Thread):
             self.scraper = SkipthegamesScraper()
         elif kwargs['website'] == 'yesbackpage':
             self.scraper = YesbackpageScraper()
-        self.scraper.keywords = keywords
+        self.scraper.set_keywords(keywords)
+        print("keywords", keywords)
+        print("scraper keywords", self.scraper.keywords)
         self.scraper.set_path(kwargs['path'])
         self.scraper.set_flagged_keywords(flagged_keywords)
         if kwargs['inclusive_search']:
             self.scraper.set_join_keywords()
         self.scraper.set_search_mode(kwargs['search_mode'])
-        self.scraper.keywords.add(kwargs['search_text'])
+        if kwargs['search_text'] != '':
+            self.scraper.keywords.add(kwargs['search_text'])
         self.scraper.set_city(kwargs['city'])
         self._stop_event = threading.Event()
 
@@ -69,18 +80,25 @@ class ScraperThread(threading.Thread):
         print("number of threads before: ", threading.active_count())
         while not self._stop_event.is_set() and not self.scraper.completed:
             thread_id = threading.get_native_id()
-            print("start thread id", thread_id)
+            print("scraper thread id", thread_id)
+            global threads
+            threads.add(threading.get_native_id())
+            print(threads)
             socketio.emit('scraper_update', {'status': 'running'})
+            print("right before run:", self.scraper.keywords)
             self.scraper.initialize()
             print(self.is_alive(), "1")
         print(self.scraper.completed, "scraper completed")
+        print("thread id after close", threading.get_native_id())
+        print("current thread  ", threading.current_thread())
         print(self.is_alive(), "thread is alive")
         if self.scraper.completed:
             print("scraper done")
             self.stop_thread()
             print("stopping thread")
-            # self.join_with_timeout()
-            print(self.is_alive(), "2")
+            print(threading.current_thread().is_alive(), "2")
+            print("id", threading.get_native_id())
+            print("current thread  ", threading.current_thread())
         socketio.emit('scraper_update', {'status': 'completed'})
 
     def stop_thread(self):
@@ -119,18 +137,20 @@ def connected():
     print("connected")
 
 
+@socketio.on('scraper_status')
+def get_status():
+    scraper_manager.get_scraper_status()
+
+
 @socketio.on('start_scraper')
 def start_scraper(data):
-    # print(data)
     socketio.emit('scraper_update', {'status': 'started'})
     response = scraper_manager.start_scraper(data)
-
     return {'Response': response}
 
 
 @socketio.on('stop_scraper')
 def stop_scraper():
-
     response = scraper_manager.manage_stop_scraper()
     socketio.emit('scraper_update', {'status': 'stopped'})
     return {'Response': response}
@@ -148,5 +168,4 @@ if __name__ == "__main__":
     # serve(app, host='127.0.0.1', port=5000)
     print("active threads: ", threading.active_count())
     open_port = find_open_port()
-    print(os.environ)
     socketio.run(app, host='127.0.0.1', port=5000, allow_unsafe_werkzeug=True)

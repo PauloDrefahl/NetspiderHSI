@@ -104,6 +104,9 @@ class YesbackpageScraper(ScraperPrototype):
     def set_flagged_keywords(self, flagged_keywords) -> None:
         self.flagged_keywords = flagged_keywords
 
+    def set_keywords(self, keywords) -> None:
+        self.keywords = keywords
+
     def initialize(self) -> None:
         # set keywords value
         # self.keywords = keywords
@@ -134,6 +137,7 @@ class YesbackpageScraper(ScraperPrototype):
         self.pdf_filename = f'{self.screenshot_directory}/yesbackpage.pdf'
         os.mkdir(self.screenshot_directory)
         print("number of threads while running: ", threading.active_count())
+        print("keywords inside scraper:", self.keywords)
         self.get_data(links)
         print("get data done")
         # time.sleep(5)
