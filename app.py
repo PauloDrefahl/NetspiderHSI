@@ -23,7 +23,6 @@ class ScraperManager:
         if self.scraper_thread is None or not self.scraper_thread.is_alive():
             self.scraper_thread = ScraperThread(kwargs)
             self.scraper_thread.start()
-            self.scraper_thread.join()
             print("starting thread: ", threading.main_thread())
             return {"Response": "Scraper Thread Started"}
         else:
@@ -41,7 +40,6 @@ class ScraperManager:
 
     def get_scraper_status(self):
         print("scraper alive", self.scraper_thread.is_alive())
-        print("scraper thread id:", self.scraper_thread.get_native_id())
         if self.scraper_thread and self.scraper_thread.is_alive():
             socketio.emit('scraper_update', {'status': 'scraper thread alive'})
         else:
@@ -81,9 +79,6 @@ class ScraperThread(threading.Thread):
         while not self._stop_event.is_set() and not self.scraper.completed:
             thread_id = threading.get_native_id()
             print("scraper thread id", thread_id)
-            global threads
-            threads.add(threading.get_native_id())
-            print(threads)
             socketio.emit('scraper_update', {'status': 'running'})
             print("right before run:", self.scraper.keywords)
             self.scraper.initialize()
