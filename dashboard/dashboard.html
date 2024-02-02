@@ -16,7 +16,7 @@
     <h1>Homeland Security Netspider</h1>
     <a href="#" id="settings-link"  ><img src="./icons/gear-solid.svg" class="icon"/>Settings</a>
     <a href="#" id="netspider-link"><img src="./icons/spider-solid.svg" class="icon"/>Netspider</a>
-    <a href="#"><img src="./icons/key-solid.svg" class="icon"/>Keyword</a>
+    <a href="#" id="keyword-link"><img src="./icons/key-solid.svg" class="icon"/>Keyword</a>
     <a href="#"><img src="./icons/circle-question-solid.svg" class="icon"/>Help</a>
     <a href="#" id="logout-link" class="last-child-divider"><img src="./icons/right-from-bracket-solid.svg" class="icon"/>Logout</a>
     <img src="photos/fgcu-logo.png" class="fgcu-logo">
@@ -26,15 +26,15 @@
 <div id="content">
     <!-- New div with margin on the left -->
     <div id="content-wrapper">
-        <div class="box">
+        <div class="box" id="keyword-box">
             <h2><img src="./icons/file-regular.svg" class="icon"/> Select Keywords File</h2>
             <input type="file" id="file1" name="file1" class="file-input">
         </div>
-        <div class="box">
+        <div class="box" id="keyword-box">
             <h2><img src="./icons/book-solid.svg" class="icon"/> Select Keysets File</h2>
             <input type="file" id="file2" name="file2" class="file-input">
         </div>
-        <div class="box">
+        <div class="box" id="keyword-box">
             <h2><img src="./icons/folder-open-regular.svg" class="icon"/>Select Results Folder</h2>
             <input type="file" id="file3" name="file3" class="file-input">
         </div>
@@ -74,11 +74,7 @@
 
             </div>
             <div class="column">
-<<<<<<< HEAD
-                <h2><img src="./icons/magnifying-glass-solid.svg" class="icon"/>Select Keywords:</h2>
-=======
                 <h2><img src="./icons/key-solid.svg" class="icon"/>Select Keywords:</h2>
->>>>>>> 19c1d8064faf02244477609f32ce506ac3188f67
                 <!-- Add content for column 2 here -->
                 <div class="listbox-area">
                     <div>
@@ -195,29 +191,166 @@
                 <button id="open-results-folder-btn" onclick="this.classList.toggle('clicked')">Open Results Folder</button>
             </div>
             <div class="column">
-<<<<<<< HEAD
-                <h2>Scraper Settings:</h2>
-=======
-                <h2><img src="./icons/gear-solid.svg" class="icon"/>Scrapper Settings:</h2>
->>>>>>> 19c1d8064faf02244477609f32ce506ac3188f67
+                <h2><img src="./icons/gear-solid.svg" class="icon"/>Scraper Settings:</h2>
                 <!-- Add content for column 3 here -->
             </div>
         </div>
         <div id="med-box">
+            <h2><img src="./icons/pen-to-square-solid.svg" class="icon"/>Edit Keywords & Sets:</h2>
             <div class="column">
-                <h2><img src="./icons/pen-to-square-solid.svg" class="icon"/>Edit Keywords & Sets:</h2>
-                <p style="margin-top: 50px;" > <!-- FIX SPACING METHOD -->
-                    Enter New Keyword:   &emsp;&emsp;&emsp;&emsp;&emsp;&emsp;&emsp;&emsp;&emsp;&emsp;&emsp;&emsp;&emsp; Enter Set Name:</style></p>
-                        <!-- Add content for first box here -->
-                        <p style="margin-left: 30px"></p><img src="./photos/arrows-rotate-solid.png" class="photos" width="36" height="36"/>
-                        <!-- Add content for second box here -->
-                <h3><warning><img src="./icons/triangle-exclamation-solid.svg" class="icon"/>Warning: Remove only one keyword at a time <img src="./icons/triangle-exclamation-solid.svg" class="icon"/></warning></h3>
+                <h3>Enter New Keyword:</h3>
+                <div class="input-container">
+                    <input type="text" class="keyword-input" placeholder="Type new keyword">
+                    <button class="add-keyword-btn">Add Keyword</button>
+                </div>
+                <div class="listbox-area">
+                    <div>
+                        <span id="ss_elem" class="listbox-label"></span>
+                        <ul id="ss_elem_list" tabindex="0" role="listbox" aria-labelledby="ss_elem">
+                            <li id="ss_elem_Np" role="option">
+                                <span class="checkmark" aria-hidden="true"></span>
+                                keyword
+                            </li>
+                            <li id="ss_elem_Pu" role="option">
+                                <span class="checkmark" aria-hidden="true"></span>
+                                keyword
+                            </li>
+                            <li id="ss_elem_Am" role="option">
+                                <span class="checkmark" aria-hidden="true"></span>
+                                keyword
+                            </li>
+                            <li id="ss_elem_Cm" role="option">
+                                <span class="checkmark" aria-hidden="true"></span>
+                                keyword
+                            </li>
+                            <li id="ss_elem_Bk" role="option">
+                                <span class="checkmark" aria-hidden="true"></span>
+                                keyword
+                            </li>
+                            <li id="ss_elem_Cf" role="option">
+                                <span class="checkmark" aria-hidden="true"></span>
+                                keyword
+                            </li>
+                            <li id="ss_elem_Es" role="option">
+                                <span class="checkmark" aria-hidden="true"></span>
+                                keyword
+                            </li>
+                            <li id="ss_elem_Fm" role="option">
+                                <span class="checkmark" aria-hidden="true"></span>
+                                keyword
+                            </li>
+                            <li id="ss_elem_Md" role="option">
+                                <span class="checkmark" aria-hidden="true"></span>
+                                keyword
+                            </li>
+                            <li id="ss_elem_No" role="option">
+                                <span class="checkmark" aria-hidden="true"></span>
+                                keyword
+                            </li>
+                            <li id="ss_elem_Lr" role="option">
+                                <span class="checkmark" aria-hidden="true"></span>
+                                keyword
+                            </li>
+                            <li id="ss_elem_Rf" role="option">
+                                <span class="checkmark" aria-hidden="true"></span>
+                                keyword
+                            </li>
+                            <li id="ss_elem_Db" role="option">
+                                <span class="checkmark" aria-hidden="true"></span>
+                                keyword
+                            </li>
+                            <li id="ss_elem_Sg" role="option">
+                                <span class="checkmark" aria-hidden="true"></span>
+                                keyword
+                            </li>
+                            <li id="ss_elem_Bh" role="option">
+                                <span class="checkmark" aria-hidden="true"></span>
+                                keyword
+                            </li>
+                            <li id="ss_elem_Hs" role="option">
+                                <span class="checkmark" aria-hidden="true"></span>
+                                keyword
+                            </li>
+                            <li id="ss_elem_Mt" role="option">
+                                <span class="checkmark" aria-hidden="true"></span>
+                                keyword
+                            </li>
+                            <li id="ss_elem_Ds" role="option">
+                                <span class="checkmark" aria-hidden="true"></span>
+                                keyword
+                            </li>
+                            <li id="ss_elem_Rg" role="option">
+                                <span class="checkmark" aria-hidden="true"></span>
+                                keyword
+                            </li>
+                            <li id="ss_elem_Cn" role="option">
+                                <span class="checkmark" aria-hidden="true"></span>
+                                keyword
+                            </li>
+                            <li id="ss_elem_Nh" role="option">
+                                <span class="checkmark" aria-hidden="true"></span>
+                                keyword
+                            </li>
+                            <li id="ss_elem_Fl" role="option">
+                                <span class="checkmark" aria-hidden="true"></span>
+                                keyword
+                            </li>
+                            <li id="ss_elem_Mc" role="option">
+                                <span class="checkmark" aria-hidden="true"></span>
+                                keyword
+                            </li>
+                            <li id="ss_elem_Lv" role="option">
+                                <span class="checkmark" aria-hidden="true"></span>
+                                keyword
+                            </li>
+                            <li id="ss_elem_Ts" role="option">
+                                <span class="checkmark" aria-hidden="true"></span>
+                                keyword
+                            </li>
+                            <li id="ss_elem_Og" role="option">
+                                <span class="checkmark" aria-hidden="true"></span>
+                                keyword
+                            </li>
+                        </ul>
+                    </div>
+                </div>
+                <div class="button-container">
+                    <img src="./icons/trash-solid.svg" class="icon"/>
+                    <button class="delete-keyword-btn">Delete Keywords</button>
+                </div>
+            </div>
+            <div class="column">
+                <h3>Enter Set Name:</h3>
+                <div class="input-container">
+                    <input type="text" class="setname-input" placeholder="Type new set name">
+                    <button class="create-set-btn">Create Set</button>
+                </div>
+                <div class="listbox-area">
+                    <div>
+                        <span id="ss_elem" class="listbox-label"></span>
+                        <ul id="ss_elem_list" tabindex="0" role="listbox" aria-labelledby="ss_elem">
+                            <li id="ss_elem_Np" role="option">
+                                <span class="checkmark" aria-hidden="true"></span>
+                                set
+                            </li>
+                            <li id="ss_elem_Pu" role="option">
+                                <span class="checkmark" aria-hidden="true"></span>
+                                set
+                            </li>
+                            <li id="ss_elem_Am" role="option">
+                                <span class="checkmark" aria-hidden="true"></span>
+                                set
+                            </li>
+                        </ul>
+                    </div>
+                </div>
+                <div class="button-container">
+                    <img src="./icons/trash-solid.svg" class="icon"/>
+                    <button class="delete-set-btn">Delete Set</button>
+                </div>
             </div>
         </div>            
     </div>
 </div>
-
-
-
 </body>
 </html>
