@@ -9,7 +9,8 @@
     <link rel="stylesheet" href="icons.css">
     <link rel="icon" type="image/ico" href="./icons/spider-solid-2xl.svg">
 </head>
-<body>
+
+<body onload="populateKeysworkds()">
 
 <div id="navbar">
     <img src="photos/logo-hsi.png">
@@ -59,8 +60,9 @@
 
                     <input type="radio" id="website5" name="website">
                     <label for="website5">Eros</label>
+                    <div class="divider"></div>
                 </div>
-                <h2 style="margin-top: 50px;"><img src="./icons/location-arrow-solid.svg" class="icon"/>Select Location:</h2>
+                <h2 style="margin-top: 25px; margin-bottom: 7px;"><img src="./icons/location-arrow-solid.svg" class="icon"/>Select Location:</h2>
                 <!-- Add the following within the #navbar div, after the last <a> tag -->
                     <div class="dropdown">
                         <a href="#" class="dropdown-item">Select Location</a>
@@ -72,8 +74,20 @@
                         </div>
                     </div>
 
+                    <h2 style="margin-top: 30px; margin-bottom: 7px;"><img src="./icons/book-solid.svg" class="icon"/>Select Keyset:</h2>
+                <!-- Add the following within the #navbar div, after the last <a> tag -->
+                    <div class="dropdown">
+                        <a href="#" class="dropdown-item">Select keyset</a>
+                        <div class="dropdown-content">
+                            <a href="#" class="dropdown-item">keyset1</a>
+                            <a href="#" class="dropdown-item">keyset2</a>
+                            <a href="#" class="dropdown-item">keyset3</a>
+                        </div>
+                    </div>
+                
             </div>
             <div class="column">
+
                 <h2><img src="./icons/key-solid.svg" class="icon"/>Select Keywords:</h2>
                 <!-- Add content for column 2 here -->
                 <div class="listbox-area">
@@ -191,8 +205,36 @@
                 <button id="open-results-folder-btn" onclick="this.classList.toggle('clicked')">Open Results Folder</button>
             </div>
             <div class="column">
-                <h2><img src="./icons/gear-solid.svg" class="icon"/>Scraper Settings:</h2>
+
+                <h2><img src="./icons/gear-solid.svg" class="icon"/>Scrapper Settings:</h2>
                 <!-- Add content for column 3 here -->
+                <p>Enter Text to Scrape:</p>
+                <textarea id="scraperTextbox" name="scraperTextbox"></textarea>
+
+                <div class="checkboxes" style="margin-top: 10px;">
+                    <p> <input type="checkbox" id="all_keywords" name="all_keywords"> Search For Page with all Keywords Included</p>
+                    <p> <input type="checkbox" id="payment_method" name="payment_method"> Find Posts Only with Payment Methods</p>
+                    <p> <input type="checkbox" id="hide_browser" name="hide_browser">Hide Browser while Running</p>
+                    <div class="divider"></div>
+                </div>
+                <h2>Start Scraper:</h2>
+                <div>
+                    <label onclick="startClock()" id="startButton">Start</label>
+                    <label onclick="stopClock()" id="stopButton">Stop</label>
+                </div>
+
+                <div id="additionalDiv">
+                    <div style="margin-right: 5%; min-height: 28px;" class="column-s">
+                        <!-- Content for the first column -->
+                        <h2 style="font-size: 20px;">Status: OFF</h2>
+                    </div>
+                    <div class="column-s">
+                        <!-- Content for the second column -->
+                        <h2>00:00:00</h2>
+                    </div>
+                </div>
+            
+                <div id="clock"> </div>
             </div>
         </div>
         <div id="med-box">
@@ -349,8 +391,9 @@
                     <button class="delete-set-btn">Delete Set</button>
                 </div>
             </div>
-        </div>            
+        </div>       
     </div>
 </div>
+
 </body>
 </html>
