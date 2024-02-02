@@ -1,5 +1,7 @@
 'use strict'; 
 var aria = aria || {}; 
+const vs = require('fs');
+
 
 document.addEventListener("DOMContentLoaded", function () {
     var settingsLink = document.getElementById("settings-link");
@@ -743,3 +745,33 @@ aria.Listbox = class Listbox {
 function showAlert() { 
     alert('Button Clicked!');
 }
+
+// initialize clock
+let clockInterval;
+let secondsElapsed = 0;
+
+// sets ups the clock  to display the runnning
+function updateClock() {
+  const hours = Math.floor(secondsElapsed / 3600).toString().padStart(2, '0');
+  const minutes = Math.floor((secondsElapsed % 3600) / 60).toString().padStart(2, '0');
+  const seconds = (secondsElapsed % 60).toString().padStart(2, '0');
+  const timeString = `${hours}:${minutes}:${seconds}`;
+  document.getElementById('clock').innerText = timeString;
+  secondsElapsed++;
+}
+
+//Starts the clock
+function startClock() {
+    stopClock();
+    secondsElapsed = 0;
+    clockInterval = setInterval(updateClock, 1000);
+}
+
+//Stops the clock
+function stopClock() {
+  clearInterval(clockInterval);
+  clockInterval = null;
+}
+
+// Initial setup of clock - displays clock
+updateClock();
