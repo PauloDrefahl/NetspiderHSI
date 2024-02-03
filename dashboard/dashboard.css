@@ -6,7 +6,6 @@ body {
     background-color: #f4f4f4;
 }
 
-/* Styles for the sidebar navigation */
 #navbar {
     height: 100%;
     width: 230px;
@@ -65,12 +64,9 @@ body {
     text-align: center;
     transition: background-color 0.3s, color 0.3s, box-shadow 0.3s, transform 0.3s;
     margin-top: 17px;
-    border: solid; 
-    border-image: linear-gradient(to right, rgb(51, 50, 50), #09558B) 1;
-    border-width: 2px;
-    border-radius: 20px;
-    box-shadow: #2A3547;
-    transition: background-color 0.3s, color 0.3s, box-shadow 0.3s, transform 0.3s;
+    border: none; /* Remove solid border */
+    border-radius: 20px; /* Adjusted border-radius for curved edges */
+    box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1); /* Apply box shadow */
     transform-style: preserve-3d; /* Enable 3D transformations */
 }
 
@@ -90,7 +86,8 @@ body {
 #navbar a:hover:not(.active):not(.focus) {
     background-color: #accaf34d;
     color: #09558B;
-    border-color: white ;
+    border-color: white;
+    border-radius: 20px; /* Added border radius */
 }
 
 
@@ -109,6 +106,12 @@ body {
     height: 1px;
     background-color: #ddd;
     margin-top: 20px;
+}
+
+.input-container, .button-container {
+    display: flex;
+    align-items: center; /* Center items horizontally */
+    justify-content: center; /* Center items vertically */
 }
 
 
@@ -454,13 +457,14 @@ input[type="file"].file-selected {
 
 /* Styles for the buttons */
 .listbox-area {
-    display: grid;
-    grid-gap: 2em;
-    grid-template-columns: repeat(1, 1fr);
-    padding: 20px;
+    /* Remove position:absolute and set flex property */
+    display: flex;
+    flex-direction: column;
+    flex: 1; /* Grow and shrink equally to fill available space */
+    padding: 10px;
     border: 1px solid white;
     border-radius: 4px;
-    background: #eee;
+    background:#09558be1;
     overflow: hidden; /* Hide overflowing content */
     position: relative; /* Positioning context for absolute positioning */
 }
@@ -514,20 +518,21 @@ input[type="file"].file-selected {
 [role="option"] {
     position: relative;
     display: block;
-    margin: .5px 2px;
+    margin: 2px 2px; /* Reduce the margin to 2px */
     border-radius: 10px;
-    padding: 2px 1em 2px 1.5em;
+    padding: 5px 10px;
     line-height: 1.8em;
     cursor: pointer;
-    transition: background-color 0.3s, color 0.3s; /* Added transition for smooth hover effect */
-    background-color: white; /* Set default background color to white */
+    transition: background-color 0.3s, color 0.3s;
+    background-color: white;
 }
 
-[role="listbox"]:focus [role="option"].focused {
-    background: #bde4ff;
+[role="option"].selected {
+    background-color:#09558B; /* Set background color for selected item */
 }
+
 [role="option"]:hover {
-    background-color: #accaf34d; /* Lighter shade for hover effect */
+    background-color: #ffffff; /* Lighter shade for hover effect */
     color: #09558B; /* Change text color to the original color when hovering */
     border-radius: 10px;
 }
@@ -626,6 +631,17 @@ button[aria-disabled="true"] {
     clip: rect(1px, 1px, 1px, 1px);
     font-size: 14px;
     white-space: nowrap;
+}
+
+/* Added to match existing styles */
+[role="option"] + [role="option"],
+[role="listbox"]:not(#ss_elem_list) + [role="listbox"] {
+    margin-top: 1em;
+}
+
+.blurred {
+    filter: blur(5px); /* Adjust blur amount as needed */
+    pointer-events: none; /* Disable pointer events to prevent interaction */
 }
 
 /* Added to match existing styles */

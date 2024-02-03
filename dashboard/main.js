@@ -1,13 +1,13 @@
 'use strict'; 
 var aria = aria || {}; 
-const vs = require('fs');
-
 
 document.addEventListener("DOMContentLoaded", function () {
     var settingsLink = document.getElementById("settings-link");
     var netspiderLink = document.getElementById("netspider-link");
+    var keywordLink = document.getElementById("keyword-link");
     var boxes = document.querySelectorAll(".box");
     var bigBox = document.getElementById("big-box");
+    var medBox = document.getElementById("med-box");
 
     settingsLink.addEventListener("click", function () {
         // Trigger hover effect on the three boxes
@@ -30,6 +30,15 @@ document.addEventListener("DOMContentLoaded", function () {
             bigBox.classList.remove("hover-effect");
         }, 1000);
     });
+
+    keywordLink.addEventListener("click", function () {
+        // Trigger hover effect on the big box
+        medBox.classList.add("hover-effect");
+
+        setTimeout(function () {
+            medBox.classList.remove("hover-effect");
+        }, 1000);
+    });
 });
 
 document.addEventListener("DOMContentLoaded", function () {
@@ -47,32 +56,70 @@ document.addEventListener("DOMContentLoaded", function () {
 });
 
 document.addEventListener("DOMContentLoaded", function () {
-    var selectAllButton = document.getElementById("select-all-btn");
-    var listbox = document.getElementById("ss_elem_list");
+  var selectAllButton = document.getElementById("select-all-btn");
+  var listbox = document.getElementById("ss_elem_list");
+
+  selectAllButton.addEventListener("click", function () {
+      var items = listbox.querySelectorAll('[role="option"]');
+      var isNotSelected = selectAllButton.classList.contains("clicked");
   
-    selectAllButton.addEventListener("click", function () {
-        var items = listbox.querySelectorAll('[role="option"]');
-        var isNotSelected = selectAllButton.classList.contains("clicked");
-    
-        if (isNotSelected) {
-            // Select all items
-            items.forEach(function (item) {
-                item.setAttribute("aria-selected", "true");
-                item.classList.remove("selected");
-                item.style.backgroundColor = '#09558B'; // Reset background color
-                item.style.color = 'white'; // Reset text color
-            });
-        } else {
-            // Deselect all items
-            items.forEach(function (item) {
-                item.setAttribute("aria-selected", "true");
-                item.classList.add("selected");
-                item.style.backgroundColor = 'white'; 
-                item.style.color = 'black'; 
-            });
-        }
-    });
+      if (isNotSelected) {
+          // Select all items
+          items.forEach(function (item) {
+              item.setAttribute("aria-selected", "true");
+              item.classList.remove("selected");
+              item.style.backgroundColor = ''; // Reset background color
+              item.style.color = ''; // Reset text color
+          });
+      } else {
+          // Deselect all items
+          items.forEach(function (item) {
+              item.setAttribute("aria-selected", "false");
+              item.classList.remove("selected");
+              item.style.backgroundColor = ''; // Reset background color
+              item.style.color = ''; // Reset text color
+          });
+      }
+
+      // Toggle class on listbox container
+      listbox.classList.toggle("select-all-mode");
+  });
 });
+
+document.addEventListener("DOMContentLoaded", function () {
+  // Initialize listboxes
+  const keywordListbox = new aria.Listbox(document.getElementById('keyword_list'));
+  const setListbox = new aria.Listbox(document.getElementById('set_list'));
+
+  // Add items to keyword listbox
+  const keywordItems = document.querySelectorAll('#keyword_list [role="option"]');
+  keywordListbox.addItems(keywordItems);
+
+  // Add items to set listbox
+  const setItems = document.querySelectorAll('#set_list [role="option"]');
+  setListbox.addItems(setItems);
+
+  // Handle focus change for keyword listbox
+  keywordListbox.setHandleFocusChange(function (element) {
+      console.log('Keyword focused:', element.textContent.trim());
+  });
+
+  // Handle focus change for set listbox
+  setListbox.setHandleFocusChange(function (element) {
+      console.log('Set focused:', element.textContent.trim());
+  });
+
+  // Add event listener for keyword listbox item change
+  keywordListbox.setHandleItemChange(function (action, items) {
+      console.log('Keyword action:', action, 'Items:', items);
+  });
+
+  // Add event listener for set listbox item change
+  setListbox.setHandleItemChange(function (action, items) {
+      console.log('Set action:', action, 'Items:', items);
+  });
+});
+
 
 aria.Listbox = class Listbox {
     constructor(listboxNode) {
@@ -140,10 +187,14 @@ aria.Listbox = class Listbox {
                 // Remove yellow background color on double-click
                 doubleClickedItem.classList.remove('yellow-background');
                 doubleClickedItem.style.backgroundColor = ''; // Reset background color
+                // Reset text color
+                doubleClickedItem.style.color = '';
             } else {
                 // Toggle yellow background color on double-click
                 doubleClickedItem.classList.add('yellow-background');
                 doubleClickedItem.style.backgroundColor = 'yellow'; // Set background color to yellow
+                // Set text color to black
+                doubleClickedItem.style.color = 'black';
             }
         }
     }
@@ -684,10 +735,6 @@ aria.Listbox = class Listbox {
     }
   };
   
-  'use strict';
-
-  var aria = aria || {};
-  
   window.addEventListener('load', function () {
     new aria.Listbox(document.getElementById('ss_elem_list'));
   });
@@ -697,6 +744,10 @@ function showAlert() {
     alert('Button Clicked!');
 }
 
+// The button click function
+function showAlert() { 
+    alert('Button Clicked!');
+}
 // initialize clock
 let clockInterval;
 let secondsElapsed = 0;
