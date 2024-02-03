@@ -481,6 +481,7 @@ input[type="file"].file-selected {
     right: 0; /* Align to the right of the listbox area */
 }
 
+
 [role="listbox"]#ss_elem_list {
     display: flex;
     flex-direction: column;
