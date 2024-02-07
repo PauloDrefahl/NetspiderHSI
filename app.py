@@ -1,10 +1,9 @@
 import threading
 import socket
 import time
-from flask import Flask, request
+from flask import Flask
 from flask_socketio import SocketIO
 from flask_cors import CORS
-from waitress import serve
 from Backend.Scraper import MegapersonalsScraper, SkipthegamesScraper, YesbackpageScraper, EscortalligatorScraper, \
     ErosScraper
 
@@ -101,7 +100,7 @@ class ScraperThread(threading.Thread):
             self.scraper.stop_scraper()
         self._stop_event.set()
 
-    def join_with_timeout(self, timeout=10):
+    def join_with_timeout(self, timeout=20):
         if not self.scraper.completed:
             print("join attempt in function")
             self.join(timeout)

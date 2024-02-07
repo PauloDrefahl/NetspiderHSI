@@ -150,7 +150,6 @@ class YesbackpageScraper(ScraperPrototype):
         print("done scraping")
 
     def stop_scraper(self) -> None:
-        self.reset_variables()
         self.driver.close()
         self.driver.quit()
 
@@ -373,10 +372,10 @@ class YesbackpageScraper(ScraperPrototype):
             data.to_excel(writer, index=False)
             worksheet = writer.sheets['Sheet1']
             for i in range(2, worksheet.max_row):
-                keywords = worksheet["K" + str(i)].value  # set the keywords var to each keyword in the cell
+                keywords = worksheet["L" + str(i)].value  # set the keywords var to each keyword in the cell
                 for flagged_keyword in self.flagged_keywords:
                     if flagged_keyword in keywords:
-                        worksheet["K" + str(i)].fill = PatternFill(
+                        worksheet["L" + str(i)].fill = PatternFill(
                             fill_type='solid',
                             start_color='ff0000',
                             end_color='ff0000')
