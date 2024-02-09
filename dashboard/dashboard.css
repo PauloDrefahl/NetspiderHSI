@@ -208,6 +208,17 @@ input[type="file"].file-selected {
     box-shadow: 0 8px 16px rgba(0, 0, 0, 0.1); /* Improved box shadow */
 }
 
+.medium-column {
+    flex: 1;
+    margin: 5px; /* Decreased margin */
+    padding: 20px; /* Decreased padding */
+    box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1); /* Improved box shadow */
+    transition: transform 1.5s, box-shadow 1.5s;
+    max-width: calc(50% - 20px); /* Adjusted max-width */
+    display: flex; /* Added */
+    flex-direction: column; /* Added */
+}
+
 /* Three columns within the big box */
 .column {
     flex: 1;
@@ -254,22 +265,38 @@ input[type="file"].file-selected {
     transform: scale(1.05);
 }
 
-
-
-/* Medium boxs under the Big box*/
+/* Medium box under the Big box w/ 3 sections */
 #med-box {
-    width: 44.6%;
+    width: 45%;
     margin-left: 15px;
     margin-top: 40px;
     padding: 30px; /* Increased padding */
     background-color: #fff;
-    border-left: 2px solid #ddd; /* Left border */
-    border-right: 2px solid #ddd; /* Right border */
+    border: 2px solid #ddd;
     border-radius: 12px; /* Rounded corners */
-    display: flex;
-    justify-content: space-between;
-    align-items: center;
-    height: 1050px;
+    display: flex; /* Added */
+    flex-direction: row; /* Changed to row */
+    justify-content: space-between; /* Adjusted justify-content */
+    align-items: flex-start; /* Adjusted align-items */
+    height: auto;
+    transition: box-shadow 0.3s, transform 0.3s;
+    box-shadow: 0 8px 16px rgba(0, 0, 0, 0.1); /* Improved box shadow */
+}
+
+#med-box-2 {
+    width: 40%;
+    margin-right: 15px;
+    margin-left: 15px;
+    margin-top: 40px;
+    padding: 30px; /* Increased padding */
+    background-color: #fff;
+    border: 2px solid #ddd;
+    border-radius: 12px; /* Rounded corners */
+    display: flex; /* Added */
+    flex-direction: row; /* Changed to row */
+    justify-content: space-between; /* Adjusted justify-content */
+    align-items: flex-start; /* Adjusted align-items */
+    height: auto;
     transition: box-shadow 0.3s, transform 0.3s;
     box-shadow: 0 8px 16px rgba(0, 0, 0, 0.1); /* Improved box shadow */
     
@@ -313,18 +340,13 @@ input[type="file"].file-selected {
     color: white;
     border-color: #09558B;
     transition: background-color 0.3s, color 0.3s, border-color 0.3s;
+    background-color: #0a6fc1
 }
 
 #select-all-btn.clicked {
     background-color: #0a6fc1;
     color: white;
     border-color: #09558B;
-}
-
-/* Adjust hover effect to make it smoother */
-#select-all-btn:hover {
-    transition: background-color 0.3s, color 0.3s, border-color 0.3s;
-    background-color: #0a6fc1;
 }
 
 /* CSS for Open Results Folder button */
@@ -355,11 +377,23 @@ input[type="file"].file-selected {
     transition: background-color 0.3s, color 0.3s, border-color 0.3s;
 }
 
-/* CSS for Add Keyword button */
-#add-keyword-btn {
-    width: 15%;
-    margin-top: 10px;
-    margin-bottom: 10px;
+#med-box h2 {
+    margin-top: 0; /* Removed top margin */
+    margin-bottom: 20px; /* Adjusted bottom margin */
+    color: #09558B;
+    text-align: center;
+}
+
+#med-box-2 h2 {
+    margin-top: 0; /* Removed top margin */
+    margin-bottom: 20px; /* Adjusted bottom margin */
+    color: #09558B;
+    text-align: center;
+}
+
+/* Specifically for bottom warning in medium box*/
+#med-box h3 {
+    color: #09558B;
     text-align: center;
     padding: 5px;
     border: 2px solid #000000;
@@ -371,17 +405,25 @@ input[type="file"].file-selected {
     cursor: pointer;
 }
 
-/* Hover effect for Open Results Folder button */
-#add-keyword-btn:hover {
-    background-color: #0a6fc1;
-    color: white;
-    border-color: #09558B;
-    transition: background-color 0.3s, color 0.3s, border-color 0.3s;
+/* Text within the medium box */
+#med-box p {
+    margin-left: 5px;
+    margin-right: 5px;
+    color: #09558B;
+    text-align: center;
+    font-size: 17px;
+    margin-bottom: 20px;
 }
 
-#add-keyword-btn:hover {
-    transition: background-color 0.3s, color 0.3s, border-color 0.3s;
+#med-box-2 p {
+    margin-left: 5px;
+    margin-right: 5px;
+    color: #09558B;
+    text-align: center;
+    font-size: 17px;
+    margin-bottom: 20px;
 }
+
 
 
 
@@ -488,27 +530,16 @@ input[type="file"].file-selected {
     position: relative; /* Positioning context for absolute positioning */
 }
 
-[role="listbox"] {
-    display: flex;
-    flex-direction: column;
-    margin: 1em 0 0;
+[role="listbox"]#ss_elem_list {
+    margin: 0 0 0;
     padding: 0;
     min-height: 18em;
     border: 1px solid #aaa;
     background: white;
     overflow-y: auto; /* Add vertical scrollbar when needed */
-    position: absolute; /* Position listbox absolutely */
-    top: 0; /* Align to the top of the listbox area */
-    bottom: 0; /* Align to the bottom of the listbox area */
-    left: 0; /* Align to the left of the listbox area */
-    right: 0; /* Align to the right of the listbox area */
-}
-
-
-[role="listbox"]#ss_elem_list {
     display: flex;
     flex-direction: column;
-    position: relative;
+    position: auto;
     max-height: 18em;
     overflow-y: auto;
     width: 100%; /* Ensure the listbox fills the entire width of the column */
@@ -550,12 +581,6 @@ input[type="file"].file-selected {
     background-color:#09558B; /* Set background color for selected item */
 }
 
-[role="option"]:hover {
-    background-color: #ffffff; /* Lighter shade for hover effect */
-    color: #09558B; /* Change text color to the original color when hovering */
-    border-radius: 10px;
-}
-
 .move-right-btn span.checkmark::after {
     content: " →";
 }
@@ -564,8 +589,7 @@ input[type="file"].file-selected {
     content: "← ";
 }
 
-[role="option"]:not(.selected):hover,
-[role="option"]:not(.selected):focus {
+[role="option"]:not(.selected):hover {
     background-color: #accaf34d; /* Lighter shade for hover effect */
     color: #09558B; /* Change text color to the original color when hovering */
 }
@@ -609,6 +633,28 @@ button[aria-haspopup="listbox"] + [role="listbox"] {
     max-height: 10em;
     border-top: 0;
     overflow-y: auto;
+}
+
+/* Override background color for deselected state of "Select All" button */
+button#select-all-button[aria-expanded="true"]::after {
+    border-top-color: #09558be1;
+}
+
+button#select-all-button[aria-expanded="false"]::after {
+    border-bottom-color: #09558be1;
+}
+
+/* Additional CSS rules to handle deselected state of "Select All" button */
+button#select-all-button:not([aria-expanded="true"])::after {
+    border-top-color: transparent;
+}
+
+button#select-all-button[aria-expanded="true"]:not(:hover)::after {
+    border-top-color: #09558be1;
+}
+
+button#select-all-button[aria-expanded="false"]:not(:hover)::after {
+    border-bottom-color: #09558be1;
 }
 
 [role="toolbar"] {
@@ -661,16 +707,6 @@ button[aria-disabled="true"] {
 .blurred {
     filter: blur(5px); /* Adjust blur amount as needed */
     pointer-events: none; /* Disable pointer events to prevent interaction */
-}
-
-/* Added to match existing styles */
-[role="option"] + [role="option"],
-[role="listbox"]:not(#ss_elem_list) + [role="listbox"] {
-    margin-top: 1em;
-}
-
-textarea {
-    resize: none; /* Prevents textbox expansion */
 }
 
 #scraperTextbox{

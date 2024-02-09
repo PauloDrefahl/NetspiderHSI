@@ -62,27 +62,27 @@ document.addEventListener("DOMContentLoaded", function () {
   selectAllButton.addEventListener("click", function () {
       var items = listbox.querySelectorAll('[role="option"]');
       var isNotSelected = selectAllButton.classList.contains("clicked");
-  
+
       if (isNotSelected) {
           // Select all items
           items.forEach(function (item) {
               item.setAttribute("aria-selected", "true");
-              item.classList.remove("selected");
-              item.style.backgroundColor = ''; // Reset background color
-              item.style.color = ''; // Reset text color
+              item.style.backgroundColor = ''; // Set background color
+              item.style.color = ''; // Set text color
+              
           });
       } else {
           // Deselect all items
           items.forEach(function (item) {
               item.setAttribute("aria-selected", "false");
-              item.classList.remove("selected");
-              item.style.backgroundColor = ''; // Reset background color
-              item.style.color = ''; // Reset text color
+              item.style.backgroundColor = '#09558B'; // Reset background color
+              item.style.color = '#fff'; // Reset text color
           });
       }
 
       // Toggle class on listbox container
       listbox.classList.toggle("select-all-mode");
+      selectAllButton.classList.toggle("clicked", !isNotSelected);
   });
 });
 
@@ -449,41 +449,41 @@ aria.Listbox = class Listbox {
     }
   
     checkClickItem(evt) {
-        if (evt.target.getAttribute('role') !== 'option') {
-            return;
-        }
-    
-        const clickedItem = evt.target;
-        const isSelected = clickedItem.getAttribute('aria-selected') === 'true';
-    
-        if (!this.multiselectable) {
-            // Deselect all other items if not multiselectable
-            const allOptions = this.listboxNode.querySelectorAll('[role="option"]');
-            allOptions.forEach(option => {
-                option.setAttribute('aria-selected', 'false');
-                option.classList.remove('selected');
-                option.style.backgroundColor = ''; // Reset background color
-                option.style.color = ''; // Reset text color
-            });
-        }
-    
-        // Toggle the selection state
-        clickedItem.setAttribute('aria-selected', isSelected ? 'false' : 'true');
-        clickedItem.classList.toggle('selected', !isSelected);
-        clickedItem.style.backgroundColor = isSelected ? '' : '#09558B'; // Toggle background color
-        clickedItem.style.color = isSelected ? '' : 'white'; // Toggle text color
-    
-        // Update the active descendant
-        this.focusItem(clickedItem);
-    
-        // Update the move button state
-        this.updateMoveButton();
-    
-        // Handle multiselectable range selection
-        if (this.multiselectable && evt.shiftKey) {
-            this.selectRange(this.startRangeIndex, clickedItem);
-        }
-    }
+      if (evt.target.getAttribute('role') !== 'option') {
+          return;
+      }
+  
+      const clickedItem = evt.target;
+      const isSelected = clickedItem.getAttribute('aria-selected') === 'true';
+  
+      if (!this.multiselectable) {
+          // Deselect all other items if not multiselectable
+          const allOptions = this.listboxNode.querySelectorAll('[role="option"]');
+          allOptions.forEach(option => {
+              option.setAttribute('aria-selected', 'false');
+              option.classList.remove('selected');
+              option.style.backgroundColor = ''; // Reset background color
+              option.style.color = ''; // Reset text color
+          });
+      }
+  
+      // Toggle the selection state
+      clickedItem.setAttribute('aria-selected', isSelected ? 'false' : 'true');
+      clickedItem.classList.toggle('selected', !isSelected);
+      clickedItem.style.backgroundColor = isSelected ? '' : '#09558B'; // Toggle background color
+      clickedItem.style.color = isSelected ? '' : 'white'; // Toggle text color
+  
+      // Update the active descendant
+      this.focusItem(clickedItem);
+  
+      // Update the move button state
+      this.updateMoveButton();
+  
+      // Handle multiselectable range selection
+      if (this.multiselectable && evt.shiftKey) {
+          this.selectRange(this.startRangeIndex, clickedItem);
+      }
+  }
   
     checkMouseDown(evt) {
       if (
@@ -744,10 +744,6 @@ function showAlert() {
     alert('Button Clicked!');
 }
 
-// The button click function
-function showAlert() { 
-    alert('Button Clicked!');
-}
 // initialize clock
 let clockInterval;
 let secondsElapsed = 0;
