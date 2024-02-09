@@ -69,7 +69,9 @@ class YesbackpageScraper(ScraperPrototype):
         # lists to store data and then send to csv file
 
         self.phone_number = []
-        self.timestamp = []
+        self.posted_on = []
+        self.expires_on = []
+        self.reply_to = []
         self.link = []
         self.name = []
         self.sex = []
@@ -150,6 +152,7 @@ class YesbackpageScraper(ScraperPrototype):
         print("done scraping")
 
     def stop_scraper(self) -> None:
+        self.reset_variables()
         self.driver.close()
         self.driver.quit()
 
@@ -207,8 +210,11 @@ class YesbackpageScraper(ScraperPrototype):
                 timestamp = self.driver.find_element(
                     By.XPATH, '/html/body/div[3]/div/div[1]/table/tbody/tr[1]/td/table[1]/tbody/'
                               'tr/td/div[3]/div[1]').text
+                posted_on, expires_on, reply_to = self.parse_timestamp(timestamp)
             except NoSuchElementException:
-                timestamp = 'Not exist'
+                posted_on = 'N/A'
+                expires_on = 'N/A'
+                reply_to = 'N/A'
 
             # check if page contains "col-sm-6 offset-sm-3" which is the table that contains name, phone number, etc.
             if self.driver.find_elements(By.XPATH, '//*[@id="mainCellWrapper"]/div[1]/table/tbody/tr[1]/td/div[1]/div'):
@@ -254,7 +260,9 @@ class YesbackpageScraper(ScraperPrototype):
                 except NoSuchElementException:
                     services = 'N/A'
             else:
-                timestamp = 'not exist 2'
+                posted_on = 'N/A'
+                expires_on = 'N/A'
+                reply_to = 'N/A'
                 name = 'N/A'
                 sex = 'N/A'
                 phone_number = 'N/A'
@@ -272,7 +280,7 @@ class YesbackpageScraper(ScraperPrototype):
                         or self.check_keywords(location) or self.check_keywords(services):
                     self.check_keywords_found(description, name, sex, phone_number, email, location, services)
                     counter = self.join_with_payment_methods(counter, description, email, link, location, name,
-                                                             phone_number, services, sex, timestamp)
+                                                             phone_number, services, sex, posted_on, expires_on, reply_to)
 
             elif self.join_keywords or self.only_posts_with_payment_methods:
                 if self.join_keywords:
@@ -281,7 +289,7 @@ class YesbackpageScraper(ScraperPrototype):
                             or self.check_keywords(location) or self.check_keywords(services):
                         self.check_keywords_found(description, name, sex, phone_number, email, location, services)
                         counter = self.join_inclusive(counter, description, email, link, location, name, phone_number,
-                                                      services, sex, timestamp)
+                                                      services, sex, posted_on, expires_on, reply_to)
 
                 elif self.only_posts_with_payment_methods:
                     if len(self.keywords) > 0:
@@ -291,7 +299,7 @@ class YesbackpageScraper(ScraperPrototype):
                             self.check_keywords_found(description, name, sex, phone_number, email, location, services)
 
                     counter = self.payment_methods_only(counter, description, email, link, location, name,
-                                                        phone_number, services, sex, timestamp)
+                                                        phone_number, services, sex, posted_on, expires_on, reply_to)
             else:
                 # run if keywords
                 if len(self.keywords) > 0:
@@ -300,23 +308,23 @@ class YesbackpageScraper(ScraperPrototype):
                             or self.check_keywords(location) or self.check_keywords(services):
                         self.check_keywords_found(description, name, sex, phone_number, email, location, services)
                         self.append_data(counter, description, email, link, location, name, phone_number, services,
-                                         sex, timestamp)
+                                         sex, posted_on, expires_on, reply_to)
                         screenshot_name = str(counter) + ".png"
                         self.capture_screenshot(screenshot_name)
                         counter += 1
                 else:
                     self.append_data(counter, description, email, link, location, name, phone_number, services,
-                                     sex, timestamp)
+                                     sex, posted_on, expires_on, reply_to)
                     screenshot_name = str(counter) + ".png"
                     self.capture_screenshot(screenshot_name)
                     counter += 1
             self.format_data_to_excel()
 
     def join_with_payment_methods(self, counter, description, email, link, location, name, phone_number,
-                                  services, sex, timestamp) -> int:
+                                  services, sex, posted_on, expires_on, reply_to) -> int:
         if self.check_for_payment_methods(description) and len(self.keywords) == len(set(self.keywords_found_in_post)):
             self.append_data(counter, description, email, link, location, name, phone_number, services,
-                             sex, timestamp)
+                             sex, posted_on, expires_on, reply_to)
             screenshot_name = str(counter) + ".png"
             self.capture_screenshot(screenshot_name)
 
@@ -332,9 +340,11 @@ class YesbackpageScraper(ScraperPrototype):
         self.check_and_append_keywords(location)
         self.check_and_append_keywords(services)
 
-    def append_data(self, counter, description, email, link, location, name, phone_number, services, sex, timestamp):
+    def append_data(self, counter, description, email, link, location, name, phone_number, services, sex, posted_on, expires_on, reply_to):
         self.post_identifier.append(counter)
-        self.timestamp.append(timestamp)
+        self.posted_on.append(posted_on)
+        self.expires_on.append(expires_on)
+        self.reply_to.append(reply_to)
         self.link.append(link)
         self.description.append(description)
         self.name.append(name)
@@ -351,7 +361,9 @@ class YesbackpageScraper(ScraperPrototype):
     def format_data_to_excel(self) -> None:
         titled_columns = pd.DataFrame({
             'Post-identifier': self.post_identifier,
-            'Timestamp': self.timestamp,
+            'Posted On': self.posted_on,
+            'Expires On': self.expires_on,
+            'Reply To': self.reply_to,
             'Phone-Number': self.phone_number,
             'Link': self.link,
             'Location': self.location,
@@ -372,10 +384,10 @@ class YesbackpageScraper(ScraperPrototype):
             data.to_excel(writer, index=False)
             worksheet = writer.sheets['Sheet1']
             for i in range(2, worksheet.max_row):
-                keywords = worksheet["L" + str(i)].value  # set the keywords var to each keyword in the cell
+                keywords = worksheet["N" + str(i)].value  # set the keywords var to each keyword in the cell
                 for flagged_keyword in self.flagged_keywords:
                     if flagged_keyword in keywords:
-                        worksheet["L" + str(i)].fill = PatternFill(
+                        worksheet["N" + str(i)].fill = PatternFill(
                             fill_type='solid',
                             start_color='ff0000',
                             end_color='ff0000')
@@ -394,9 +406,18 @@ class YesbackpageScraper(ScraperPrototype):
                 worksheet.column_dimensions[
                     col[0].column_letter].width = adjusted_width
 
+    def parse_timestamp(self, timestamp_str):
+        # Example input: "Posted on: Sunday, 04 February, 2024 07:25 Expires On: Monday, 19 February, 2024 07:25 Reply to: (Not Shown)"
+        parts = timestamp_str.split('Expires On:')
+        posted_on = parts[0].replace('Posted on:', '').strip() if len(parts) > 0 else 'N/A'
+        expires_on, reply_to = parts[1].split('Reply to:') if len(parts) > 1 else ('N/A', 'N/A')
+        return posted_on, expires_on.strip(), reply_to.strip()
+
     def reset_variables(self) -> None:
         self.phone_number = []
-        self.timestamp = []
+        self.posted_on = []
+        self.expires_on = []
+        self.reply_to = []
         self.link = []
         self.name = []
         self.sex = []
@@ -461,10 +482,10 @@ class YesbackpageScraper(ScraperPrototype):
                 self.keywords_found_in_post.append(key)
                 self.number_of_keywords_in_post += 1
 
-    def join_inclusive(self, counter, description, email, link, location, name, phone_number, services, sex, timestamp) -> int:
+    def join_inclusive(self, counter, description, email, link, location, name, phone_number, services, sex, posted_on, expires_on, reply_to) -> int:
         if len(self.keywords) == len(set(self.keywords_found_in_post)):
             self.append_data(counter, description, email, link, location, name, phone_number, services,
-                             sex, timestamp)
+                             sex, posted_on, expires_on, reply_to)
             screenshot_name = str(counter) + ".png"
             self.capture_screenshot(screenshot_name)
 
@@ -472,11 +493,11 @@ class YesbackpageScraper(ScraperPrototype):
         return counter
 
     def payment_methods_only(self, counter, description, email, link, location, name, phone_number,
-                             services, sex, timestamp) -> int:
+                             services, sex, posted_on, expires_on, reply_to) -> int:
 
         if self.check_for_payment_methods(description):
             self.append_data(counter, description, email, link, location, name, phone_number, services,
-                             sex, timestamp)
+                             sex, posted_on, expires_on, reply_to)
             screenshot_name = str(counter) + ".png"
             self.capture_screenshot(screenshot_name)
 
