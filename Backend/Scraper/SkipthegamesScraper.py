@@ -54,6 +54,7 @@ class SkipthegamesScraper(ScraperPrototype):
         self.pdf_filename = None
         self.keywords = None
         self.flagged_keywords = None
+        self.completed = False
 
         self.join_keywords = False
         self.search_mode = False

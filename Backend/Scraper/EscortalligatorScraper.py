@@ -57,6 +57,7 @@ class EscortalligatorScraper(ScraperPrototype):
         self.keywords = ""
         self.flagged_keywords = None
         self.only_posts_with_payment_methods = False
+        self.completed = False
 
         self.join_keywords = False
         self.search_mode = False
