@@ -87,7 +87,6 @@
                 
             </div>
             <div class="column">
-
                 <h2><img src="./icons/key-solid.svg" class="icon"/>Select Keywords:</h2>
                 <!-- Add content for column 2 here -->
                 <div class="listbox-area">
@@ -201,12 +200,12 @@
                         </ul>
                     </div>
                 </div>
-                <button id="select-all-btn" onclick="this.classList.toggle('clicked')">Select All</button>
+                <button id="select-all-btn">Select All</button>
                 <button id="open-results-folder-btn" onclick="this.classList.toggle('clicked')">Open Results Folder</button>
             </div>
             <div class="column">
 
-                <h2><img src="./icons/gear-solid.svg" class="icon"/>Scrapper Settings:</h2>
+                <h2><img src="./icons/gear-solid.svg" class="icon"/> Scraper Settings:</h2>
                 <!-- Add content for column 3 here -->
                 <p>Enter Text to Scrape:</p>
                 <textarea id="scraperTextbox" name="scraperTextbox"></textarea>
@@ -230,16 +229,15 @@
                     </div>
                     <div class="column-s">
                         <!-- Content for the second column -->
-                        <h2>00:00:00</h2>
+                        <h2><div id="clock"></div></h2>
                     </div>
                 </div>
-            
-                <div id="clock"> </div>
             </div>
         </div>
         <div id="med-box">
             <h2><img src="./icons/pen-to-square-solid.svg" class="icon"/>Edit Keywords & Sets:</h2>
-            <div class="column">
+            <p margin: 50px></p>
+            <div class="medium-column">
                 <h3>Enter New Keyword:</h3>
                 <div class="input-container">
                     <input type="text" class="keyword-input" placeholder="Type new keyword">
@@ -358,10 +356,10 @@
                 </div>
                 <div class="button-container">
                     <img src="./icons/trash-solid.svg" class="icon"/>
-                    <button class="delete-keyword-btn">Delete Keywords</button>
+                    <button class="delete-keyword-btn" onclick="this.classList.toggle('clicked')">Delete Keywords</button>
                 </div>
             </div>
-            <div class="column">
+            <div class="medium-column">
                 <h3>Enter Set Name:</h3>
                 <div class="input-container">
                     <input type="text" class="setname-input" placeholder="Type new set name">
@@ -391,7 +389,15 @@
                     <button class="delete-set-btn">Delete Set</button>
                 </div>
             </div>
-        </div>       
+        </div>
+        <div id="med-box-2">
+            <div class="column">
+                <!-- PICK ICON (1/3) -->
+                <h2><img src="./icons/sheet-plastic-solid.svg" class="icon"/>Results:</h2>
+                <p style="margin-top: 50px;" > 
+                <!-- Results here -->                          
+            </div>
+        </div>      
     </div>
 </div>
 
