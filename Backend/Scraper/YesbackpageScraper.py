@@ -162,7 +162,6 @@ class YesbackpageScraper(ScraperPrototype):
         print("done scraping")
 
     def stop_scraper(self) -> None:
-        self.reset_variables()
         self.driver.close()
         self.driver.quit()
 
@@ -533,4 +532,3 @@ class YesbackpageScraper(ScraperPrototype):
         self.join_keywords = False
         self.keywords_found = []
         self.social_media_found = []
-
