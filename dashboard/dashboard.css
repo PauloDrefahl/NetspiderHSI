@@ -258,7 +258,7 @@ input[type="file"].file-selected {
 
 /* Medium box under the Big box w/ 3 sections */
 #med-box {
-    width: 45%;
+    width: 55%;
     margin-left: 15px;
     margin-top: 40px;
     padding: 30px; /* Increased padding */
@@ -462,6 +462,7 @@ input[type="file"].file-selected {
     flex-direction: column;
     flex: 1; /* Grow and shrink equally to fill available space */
     padding: 10px;
+    min-height: 60%;
     border: 1px solid white;
     border-radius: 4px;
     background:#09558be1;
@@ -721,4 +722,16 @@ button[aria-disabled="true"] {
     justify-content: center;
     color: #09558B;
     height: fit-content;
+}
+
+#header-keywords{
+    margin-top: 20px;
+    margin-bottom: 20px;
+    padding: 20px;
+    border: 1px solid #ddd;
+    background-color: #fff;
+    text-align: center;
+    border-radius: 12px;
+    box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+    transition: transform 0.3s, box-shadow 0.3s;
 }
