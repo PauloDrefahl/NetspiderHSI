@@ -86,6 +86,11 @@ class YesbackpageScraper(ScraperPrototype):
         self.keywords_found = []
         self.social_media_found = []
 
+    '''
+    ---------------------------------------
+    Set Data
+    ---------------------------------------
+    '''
     def get_cities(self) -> list:
         return list(self.cities.keys())
 
@@ -110,6 +115,11 @@ class YesbackpageScraper(ScraperPrototype):
     def set_keywords(self, keywords) -> None:
         self.keywords = keywords
 
+    '''
+    ---------------------------------------
+    Managing Scraper Run Time
+    ---------------------------------------
+    '''
     def initialize(self) -> None:
         # set keywords value
         # self.keywords = keywords
@@ -180,6 +190,11 @@ class YesbackpageScraper(ScraperPrototype):
     def close_webpage(self) -> None:
         self.driver.close()
 
+    '''
+    ---------------------------------------
+    Getting the Data Running the Appending Functions and Getters
+    ---------------------------------------
+    '''
     def get_links(self) -> list:
         posts = self.driver.find_elements(
             By.CLASS_NAME, 'posttitle')
@@ -320,26 +335,11 @@ class YesbackpageScraper(ScraperPrototype):
                     counter += 1
             self.format_data_to_excel()
 
-    def join_with_payment_methods(self, counter, description, email, link, location, name, phone_number,
-                                  services, sex, posted_on, expires_on, reply_to) -> int:
-        if self.check_for_payment_methods(description) and len(self.keywords) == len(set(self.keywords_found_in_post)):
-            self.append_data(counter, description, email, link, location, name, phone_number, services,
-                             sex, posted_on, expires_on, reply_to)
-            screenshot_name = str(counter) + ".png"
-            self.capture_screenshot(screenshot_name)
-
-            return counter + 1
-        return counter
-
-    def check_keywords_found(self, description, name, sex, phone_number, email, location, services) -> None:
-        self.check_and_append_keywords(description)
-        self.check_and_append_keywords(name)
-        self.check_and_append_keywords(sex)
-        self.check_and_append_keywords(phone_number)
-        self.check_and_append_keywords(email)
-        self.check_and_append_keywords(location)
-        self.check_and_append_keywords(services)
-
+    '''
+    --------------------------
+    Appending Data
+    --------------------------
+    '''
     def append_data(self, counter, description, email, link, location, name, phone_number, services, sex, posted_on, expires_on, reply_to):
         self.post_identifier.append(counter)
         self.posted_on.append(posted_on)
@@ -358,6 +358,98 @@ class YesbackpageScraper(ScraperPrototype):
         self.number_of_keywords_found.append(self.number_of_keywords_in_post or 'N/A')
         self.check_for_social_media(description)
 
+    def join_with_payment_methods(self, counter, description, email, link, location, name, phone_number,
+                                  services, sex, posted_on, expires_on, reply_to) -> int:
+        if self.check_for_payment_methods(description) and len(self.keywords) == len(set(self.keywords_found_in_post)):
+            self.append_data(counter, description, email, link, location, name, phone_number, services,
+                             sex, posted_on, expires_on, reply_to)
+            screenshot_name = str(counter) + ".png"
+            self.capture_screenshot(screenshot_name)
+
+            return counter + 1
+        return counter
+
+    def join_inclusive(self, counter, description, email, link, location, name, phone_number, services, sex, posted_on, expires_on, reply_to) -> int:
+        if len(self.keywords) == len(set(self.keywords_found_in_post)):
+            self.append_data(counter, description, email, link, location, name, phone_number, services,
+                             sex, posted_on, expires_on, reply_to)
+            screenshot_name = str(counter) + ".png"
+            self.capture_screenshot(screenshot_name)
+
+            return counter + 1
+        return counter
+
+    def payment_methods_only(self, counter, description, email, link, location, name, phone_number,
+                             services, sex, posted_on, expires_on, reply_to) -> int:
+
+        if self.check_for_payment_methods(description):
+            self.append_data(counter, description, email, link, location, name, phone_number, services,
+                             sex, posted_on, expires_on, reply_to)
+            screenshot_name = str(counter) + ".png"
+            self.capture_screenshot(screenshot_name)
+
+            return counter + 1
+        return counter
+
+    '''
+    --------------------------
+    Checking and Running Append
+    --------------------------
+    '''
+    def check_keywords_found(self, description, name, sex, phone_number, email, location, services) -> None:
+        self.check_and_append_keywords(description)
+        self.check_and_append_keywords(name)
+        self.check_and_append_keywords(sex)
+        self.check_and_append_keywords(phone_number)
+        self.check_and_append_keywords(email)
+        self.check_and_append_keywords(location)
+        self.check_and_append_keywords(services)
+
+    def check_for_payment_methods(self, description) -> bool:
+        for payment in self.known_payment_methods:
+            if payment in description.lower():
+                return True
+        return False
+
+    def check_and_append_payment_methods(self, description) -> None:
+        payments = ''
+        for payment in self.known_payment_methods:
+            if payment in description.lower():
+                payments += payment + '\n'
+
+        if payments != '':
+            self.payment_methods_found.append(payments)
+        else:
+            self.payment_methods_found.append('N/A')
+
+    def check_for_social_media(self, description) -> None:
+        social_media = ''
+        for social in self.known_social_media:
+            if social in description.lower():
+                social_media += social + '\n'
+
+        if social_media != '':
+            self.social_media_found.append(social_media)
+        else:
+            self.social_media_found.append('N/A')
+
+    def check_keywords(self, data) -> bool:
+        for key in self.keywords:
+            if key in data.lower():
+                return True
+        return False
+
+    def check_and_append_keywords(self, data) -> None:
+        for key in self.keywords:
+            if key in data.lower():
+                self.keywords_found_in_post.append(key)
+                self.number_of_keywords_in_post += 1
+
+    '''
+    ---------------------------------
+    Formatting Data and Result Creation
+    ---------------------------------
+    '''
     def format_data_to_excel(self) -> None:
         titled_columns = pd.DataFrame({
             'Post-identifier': self.post_identifier,
@@ -413,6 +505,15 @@ class YesbackpageScraper(ScraperPrototype):
         expires_on, reply_to = parts[1].split('Reply to:') if len(parts) > 1 else ('N/A', 'N/A')
         return posted_on, expires_on.strip(), reply_to.strip()
 
+    def capture_screenshot(self, screenshot_name) -> None:
+        self.driver.save_screenshot(f'{self.screenshot_directory}/{screenshot_name}')
+        self.create_pdf()
+
+    def create_pdf(self) -> None:
+        screenshot_files = [os.path.join(self.screenshot_directory, filename) for filename in os.listdir(self.screenshot_directory) if filename.endswith('.png')]
+        with open(self.pdf_filename, "wb") as f:
+            f.write(img2pdf.convert(screenshot_files))
+
     def reset_variables(self) -> None:
         self.phone_number = []
         self.posted_on = []
@@ -433,73 +534,3 @@ class YesbackpageScraper(ScraperPrototype):
         self.keywords_found = []
         self.social_media_found = []
 
-    def check_for_payment_methods(self, description) -> bool:
-        for payment in self.known_payment_methods:
-            if payment in description.lower():
-                return True
-        return False
-
-    def check_and_append_payment_methods(self, description) -> None:
-        payments = ''
-        for payment in self.known_payment_methods:
-            if payment in description.lower():
-                payments += payment + '\n'
-
-        if payments != '':
-            self.payment_methods_found.append(payments)
-        else:
-            self.payment_methods_found.append('N/A')
-
-    def check_for_social_media(self, description) -> None:
-        social_media = ''
-        for social in self.known_social_media:
-            if social in description.lower():
-                social_media += social + '\n'
-
-        if social_media != '':
-            self.social_media_found.append(social_media)
-        else:
-            self.social_media_found.append('N/A')
-
-    def capture_screenshot(self, screenshot_name) -> None:
-        self.driver.save_screenshot(f'{self.screenshot_directory}/{screenshot_name}')
-        self.create_pdf()
-
-    def create_pdf(self) -> None:
-        screenshot_files = [os.path.join(self.screenshot_directory, filename) for filename in os.listdir(self.screenshot_directory) if filename.endswith('.png')]
-        with open(self.pdf_filename, "wb") as f:
-            f.write(img2pdf.convert(screenshot_files))
-
-    def check_keywords(self, data) -> bool:
-        for key in self.keywords:
-            if key in data.lower():
-                return True
-        return False
-
-    def check_and_append_keywords(self, data) -> None:
-        for key in self.keywords:
-            if key in data.lower():
-                self.keywords_found_in_post.append(key)
-                self.number_of_keywords_in_post += 1
-
-    def join_inclusive(self, counter, description, email, link, location, name, phone_number, services, sex, posted_on, expires_on, reply_to) -> int:
-        if len(self.keywords) == len(set(self.keywords_found_in_post)):
-            self.append_data(counter, description, email, link, location, name, phone_number, services,
-                             sex, posted_on, expires_on, reply_to)
-            screenshot_name = str(counter) + ".png"
-            self.capture_screenshot(screenshot_name)
-
-            return counter + 1
-        return counter
-
-    def payment_methods_only(self, counter, description, email, link, location, name, phone_number,
-                             services, sex, posted_on, expires_on, reply_to) -> int:
-
-        if self.check_for_payment_methods(description):
-            self.append_data(counter, description, email, link, location, name, phone_number, services,
-                             sex, posted_on, expires_on, reply_to)
-            screenshot_name = str(counter) + ".png"
-            self.capture_screenshot(screenshot_name)
-
-            return counter + 1
-        return counter
