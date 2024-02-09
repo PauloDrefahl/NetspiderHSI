@@ -5,7 +5,7 @@ from flask import Flask
 from flask_socketio import SocketIO
 from flask_cors import CORS
 from Backend.Scraper import MegapersonalsScraper, SkipthegamesScraper, YesbackpageScraper, EscortalligatorScraper, \
-    ErosScraper
+    ErosScraper, RubratingsScraper
 
 # pyinstaller app.py --onefile --name=NetSpiderServer --hidden-import pyimod02_importers
 
@@ -60,6 +60,8 @@ class ScraperThread(threading.Thread):
             self.scraper = SkipthegamesScraper()
         elif kwargs['website'] == 'yesbackpage':
             self.scraper = YesbackpageScraper()
+        elif kwargs['website'] == 'rubratings':
+            self.scraper = RubratingsScraper()
         self.scraper.set_keywords(keywords)
         print("keywords", keywords)
         print("scraper keywords", self.scraper.keywords)
