@@ -207,5 +207,5 @@ if __name__ == "__main__":
     # Use the open ports as needed in the rest of your program
     print(os.environ)
     # Note: You may want to handle the case where `open_ports` is an empty list.
-    socketio.run(app, host='127.0.0.1', port=3030,
+    socketio.run(app, host='127.0.0.1', port=open_ports,
                  allow_unsafe_werkzeug=True)
