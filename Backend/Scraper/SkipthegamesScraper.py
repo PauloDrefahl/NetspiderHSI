@@ -74,6 +74,11 @@ class SkipthegamesScraper(ScraperPrototype):
         self.keywords_found = []
         self.social_media_found = []
 
+    '''
+    ---------------------------------------
+    Set Data
+    ---------------------------------------
+    '''
     def get_cities(self) -> list:
         return list(self.cities.keys())
 
@@ -95,6 +100,11 @@ class SkipthegamesScraper(ScraperPrototype):
     def set_flagged_keywords(self, flagged_keywords) -> None:
         self.flagged_keywords = flagged_keywords
 
+    '''
+    ---------------------------------------
+    Managing Scraper Run Time
+    ---------------------------------------
+    '''
     def initialize(self, keywords) -> None:
         # set keywords value
         self.keywords = keywords
@@ -160,6 +170,11 @@ class SkipthegamesScraper(ScraperPrototype):
     def close_webpage(self) -> None:
         self.driver.close()
 
+    '''
+    ---------------------------------------
+    Getting the Data Running the Appending Functions and Getters
+    ---------------------------------------
+    '''
     def get_links(self) -> set:
         posts = self.driver.find_elements(
             By.CSS_SELECTOR, 'html.no-js body div table.two-col-wrap tbody tr '
@@ -238,6 +253,11 @@ class SkipthegamesScraper(ScraperPrototype):
 
             self.format_data_to_excel()
 
+    '''
+    --------------------------
+    Appending Data
+    --------------------------
+    '''
     def append_data(self, about_info, counter, description, link, services):
         self.post_identifier.append(counter)
         self.link.append(link)
@@ -258,11 +278,81 @@ class SkipthegamesScraper(ScraperPrototype):
             return counter + 1
         return counter
 
+    def join_inclusive(self, about_info, counter, description, link, services) -> int:
+        if len(self.keywords) == len(set(self.keywords_found_in_post)):
+            self.append_data(about_info, counter, description, link, services)
+
+            screenshot_name = str(counter) + ".png"
+            self.capture_screenshot(screenshot_name)
+
+            return counter + 1
+        return counter
+
+    def payment_methods_only(self, about_info, counter, description, link, services) -> int:
+
+        if self.check_for_payment_methods(description):
+            self.append_data(about_info, counter, description, link, services)
+            screenshot_name = str(counter) + ".png"
+            self.capture_screenshot(screenshot_name)
+
+            return counter + 1
+        return counter
+
+    '''
+    --------------------------
+    Checking and Running Append
+    --------------------------
+    '''
     def check_keywords_found(self, about_info, services, description) -> None:
         self.check_and_append_keywords(about_info)
         self.check_and_append_keywords(services)
         self.check_and_append_keywords(description)
 
+    def check_for_payment_methods(self, description) -> bool:
+        for payment in self.known_payment_methods:
+            if payment in description.lower():
+                return True
+        return False
+
+    def check_and_append_payment_methods(self, description) -> None:
+        payments = ''
+        for payment in self.known_payment_methods:
+            if payment in description.lower():
+                payments += payment + '\n'
+
+        if payments != '':
+            self.payment_methods_found.append(payments)
+        else:
+            self.payment_methods_found.append('N/A')
+
+    def check_for_social_media(self, description) -> None:
+        social_media = ''
+        for social in self.known_social_media:
+            if social in description.lower():
+                social_media += social + '\n'
+
+        if social_media != '':
+            self.social_media_found.append(social_media)
+        else:
+            self.social_media_found.append('N/A')
+
+    def check_keywords(self, data) -> bool:
+        for key in self.keywords:
+            if key in data:
+                return True
+        return False
+
+    def check_and_append_keywords(self, data) -> None:
+        for key in self.keywords:
+            if key in data.lower():
+                self.keywords_found_in_post.append(key)
+                self.number_of_keywords_in_post += 1
+
+    '''
+    ---------------------------------
+    Formatting Data and Result Creation
+    ---------------------------------
+    '''
     def format_data_to_excel(self) -> None:
         titled_columns = {
             'Post-identifier': self.post_identifier,
@@ -307,6 +397,16 @@ class SkipthegamesScraper(ScraperPrototype):
                 worksheet.column_dimensions[
                     col[0].column_letter].width = adjusted_width
 
+    def capture_screenshot(self, screenshot_name) -> None:
+        self.driver.save_screenshot(f'{self.screenshot_directory}/{screenshot_name}')
+        self.create_pdf()
+
+    def create_pdf(self) -> None:
+        screenshot_files = [os.path.join(self.screenshot_directory, filename) for filename in
+                            os.listdir(self.screenshot_directory) if filename.endswith('.png')]
+        with open(self.pdf_filename, "wb") as f:
+            f.write(img2pdf.convert(screenshot_files))
+
     def reset_variables(self) -> None:
         self.link = []
         self.about_info = []
@@ -319,72 +419,3 @@ class SkipthegamesScraper(ScraperPrototype):
         self.only_posts_with_payment_methods = False
         self.join_keywords = False
         self.social_media_found = []
-
-    def check_for_payment_methods(self, description) -> bool:
-        for payment in self.known_payment_methods:
-            if payment in description.lower():
-                return True
-        return False
-
-    def check_and_append_payment_methods(self, description) -> None:
-        payments = ''
-        for payment in self.known_payment_methods:
-            if payment in description.lower():
-                payments += payment + '\n'
-
-        if payments != '':
-            self.payment_methods_found.append(payments)
-        else:
-            self.payment_methods_found.append('N/A')
-
-    def check_for_social_media(self, description) -> None:
-        social_media = ''
-        for social in self.known_social_media:
-            if social in description.lower():
-                social_media += social + '\n'
-
-        if social_media != '':
-            self.social_media_found.append(social_media)
-        else:
-            self.social_media_found.append('N/A')
-
-    def capture_screenshot(self, screenshot_name) -> None:
-        self.driver.save_screenshot(f'{self.screenshot_directory}/{screenshot_name}')
-        self.create_pdf()
-
-    def create_pdf(self) -> None:
-        screenshot_files = [os.path.join(self.screenshot_directory, filename) for filename in os.listdir(self.screenshot_directory) if filename.endswith('.png')]
-        with open(self.pdf_filename, "wb") as f:
-            f.write(img2pdf.convert(screenshot_files))
-
-    def check_keywords(self, data) -> bool:
-        for key in self.keywords:
-            if key in data:
-                return True
-        return False
-
-    def check_and_append_keywords(self, data) -> None:
-        for key in self.keywords:
-            if key in data.lower():
-                self.keywords_found_in_post.append(key)
-                self.number_of_keywords_in_post += 1
-
-    def join_inclusive(self, about_info, counter, description, link, services) -> int:
-        if len(self.keywords) == len(set(self.keywords_found_in_post)):
-            self.append_data(about_info, counter, description, link, services)
-
-            screenshot_name = str(counter) + ".png"
-            self.capture_screenshot(screenshot_name)
-
-            return counter + 1
-        return counter
-
-    def payment_methods_only(self, about_info, counter, description, link, services) -> int:
-
-        if self.check_for_payment_methods(description):
-            self.append_data(about_info, counter, description, link, services)
-            screenshot_name = str(counter) + ".png"
-            self.capture_screenshot(screenshot_name)
-
-            return counter + 1
-        return counter

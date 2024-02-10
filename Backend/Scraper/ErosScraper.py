@@ -49,7 +49,7 @@ class ErosScraper(ScraperPrototype):
         self.only_posts_with_payment_methods = False
         self.social_media_found = []
 
-        # lists to store data and then send to excel file
+        # lists to store data and then send to Excel file
         self.post_identifier = []
         self.link = []
         self.profile_header = []
@@ -61,6 +61,11 @@ class ErosScraper(ScraperPrototype):
         self.number_of_keywords_found = []
         self.keywords_found = []
 
+    '''
+    ---------------------------------------
+    Set Data
+    ---------------------------------------
+    '''
     def get_cities(self) -> list:
         return list(self.cities.keys())
 
@@ -82,6 +87,11 @@ class ErosScraper(ScraperPrototype):
     def set_flagged_keywords(self, flagged_keywords) -> None:
         self.flagged_keywords = flagged_keywords
 
+    '''
+    ---------------------------------------
+    Managing Scraper Run Time
+    ---------------------------------------
+    '''
     def initialize(self, keywords) -> None:
         # set keywords value
         self.keywords = keywords
@@ -136,6 +146,11 @@ class ErosScraper(ScraperPrototype):
     def close_webpage(self) -> None:
         self.driver.close()
 
+    '''
+    ---------------------------------------
+    Getting the Data Running the Appending Functions and Getters
+    ---------------------------------------
+    '''
     def get_links(self) -> set:
         try:
             # Find website agreement
@@ -241,21 +256,11 @@ class ErosScraper(ScraperPrototype):
 
             self.format_data_to_excel()
 
-    def join_with_payment_methods(self, contact_details, counter, description, info_details, link, profile_header):
-        if self.check_for_payment_methods(description) and len(self.keywords) == len(set(self.keywords_found_in_post)):
-            self.append_data(contact_details, counter, description, info_details, link, profile_header)
-            screenshot_name = str(counter) + ".png"
-            self.capture_screenshot(screenshot_name)
-
-            return counter + 1
-        return counter
-
-    def check_keywords_found(self, contact_details, description, info_details, profile_header):
-        self.check_and_append_keywords(contact_details)
-        self.check_and_append_keywords(description)
-        self.check_and_append_keywords(info_details)
-        self.check_and_append_keywords(profile_header)
-
+    '''
+    --------------------------
+    Appending Data
+    --------------------------
+    '''
     def append_data(self, contact_details, counter, description, info_details, link, profile_header) -> None:
         self.post_identifier.append(counter)
         self.link.append(link)
@@ -268,6 +273,90 @@ class ErosScraper(ScraperPrototype):
         self.keywords_found.append(', '.join(self.keywords_found_in_post) or 'N/A')
         self.number_of_keywords_found.append(self.number_of_keywords_in_post or 'N/A')
 
+    def join_inclusive(self, contact_details, counter, description, info_details, link, profile_header):
+        if len(self.keywords) == len(set(self.keywords_found_in_post)):
+            self.append_data(contact_details, counter, description, info_details, link, profile_header)
+
+            screenshot_name = str(counter) + ".png"
+            self.capture_screenshot(screenshot_name)
+
+            return counter + 1
+        return counter
+
+    def payment_methods_only(self, about_info, counter, description, link, services, profile_header) -> int:
+        if self.check_for_payment_methods(description):
+            self.append_data(about_info, counter, description, link, services, profile_header)
+            screenshot_name = str(counter) + ".png"
+            self.capture_screenshot(screenshot_name)
+
+            return counter + 1
+        return counter
+
+    def join_with_payment_methods(self, contact_details, counter, description, info_details, link, profile_header):
+        if self.check_for_payment_methods(description) and len(self.keywords) == len(set(self.keywords_found_in_post)):
+            self.append_data(contact_details, counter, description, info_details, link, profile_header)
+            screenshot_name = str(counter) + ".png"
+            self.capture_screenshot(screenshot_name)
+
+            return counter + 1
+        return counter
+
+    '''
+    --------------------------
+    Checking and Running Append
+    --------------------------
+    '''
+    def check_keywords_found(self, contact_details, description, info_details, profile_header):
+        self.check_and_append_keywords(contact_details)
+        self.check_and_append_keywords(description)
+        self.check_and_append_keywords(info_details)
+        self.check_and_append_keywords(profile_header)
+
+    def check_for_payment_methods(self, description) -> bool:
+        for payment in self.known_payment_methods:
+            if payment in description.lower():
+                return True
+        return False
+
+    def check_and_append_payment_methods(self, description):
+        payments = ''
+        for payment in self.known_payment_methods:
+            if payment in description.lower():
+                payments += payment + '\n'
+
+        if payments != '':
+            self.payment_methods_found.append(payments)
+        else:
+            self.payment_methods_found.append('N/A')
+
+    def check_for_social_media(self, description) -> None:
+        social_media = ''
+        for social in self.known_social_media:
+            if social in description.lower():
+                social_media += social + '\n'
+
+        if social_media != '':
+            self.social_media_found.append(social_media)
+        else:
+            self.social_media_found.append('N/A')
+
+    def check_keywords(self, data) -> bool:
+        for key in self.keywords:
+            if key in data:
+                return True
+        return False
+
+    def check_and_append_keywords(self, data) -> None:
+        for key in self.keywords:
+            if key in data.lower():
+                self.keywords_found_in_post.append(key)
+                self.number_of_keywords_in_post += 1
+
+    '''
+    ---------------------------------
+    Formatting Data and Result Creation
+    ---------------------------------
+    '''
     def format_data_to_excel(self) -> None:
         titled_columns = {
             'Post-identifier': self.post_identifier,
@@ -313,6 +402,16 @@ class ErosScraper(ScraperPrototype):
                 worksheet.column_dimensions[
                     col[0].column_letter].width = adjusted_width
 
+    def capture_screenshot(self, screenshot_name) -> None:
+        self.driver.save_screenshot(f'{self.screenshot_directory}/{screenshot_name}')
+        self.create_pdf()
+
+    def create_pdf(self) -> None:
+        screenshot_files = [
+            os.path.join(self.screenshot_directory, filename) for filename in os.listdir(self.screenshot_directory) if filename.endswith('.png')]
+        with open(self.pdf_filename, "wb") as f:
+            f.write(img2pdf.convert(screenshot_files))
+
     def reset_variables(self) -> None:
         self.post_identifier = []
         self.link = []
@@ -327,72 +426,6 @@ class ErosScraper(ScraperPrototype):
         self.only_posts_with_payment_methods = False
         self.join_keywords = False
 
-    def check_for_payment_methods(self, description) -> bool:
-        for payment in self.known_payment_methods:
-            if payment in description.lower():
-                return True
-        return False
 
-    def check_and_append_payment_methods(self, description):
-        payments = ''
-        for payment in self.known_payment_methods:
-            if payment in description.lower():
-                payments += payment + '\n'
 
-        if payments != '':
-            self.payment_methods_found.append(payments)
-        else:
-            self.payment_methods_found.append('N/A')
-
-    def check_for_social_media(self, description) -> None:
-        social_media = ''
-        for social in self.known_social_media:
-            if social in description.lower():
-                social_media += social + '\n'
-
-        if social_media != '':
-            self.social_media_found.append(social_media)
-        else:
-            self.social_media_found.append('N/A')
-
-    def capture_screenshot(self, screenshot_name) -> None:
-        self.driver.save_screenshot(f'{self.screenshot_directory}/{screenshot_name}')
-        self.create_pdf()
-
-    def create_pdf(self) -> None:
-        screenshot_files = [
-            os.path.join(self.screenshot_directory, filename) for filename in os.listdir(self.screenshot_directory) if filename.endswith('.png')]
-        with open(self.pdf_filename, "wb") as f:
-            f.write(img2pdf.convert(screenshot_files))
-
-    def check_keywords(self, data) -> bool:
-        for key in self.keywords:
-            if key in data:
-                return True
-        return False
-
-    def check_and_append_keywords(self, data) -> None:
-        for key in self.keywords:
-            if key in data.lower():
-                self.keywords_found_in_post.append(key)
-                self.number_of_keywords_in_post += 1
-
-    def join_inclusive(self, contact_details, counter, description, info_details, link, profile_header):
-        if len(self.keywords) == len(set(self.keywords_found_in_post)):
-            self.append_data(contact_details, counter, description, info_details, link, profile_header)
-
-            screenshot_name = str(counter) + ".png"
-            self.capture_screenshot(screenshot_name)
-
-            return counter + 1
-        return counter
-
-    def payment_methods_only(self, about_info, counter, description, link, services, profile_header) -> int:
-        if self.check_for_payment_methods(description):
-            self.append_data(about_info, counter, description, link, services, profile_header)
-            screenshot_name = str(counter) + ".png"
-            self.capture_screenshot(screenshot_name)
-
-            return counter + 1
-        return counter
 
