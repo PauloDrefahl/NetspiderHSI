@@ -15,6 +15,12 @@ app = Flask(__name__)
 CORS(app)
 socketio = SocketIO(app, cors_allowed_origins="*")
 
+'''
+    ---------------------------------
+    Manage Scraper
+    ---------------------------------
+'''
+
 
 class ScraperManager:
     def __init__(self):
@@ -104,16 +110,15 @@ class ScraperThread(threading.Thread):
         return self._stop_event.is_set()
 
 
+# Defining Scraper Manager Obj for managing scraper and its thread
 scraper_manager = ScraperManager()
 
 
-def find_open_port():
-    s = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
-    s.bind(('127.0.0.1', 0))
-    port = s.getsockname()[1]
-    s.close()
-    # os.environ['NETSPIDER_PORT'] = str(port)
-    return port
+'''
+    ---------------------------------
+    Socket Routes
+    ---------------------------------
+'''
 
 
 @socketio.on('connection')
@@ -145,6 +150,12 @@ def handle_error(e):
     return response, 500
 
 
+'''
+    ---------------------------------
+    Finding ports
+    ---------------------------------
+'''
+
 # def write_open_ports(port):
 #     with open('open_ports.txt', 'a') as file:
 #         file.write(str(port) + '\n')
@@ -158,10 +169,20 @@ def handle_error(e):
 #     print(os.environ)
 #     socketio.run(app, host='127.0.0.1', port=open_port, allow_unsafe_werkzeug=True)
 
+
 def write_open_ports(ports):
     with open('open_ports.txt', 'w') as file:
         for port in ports:
             file.write(str(port) + '\n')
+
+
+def find_open_port():
+    s = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
+    s.bind(('127.0.0.1', 0))
+    port = s.getsockname()[1]
+    s.close()
+    # os.environ['NETSPIDER_PORT'] = str(port)
+    return port
 
 
 def find_open_ports(num_ports):
@@ -186,5 +207,5 @@ if __name__ == "__main__":
     # Use the open ports as needed in the rest of your program
     print(os.environ)
     # Note: You may want to handle the case where `open_ports` is an empty list.
-    socketio.run(app, host='127.0.0.1', port=open_ports[0],
+    socketio.run(app, host='127.0.0.1', port=3030,
                  allow_unsafe_werkzeug=True)
