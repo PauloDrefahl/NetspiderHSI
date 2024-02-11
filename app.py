@@ -1,3 +1,6 @@
+import gevent.monkey
+gevent.monkey.patch_all()
+
 import os
 import threading
 import socket
@@ -11,9 +14,11 @@ from Backend.Scraper import MegapersonalsScraper, SkipthegamesScraper, Yesbackpa
 
 # pyinstaller app.py --onefile --name=NetSpiderServer --hidden-import pyimod02_importers
 
+
+
 app = Flask(__name__)
 CORS(app)
-socketio = SocketIO(app, cors_allowed_origins="*")
+socketio = SocketIO(app, async_mode='gevent', cors_allowed_origins="*")
 
 '''
     ---------------------------------
@@ -207,5 +212,5 @@ if __name__ == "__main__":
     # Use the open ports as needed in the rest of your program
     print(os.environ)
     # Note: You may want to handle the case where `open_ports` is an empty list.
-    socketio.run(app, host='127.0.0.1', port=open_ports,
+    socketio.run(app, host='127.0.0.1', port=3030,
                  allow_unsafe_werkzeug=True)
