@@ -21,8 +21,8 @@
     <a href="#" id="settings-link"  ><img src="./icons/gear-solid.svg" class="icon"/>Settings</a>
     <a href="#" id="netspider-link"><img src="./icons/spider-solid.svg" class="icon"/>Netspider</a>
     <a href="#med-box" id="keyword-link"><img src="./icons/key-solid.svg" class="icon"/>Keyword</a>
-    <a href="#med-box"><img src="./icons/circle-question-solid.svg" class="icon"/>Help</a>
-    <a href="#" id="logout-link" class="last-child-divider"><img src="./icons/right-from-bracket-solid.svg" class="icon"/>Logout</a>
+    <a href="#small-box" id="help-link"><img src="./icons/circle-question-solid.svg" class="icon"/>Help</a>
+    <a href="../index.html" id="logout-link" class="last-child-divider"><img src="./icons/right-from-bracket-solid.svg" class="icon"/>Logout</a>
     <img src="photos/fgcu-logo.png" class="fgcu-logo">
     <div class="divider"></div>
 </div>
@@ -90,7 +90,7 @@
                 
             </div>
             <div class="column">
-                <h2><img src="./icons/key-solid.svg" class="icon"/>Select Keywords:</h2>
+                <h2><img src="./icons/key-solid.svg" class="icon" id="blueIcon"/>Select Keywords:</h2>
                 <!-- Add content for column 2 here -->
                 <div class="listbox-area">
                     <select id="itemList" multiple="multiple"></select>
@@ -100,7 +100,7 @@
             </div>
             <div class="column">
 
-                <h2><img src="./icons/gear-solid.svg" class="icon"/> Scraper Settings:</h2>
+                <h2><img src="./icons/gear-solid.svg" class="icon" id="blueIcon2"/> Scraper Settings:</h2>
                 <!-- Add content for column 3 here -->
                 <p>Enter Text to Scrape:</p>
                 <textarea id="scraperTextbox" name="scraperTextbox"></textarea>
@@ -164,7 +164,14 @@
         </div>
         
         
-        <div id="med-box" style="width: 30%; margin-left: 4%;">
+        <div id="small-box" style="width: 30%; margin-left: 4%;">
+            <div id="header-keywords"  style="margin-bottom: 12%">
+                <h2 style="color: #09558B;"><img style="height: 20px; margin-right: 10px;" src="./icons/circle-question-solid.svg" class="blueIcon2">Resources and Support:</h2>
+            </div>
+                <button class="button-hp" onclick="openUserGuide()">Open User Guide</button>
+                <button class="button-hp" onclick="openGitDocumentation()">Git Home Documentation</button>
+                <button class="button-hp" onclick="openLicenseAgreement()">License Agreement</button>
+                <button class="button-hp" onclick="emailSupport()">Email Support</button>
         </div>
     </div>
 </div>
@@ -215,6 +222,9 @@ $(document).ready(function() {
         });
     });
     
+    function FocusON() {
+        document.getElementById("settings-link").focus();
+    }
 </script>
 
 </body>

@@ -58,6 +58,7 @@ body {
     display: block;
     bottom: 6%;
     width: 80%;
+    overflow: hidden;
 }
 
 /* Styles for navigation links */
@@ -66,14 +67,14 @@ body {
     font-size: 18px;
     padding: 15px;
     text-decoration: none;
-    color: #2A3547;
+    color: #09558B;
     background-color: #ffffff;
     text-align: center;
     transition: background-color 0.3s, color 0.3s, box-shadow 0.3s, transform 0.3s;
     margin-top: 17px;
     border: none; /* Remove solid border */
     border-radius: 20px; /* Adjusted border-radius for curved edges */
-    box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1); /* Apply box shadow */
+    box-shadow: 0 4px 8px rgba(0, 0, 0, 0.5); /* Stronger and more defined shadow */
     transform-style: preserve-3d; /* Enable 3D transformations */
 }
 
@@ -84,7 +85,7 @@ body {
 #navbar a.focus:hover {
     background-color: #09558B;
     color: white;
-    box-shadow: 0 8px 16px rgba(9, 85, 139, 0.2); /* Enhanced box shadow */
+    box-shadow: 0 8px 16px rgba(9, 85, 139, 0.9); /* Enhanced box shadow */
     transform: translateY(4px);
     border-image: none;
     box-shadow: 0 12px 16px 0 rgba(0,0,0,0.24),0 17px 50px 0 rgba(0,0,0,0.19);
@@ -272,12 +273,21 @@ input[type="file"].file-selected {
     transform: scale(1.05);
 }
 
+<<<<<<< HEAD
+=======
+#small-box.hover-effect {
+    box-shadow: 0 8px 16px rgba(0, 0, 0, 0.2); /* Enhanced box shadow on hover */
+    transform: scale(1.05);
+}
+
+
+>>>>>>> GUI-Paulo-3.0.1v
 /* Medium box under the Big box w/ 3 sections */
 #med-box {
     display: grid;
     grid-template-columns: repeat(2, 1fr); /* Two equal-width columns */
     grid-gap: 20px; /* Gap between columns */
-    width: 55%;
+    width: 60%;
     margin-left: 15px;
     margin-top: 40px;
     padding: 30px; /* Increased padding */
@@ -312,8 +322,14 @@ input[type="file"].file-selected {
     transition: background-color 0.3s, color 0.3s, border-color 0.3s;
     box-shadow: 0 6px 8px 0 rgba(0,0,0,0.24),0 8.5px 25px 0 rgba(0,0,0,0.19);
     cursor: pointer;
+    transition: box-shadow 0.3s, transform 0.3s;
     font: 15px "Plus Jakarta Sans", sans-serif;
 
+}
+
+.deleteButton:hover{
+    transform: scale(1.05);
+    box-shadow: 0 8px 16px rgba(0, 0, 0, 0.2);
 }
 
 .column-edit-keywords {
@@ -366,7 +382,13 @@ input[type="file"].file-selected {
     cursor: pointer;
     max-height: 40px;
     overflow: hidden;
+    transition: box-shadow 0.3s, transform 0.3s;
 
+}
+
+.create-set-btn:hover{
+        transform: scale(1.05);
+        box-shadow: 0 8px 16px rgba(0, 0, 0, 0.2);
 }
 
 
@@ -896,4 +918,36 @@ select {
 
 option.selected {
     background-color: rgb(0, 0, 0); /* Change to the color you want */
+}
+
+@media (max-height: 900px) {
+    #navbar .fgcu-logo {
+        display: none;
+    }
+  }
+
+#small-box{
+    margin-left: 15px;
+    max-width: 370px;
+    margin-top: 40px;
+    padding: 30px; /* Increased padding */
+    background-color: #fff;
+    border-left: 2px solid #ddd; /* Left border */
+    border-right: 2px solid #ddd; /* Right border */
+    border-radius: 12px; /* Rounded corners */
+    position: relative; /* Ensure positioning context for absolute positioning */
+    min-height: 500px;
+    transition: box-shadow 0.3s, transform 0.3s;
+    box-shadow: 0 8px 16px rgba(255, 255, 255, 0.1); /* Improved box shadow */
+}
+
+#small-box:hover {
+    box-shadow: 0 8px 16px rgba(0, 0, 0, 0.2); /* Enhanced box shadow on hover */
+    transform: scale(1.05);
+}
+
+/* Add this CSS for the big box hover effect */
+.small-box.hover-effect {
+    box-shadow: 0 8px 16px rgba(0, 0, 0, 0.2); /* Enhanced box shadow on hover */
+    transform: scale(1.05);
 }
