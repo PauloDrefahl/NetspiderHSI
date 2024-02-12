@@ -62,27 +62,27 @@ document.addEventListener("DOMContentLoaded", function () {
   selectAllButton.addEventListener("click", function () {
       var items = listbox.querySelectorAll('[role="option"]');
       var isNotSelected = selectAllButton.classList.contains("clicked");
-  
+
       if (isNotSelected) {
           // Select all items
           items.forEach(function (item) {
               item.setAttribute("aria-selected", "true");
-              item.classList.remove("selected");
-              item.style.backgroundColor = ''; // Reset background color
-              item.style.color = ''; // Reset text color
+              item.style.backgroundColor = ''; // Set background color
+              item.style.color = ''; // Set text color
+              
           });
       } else {
           // Deselect all items
           items.forEach(function (item) {
               item.setAttribute("aria-selected", "false");
-              item.classList.remove("selected");
-              item.style.backgroundColor = ''; // Reset background color
-              item.style.color = ''; // Reset text color
+              item.style.backgroundColor = '#09558B'; // Reset background color
+              item.style.color = '#fff'; // Reset text color
           });
       }
 
       // Toggle class on listbox container
       listbox.classList.toggle("select-all-mode");
+      selectAllButton.classList.toggle("clicked", !isNotSelected);
   });
 });
 
@@ -700,10 +700,6 @@ function showAlert() {
     alert('Button Clicked!');
 }
 
-// The button click function
-function showAlert() { 
-    alert('Button Clicked!');
-}
 // initialize clock
 let clockInterval;
 let secondsElapsed = 0;
