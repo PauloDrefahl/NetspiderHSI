@@ -338,6 +338,7 @@ input[type="file"].file-selected {
 
 #header-keywords{
     margin: 0 auto;
+    padding-top: 10px;
     border: 1px solid #ddd;
     background-color: #fff;
     text-align: center;
