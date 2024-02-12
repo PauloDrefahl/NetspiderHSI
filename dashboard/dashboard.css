@@ -252,6 +252,11 @@ input[type="file"].file-selected {
     transform: scale(1.05);
 }
 
+.medium-column:hover {
+    box-shadow: 0 8px 16px rgba(0, 0, 0, 0.2);
+    transform: scale(1.05);
+}
+
 
 /* Add this CSS for the hover effect */
 .box.hover-effect {
@@ -278,7 +283,7 @@ input[type="file"].file-selected {
     flex-direction: row; /* Changed to row */
     justify-content: space-between; /* Adjusted justify-content */
     align-items: flex-start; /* Adjusted align-items */
-    height: auto;
+    height: 5000;
     transition: box-shadow 0.3s, transform 0.3s;
     box-shadow: 0 8px 16px rgba(0, 0, 0, 0.1); /* Improved box shadow */
 }
