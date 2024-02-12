@@ -1,1 +1,1 @@
-{"name":"hello-world","version":"1.0.0","main":"main.js","devDependencies":{"electron":"^1.8.8"},"scripts":{"start":"electron ."}}
+{"name":"hello-world","version":"1.0.0","main":"main.js","devDependencies":{"electron":"^1.8.8"},"scripts":{"start":"electron ."},"dependencies":{"jquery":"^3.7.1"}}
