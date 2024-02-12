@@ -338,7 +338,6 @@ input[type="file"].file-selected {
 
 #header-keywords{
     margin: 0 auto;
-    padding-top: 10px;
     border: 1px solid #ddd;
     background-color: #fff;
     text-align: center;
@@ -348,6 +347,10 @@ input[type="file"].file-selected {
     transition: transform 0.3s, box-shadow 0.3s;
     grid-column: span 2;
     
+}
+
+#header-keywords h2 {
+    margin-bottom: 0;
 }
 
 .listbox-area2{
@@ -949,3 +952,4 @@ option.selected {
     box-shadow: 0 8px 16px rgba(0, 0, 0, 0.2); /* Enhanced box shadow on hover */
     transform: scale(1.05);
 }
+
