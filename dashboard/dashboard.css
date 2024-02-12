@@ -6,6 +6,10 @@ body {
     background-color: #f4f4f4;
 }
 
+* {
+    scroll-behavior: smooth;
+  }
+
 #navbar {
     height: 100%;
     width: 230px;
@@ -27,6 +31,9 @@ body {
     font-weight: 600;
     margin-top: 8%;
     position: relative;
+    -webkit-text-stroke-width: 0.2px;
+    -webkit-text-stroke-color: black;
+
 }
 
 #navbar h1::after {
@@ -261,7 +268,7 @@ input[type="file"].file-selected {
     display: grid;
     grid-template-columns: repeat(2, 1fr); /* Two equal-width columns */
     grid-gap: 20px; /* Gap between columns */
-    width: 50%;
+    width: 55%;
     margin-left: 15px;
     margin-top: 40px;
     padding: 30px; /* Increased padding */
@@ -272,7 +279,33 @@ input[type="file"].file-selected {
     position: relative; /* Ensure positioning context for absolute positioning */
     min-height: 500px;
     transition: box-shadow 0.3s, transform 0.3s;
-    box-shadow: 0 8px 16px rgba(0, 0, 0, 0.1); /* Improved box shadow */
+    box-shadow: 0 8px 16px rgba(255, 255, 255, 0.1); /* Improved box shadow */
+}
+
+.setname-input{
+    width: 100%;
+    padding: 10px;
+    border: 2px solid #09558B;
+    border-radius: 8px;
+    background-color: #fff;
+    transition: background-color 0.3s, color 0.3s, border-color 0.3s;
+    box-shadow: 0 6px 8px 0 rgba(0,0,0,0.24),0 8.5px 25px 0 rgba(0,0,0,0.19);
+    cursor: pointer;
+}
+
+.deleteButton{
+    width: 50%;
+    margin-top: 10px;
+    padding: 6px;
+    border: 2px solid #09558B;
+    border-radius: 8px;
+    background-color: #09558B;
+    color: #fff;
+    transition: background-color 0.3s, color 0.3s, border-color 0.3s;
+    box-shadow: 0 6px 8px 0 rgba(0,0,0,0.24),0 8.5px 25px 0 rgba(0,0,0,0.19);
+    cursor: pointer;
+    font: 15px "Plus Jakarta Sans", sans-serif;
+
 }
 
 .column-edit-keywords {
@@ -283,16 +316,49 @@ input[type="file"].file-selected {
 }
 
 #header-keywords{
-    margin-top: 20px;
-    margin-bottom: 20px;
-    padding: 20px;
+    margin: 0 auto;
     border: 1px solid #ddd;
     background-color: #fff;
     text-align: center;
-    border-radius: 12px;
+    width: 80%;
+    border-radius: 7px;
     box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
     transition: transform 0.3s, box-shadow 0.3s;
     grid-column: span 2;
+    
+}
+
+.listbox-area2{
+    display: flex;
+    flex-direction: column;
+    flex: 1;
+    padding: 10px;
+    border: 1px solid white;
+    border-radius: 4px;
+    background:#09558be1;
+    overflow: hidden;
+    position: relative;
+    margin-top: 15px;
+}
+
+.create-set-btn{
+    width: 100%;
+    margin-left: 8px;
+    margin-top: 0px;
+    height: fit-content;
+    text-align: center;
+    padding: 8PX;
+    border: 2px solid #000000;
+    border-radius: 4px; /* Rounded corners */
+    background-color: #09558B;
+    color: #fff;
+    font: 15px "Plus Jakarta Sans", sans-serif;
+    transition: background-color 0.3s, color 0.3s, border-color 0.3s;
+    box-shadow: 0 6px 8px 0 rgba(0,0,0,0.24),0 8.5px 25px 0 rgba(0,0,0,0.19);
+    cursor: pointer;
+    max-height: 40px;
+    overflow: hidden;
+
 }
 
 
@@ -745,18 +811,6 @@ button[aria-disabled="true"] {
     height: fit-content;
 }
 
-#header-keywords{
-    margin-top: 20px;
-    margin-bottom: 20px;
-    padding: 20px;
-    border: 1px solid #ddd;
-    background-color: #fff;
-    text-align: center;
-    border-radius: 12px;
-    box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
-    transition: transform 0.3s, box-shadow 0.3s;
-}
-
 #itemList{
     width: 100%;
     height: 320px;
@@ -766,6 +820,7 @@ button[aria-disabled="true"] {
     transition: transform 0.3s, box-shadow 0.3s;
     font-size: 24px;
     display: block;
+    
 }
 
 #itemListSet{

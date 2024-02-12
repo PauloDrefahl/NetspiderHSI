@@ -20,8 +20,8 @@
     <h1>Homeland Security Netspider</h1>
     <a href="#" id="settings-link"  ><img src="./icons/gear-solid.svg" class="icon"/>Settings</a>
     <a href="#" id="netspider-link"><img src="./icons/spider-solid.svg" class="icon"/>Netspider</a>
-    <a href="#" id="keyword-link"><img src="./icons/key-solid.svg" class="icon"/>Keyword</a>
-    <a href="#"><img src="./icons/circle-question-solid.svg" class="icon"/>Help</a>
+    <a href="#med-box" id="keyword-link"><img src="./icons/key-solid.svg" class="icon"/>Keyword</a>
+    <a href="#med-box"><img src="./icons/circle-question-solid.svg" class="icon"/>Help</a>
     <a href="#" id="logout-link" class="last-child-divider"><img src="./icons/right-from-bracket-solid.svg" class="icon"/>Logout</a>
     <img src="photos/fgcu-logo.png" class="fgcu-logo">
     <div class="divider"></div>
@@ -90,18 +90,17 @@
                 
             </div>
             <div class="column">
-
                 <h2><img src="./icons/key-solid.svg" class="icon"/>Select Keywords:</h2>
                 <!-- Add content for column 2 here -->
                 <div class="listbox-area">
                     <select id="itemList" multiple="multiple"></select>
                 </div>
-                <button id="select-all-btn" onclick="this.classList.toggle('clicked')">Select All</button>
+                <button id="select-all-btn">Select All</button>
                 <button id="open-results-folder-btn" onclick="this.classList.toggle('clicked')">Open Results Folder</button>
             </div>
             <div class="column">
 
-                <h2><img src="./icons/gear-solid.svg" class="icon"/>Scrapper Settings:</h2>
+                <h2><img src="./icons/gear-solid.svg" class="icon"/> Scraper Settings:</h2>
                 <!-- Add content for column 3 here -->
                 <p>Enter Text to Scrape:</p>
                 <textarea id="scraperTextbox" name="scraperTextbox"></textarea>
@@ -126,29 +125,27 @@
                     <div class="column-s">
                         <!-- Content for the second column -->
                         <h2><div id="clock"></div></h2>
+                        <h2><div id="clock"></div></h2>
                     </div>
                 </div>
-            
-                <div id="clock"> </div>
             </div>
         </div>
 
         <div id="med-box">
             <div id="header-keywords">
-                <h2><img src="./icons/pen-to-square-solid.svg" class="icon"/>Edit Keywords & Sets:</h2>
+                <h2 style="color: #09558B;"><img src="./icons/pen-to-square-solid.svg" class="icon"/>Edit Keywords & Sets:</h2>
             </div>
             <div class="column">
                 <h3>Enter New Keyword:</h3>
                 <div class="input-container">
-                    <input type="text" class="keyword-input" placeholder="Type new keyword">
-                    <button class="add-keyword-btn">Add Keyword</button>
+                    <input type="text" class="setname-input" placeholder="Type new keyword">
+                    <button class="create-set-btn">Add Keyword</button>
                 </div>
-                <div class="listbox-area">
+                <div class="listbox-area2">
                     <select id="itemListKeywords" multiple="multiple"></select>
                 </div>
                 <div class="button-container">
-                    <img src="./icons/trash-solid.svg" class="icon"/>
-                    <button class="delete-keyword-btn">Delete Keywords</button>
+                    <button class="deleteButton" style="width: 60%; display: inline-block; white-space: nowrap; padding-right: 10px;">Delete Keyword<img style="height: 12px; margin-left: 5%;" src="./icons/trash-solid.svg"/> </button>
                 </div>
             </div>
             <div class="column">
@@ -157,12 +154,11 @@
                     <input type="text" class="setname-input" placeholder="Type new set name">
                     <button class="create-set-btn">Create Set</button>
                 </div>
-                <div class="listbox-area">
+                <div class="listbox-area2">
                     <select id="itemListSet" multiple="multiple"></select>
                 </div>
                 <div class="button-container">
-                    <img src="./icons/trash-solid.svg" class="icon"/>
-                    <button class="delete-set-btn">Delete Set</button>
+                    <button class="deleteButton">Delete Set <img style="height: 12px; margin-left: 5%;" src="./icons/trash-solid.svg"/> </button>
                 </div>
             </div>
         </div>
