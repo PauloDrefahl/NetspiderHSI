@@ -258,7 +258,10 @@ input[type="file"].file-selected {
 
 /* Medium box under the Big box w/ 3 sections */
 #med-box {
-    width: 55%;
+    display: grid;
+    grid-template-columns: repeat(2, 1fr); /* Two equal-width columns */
+    grid-gap: 20px; /* Gap between columns */
+    width: 50%;
     margin-left: 15px;
     margin-top: 40px;
     padding: 30px; /* Increased padding */
@@ -266,13 +269,32 @@ input[type="file"].file-selected {
     border-left: 2px solid #ddd; /* Left border */
     border-right: 2px solid #ddd; /* Right border */
     border-radius: 12px; /* Rounded corners */
-    display: flex;
-    justify-content: space-between;
-    align-items: center;
-    height: 500px;
+    position: relative; /* Ensure positioning context for absolute positioning */
+    min-height: 500px;
     transition: box-shadow 0.3s, transform 0.3s;
     box-shadow: 0 8px 16px rgba(0, 0, 0, 0.1); /* Improved box shadow */
 }
+
+.column-edit-keywords {
+    grid-column: 1 / span 2; /* Span both columns */
+    position: relative; /* Ensure positioning context for absolute positioning */
+    width: fit-content;
+    height:  fit-content;
+}
+
+#header-keywords{
+    margin-top: 20px;
+    margin-bottom: 20px;
+    padding: 20px;
+    border: 1px solid #ddd;
+    background-color: #fff;
+    text-align: center;
+    border-radius: 12px;
+    box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+    transition: transform 0.3s, box-shadow 0.3s;
+    grid-column: span 2;
+}
+
 
 /* CSS for Select All button */
 #select-all-btn {
@@ -281,7 +303,7 @@ input[type="file"].file-selected {
     text-align: center;
     padding: 15px;
     border: 2px solid #000000;
-    border-radius: 0px; /* Rounded corners */
+    border-radius: 4px; /* Rounded corners */
     background-color: #09558B;
     color: #fff;
     transition: background-color 0.3s, color 0.3s, border-color 0.3s;
@@ -317,7 +339,7 @@ input[type="file"].file-selected {
     text-align: center;
     padding: 5px;
     border: 2px solid #000000;
-    border-radius: 12px; /* Rounded corners */
+    border-radius: 5px; /* Rounded corners */
     background-color: #09558B;
     color: #fff;
     transition: background-color 0.3s, color 0.3s, border-color 0.3s;
@@ -462,7 +484,6 @@ input[type="file"].file-selected {
     flex-direction: column;
     flex: 1; /* Grow and shrink equally to fill available space */
     padding: 10px;
-    min-height: 60%;
     border: 1px solid white;
     border-radius: 4px;
     background:#09558be1;
@@ -734,4 +755,49 @@ button[aria-disabled="true"] {
     border-radius: 12px;
     box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
     transition: transform 0.3s, box-shadow 0.3s;
+}
+
+#itemList{
+    width: 100%;
+    height: 320px;
+    padding: 10px;
+    text-align: center;
+    box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+    transition: transform 0.3s, box-shadow 0.3s;
+    font-size: 24px;
+    display: block;
+}
+
+#itemListSet{
+    width: 100%;
+    height: 320px;
+    padding: 10px;
+    text-align: center;
+    box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+    transition: transform 0.3s, box-shadow 0.3s;
+    font-size: 24px;
+    display: block;
+}
+
+#itemListKeywords{
+    width: 100%;
+    height: 320px;
+    padding: 10px;
+    text-align: center;
+    box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+    transition: transform 0.3s, box-shadow 0.3s;
+    font-size: 24px;
+    display: block;
+}
+
+
+select {
+    height: 100px;
+    width: 100px;
+    display: block;
+}
+/* Example CSS rules */
+
+option.selected {
+    background-color: rgb(0, 0, 0); /* Change to the color you want */
 }

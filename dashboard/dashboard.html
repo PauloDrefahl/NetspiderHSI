@@ -7,6 +7,8 @@
     <link rel="stylesheet" href="dashboard.css">
     <script src="main.js" defer></script>
     <script src="RetrieveData.js" defer></script>
+    <script src="keywords.js"></script>
+    <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.6.0/jquery.min.js"></script>
     <link rel="stylesheet" href="icons.css">
     <link rel="icon" type="image/ico" href="./icons/spider-solid-2xl.svg">
 </head>
@@ -92,9 +94,7 @@
                 <h2><img src="./icons/key-solid.svg" class="icon"/>Select Keywords:</h2>
                 <!-- Add content for column 2 here -->
                 <div class="listbox-area">
-                    <div>
-                        <textarea id="textBox-keywords1" rows="10" cols="50" style="height: 330px"></textarea>
-                    </div>
+                    <select id="itemList" multiple="multiple"></select>
                 </div>
                 <button id="select-all-btn" onclick="this.classList.toggle('clicked')">Select All</button>
                 <button id="open-results-folder-btn" onclick="this.classList.toggle('clicked')">Open Results Folder</button>
@@ -132,6 +132,7 @@
                 <div id="clock"> </div>
             </div>
         </div>
+
         <div id="med-box">
             <div id="header-keywords">
                 <h2><img src="./icons/pen-to-square-solid.svg" class="icon"/>Edit Keywords & Sets:</h2>
@@ -143,15 +144,7 @@
                     <button class="add-keyword-btn">Add Keyword</button>
                 </div>
                 <div class="listbox-area">
-                    <div>
-                        <span id="ss_elem" class="listbox-label"></span>
-                        <ul id="ss_elem_list" tabindex="0" role="listbox" aria-labelledby="ss_elem">
-                            <li id="ss_elem_Np" role="option">
-                                <span class="checkmark" aria-hidden="true"></span>
-                                keyword
-                            </li>
-                        </ul>
-                    </div>
+                    <select id="itemListKeywords" multiple="multiple"></select>
                 </div>
                 <div class="button-container">
                     <img src="./icons/trash-solid.svg" class="icon"/>
@@ -165,34 +158,70 @@
                     <button class="create-set-btn">Create Set</button>
                 </div>
                 <div class="listbox-area">
-                    <div>
-                        <span id="ss_elem" class="listbox-label"></span>
-                        <ul id="ss_elem_list" tabindex="0" role="listbox" aria-labelledby="ss_elem">
-                            <li id="ss_elem_Np" role="option">
-                                <span class="checkmark" aria-hidden="true"></span>
-                                set
-                            </li>
-                            <li id="ss_elem_Pu" role="option">
-                                <span class="checkmark" aria-hidden="true"></span>
-                                set
-                            </li>
-                            <li id="ss_elem_Am" role="option">
-                                <span class="checkmark" aria-hidden="true"></span>
-                                set
-                            </li>
-                        </ul>
-                    </div>
+                    <select id="itemListSet" multiple="multiple"></select>
                 </div>
                 <div class="button-container">
                     <img src="./icons/trash-solid.svg" class="icon"/>
                     <button class="delete-set-btn">Delete Set</button>
                 </div>
             </div>
-        </div> 
+        </div>
+        
+        
         <div id="med-box" style="width: 30%; margin-left: 4%;">
         </div>
     </div>
 </div>
 
+<script>
+$(document).ready(function() {
+        $('#itemList').on('mousedown', 'option', function(e) {
+            e.preventDefault();
+            var originalScrollTop = $(this).parent().scrollTop();
+            console.log(originalScrollTop);
+            $(this).prop('selected', !$(this).prop('selected'));
+            var self = this;
+            $(this).parent().focus();
+            setTimeout(function() {
+                $(self).parent().scrollTop(originalScrollTop);
+            }, 0);
+            return false;
+        });
+    });
+
+    $(document).ready(function() {
+        $('#itemListSet').on('mousedown', 'option', function(e) {
+            e.preventDefault();
+            var originalScrollTop = $(this).parent().scrollTop();
+            console.log(originalScrollTop);
+            $(this).prop('selected', !$(this).prop('selected'));
+            var self = this;
+            $(this).parent().focus();
+            setTimeout(function() {
+                $(self).parent().scrollTop(originalScrollTop);
+            }, 0);
+            return false;
+        });
+    });
+
+    $(document).ready(function() {
+        $('#itemListKeywords').on('mousedown', 'option', function(e) {
+            e.preventDefault();
+            var originalScrollTop = $(this).parent().scrollTop();
+            console.log(originalScrollTop);
+            $(this).prop('selected', !$(this).prop('selected'));
+            var self = this;
+            $(this).parent().focus();
+            setTimeout(function() {
+                $(self).parent().scrollTop(originalScrollTop);
+            }, 0);
+            return false;
+        });
+    });
+    
+</script>
+
 </body>
+
+
 </html>

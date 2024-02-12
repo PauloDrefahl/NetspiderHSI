@@ -448,43 +448,6 @@ aria.Listbox = class Listbox {
       return null;
     }
   
-    checkClickItem(evt) {
-        if (evt.target.getAttribute('role') !== 'option') {
-            return;
-        }
-    
-        const clickedItem = evt.target;
-        const isSelected = clickedItem.getAttribute('aria-selected') === 'true';
-    
-        if (!this.multiselectable) {
-            // Deselect all other items if not multiselectable
-            const allOptions = this.listboxNode.querySelectorAll('[role="option"]');
-            allOptions.forEach(option => {
-                option.setAttribute('aria-selected', 'false');
-                option.classList.remove('selected');
-                option.style.backgroundColor = ''; // Reset background color
-                option.style.color = ''; // Reset text color
-            });
-        }
-    
-        // Toggle the selection state
-        clickedItem.setAttribute('aria-selected', isSelected ? 'false' : 'true');
-        clickedItem.classList.toggle('selected', !isSelected);
-        clickedItem.style.backgroundColor = isSelected ? '' : '#09558B'; // Toggle background color
-        clickedItem.style.color = isSelected ? '' : 'white'; // Toggle text color
-    
-        // Update the active descendant
-        this.focusItem(clickedItem);
-    
-        // Update the move button state
-        this.updateMoveButton();
-    
-        // Handle multiselectable range selection
-        if (this.multiselectable && evt.shiftKey) {
-            this.selectRange(this.startRangeIndex, clickedItem);
-        }
-    }
-  
     checkMouseDown(evt) {
       if (
         this.multiselectable &&
@@ -493,13 +456,6 @@ aria.Listbox = class Listbox {
       ) {
         evt.preventDefault();
       }
-    }
-  
-    toggleSelectItem(element) {
-        // Toggle the aria-selected value without deselecting other items
-        const isSelected = element.getAttribute('aria-selected') === 'true';
-        element.setAttribute('aria-selected', isSelected ? 'false' : 'true');
-        this.updateMoveButton();
     }
   
     defocusItem(element) {
@@ -777,3 +733,4 @@ function stopClock() {
 
 // Initial setup of clock - displays clock
 updateClock();
+
