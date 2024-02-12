@@ -273,15 +273,12 @@ input[type="file"].file-selected {
     transform: scale(1.05);
 }
 
-<<<<<<< HEAD
-=======
 #small-box.hover-effect {
     box-shadow: 0 8px 16px rgba(0, 0, 0, 0.2); /* Enhanced box shadow on hover */
     transform: scale(1.05);
 }
 
 
->>>>>>> GUI-Paulo-3.0.1v
 /* Medium box under the Big box w/ 3 sections */
 #med-box {
     display: grid;
