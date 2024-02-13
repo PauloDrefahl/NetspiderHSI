@@ -573,6 +573,8 @@ input[type="file"].file-selected {
     box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
     border-radius: 8px;
     z-index: 1;
+    overflow-y: auto;
+    max-height: 150px;
 }
 
 .dropdown:hover .dropdown-content {
