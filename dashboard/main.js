@@ -745,3 +745,9 @@ function stopClock() {
 // Initial setup of clock - displays clock
 updateClock();
 
+document.getElementById("selectAllButton").addEventListener("click", function() {
+  var itemList = document.getElementById("itemList");
+  for (var i = 0; i < itemList.options.length; i++) {
+      itemList.options[i].selected = true;
+  }
+});
