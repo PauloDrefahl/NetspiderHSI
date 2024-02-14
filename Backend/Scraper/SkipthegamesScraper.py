@@ -100,14 +100,17 @@ class SkipthegamesScraper(ScraperPrototype):
     def set_flagged_keywords(self, flagged_keywords) -> None:
         self.flagged_keywords = flagged_keywords
 
+    def set_keywords(self, keywords) -> None:
+        self.keywords = keywords
+
     '''
     ---------------------------------------
     Managing Scraper Run Time
     ---------------------------------------
     '''
-    def initialize(self, keywords) -> None:
+    def initialize(self) -> None:
         # set keywords value
-        self.keywords = keywords
+        #self.keywords = keywords
 
         # set up directories to save screenshots and excel file.
         self.date_time = str(datetime.today())[0:19].replace(' ', '_').replace(':', '-')
