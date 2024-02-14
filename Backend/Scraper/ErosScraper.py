@@ -87,6 +87,9 @@ class ErosScraper(ScraperPrototype):
     def set_flagged_keywords(self, flagged_keywords) -> None:
         self.flagged_keywords = flagged_keywords
 
+    def set_keywords(self, keywords) -> None:
+        self.keywords = keywords
+
     '''
     ---------------------------------------
     Managing Scraper Run Time
@@ -94,7 +97,7 @@ class ErosScraper(ScraperPrototype):
     '''
     def initialize(self, keywords) -> None:
         # set keywords value
-        self.keywords = keywords
+        # self.keywords = keywords
 
         # Date and time of search
         self.date_time = str(datetime.today())[0:19].replace(' ', '_').replace(':', '-')
