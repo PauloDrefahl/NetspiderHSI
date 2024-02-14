@@ -48,6 +48,12 @@ class ScraperManager:
             print("number of threads: ", threading.active_count())
             return {"Response": "No active Scraper Thread, Forceful Stop Attempted"}
 
+    def get_scraper_status(self):
+        if self.scraper_thread and self.scraper_thread.is_alive():
+            socketio.emit('scraper_update', {'status': 'scraper thread alive'})
+        else:
+            socketio.emit('scraper_update', {'status': 'scraper thread not alive'})
+
 
 class ScraperThread(threading.Thread):
     def __init__(self, kwargs):
@@ -71,8 +77,9 @@ class ScraperThread(threading.Thread):
         self.scraper.set_flagged_keywords(flagged_keywords)
         if kwargs['inclusive_search']:
             self.scraper.set_join_keywords()
+        if kwargs['search_text'] != '':
+            self.scraper.keywords.add(kwargs['search_text'])
         self.scraper.set_search_mode(kwargs['search_mode'])
-        self.scraper.keywords.add(kwargs['search_text'])
         self.scraper.set_city(kwargs['city'])
         self._stop_event = threading.Event()
 
@@ -128,6 +135,11 @@ def connected():
     print("connected")
 
 
+@socketio.on('scraper_status')
+def get_status():
+    scraper_manager.get_scraper_status()
+
+
 @socketio.on('start_scraper')
 def start_scraper(data):
     # print(data)
@@ -159,7 +171,7 @@ def handle_error(e):
 
 
 def write_open_ports(ports):
-    with open('C:\\Users\\Zach\\WebstormProjects\\ElectronTest\\open_ports.txt', 'w') as file:
+    with open('C:\\Users\\Zach\\WebstormProjects\\NetspiderHSI\\open_ports.txt', 'w') as file:
         for port in ports:
             file.write(str(port) + '\n')
 
