@@ -5,6 +5,8 @@ import pandas as pd
 import undetected_chromedriver as uc
 from selenium.common import NoSuchElementException
 from selenium.webdriver.common.by import By
+from selenium.webdriver.support.ui import WebDriverWait
+from selenium.webdriver.support import expected_conditions as EC
 from Backend.ScraperPrototype import ScraperPrototype
 import img2pdf
 from openpyxl.styles import PatternFill
@@ -270,58 +272,6 @@ class RubratingsScraper(ScraperPrototype):
                 print("Description elements not found")
                 description = 'N/A'
 
-            # check if page contains "col-sm-6 offset-sm-3" which is the table that contains name, phone number, etc.
-            # if self.driver.find_elements(By.XPATH, '//*[@id="mainCellWrapper"]/div[1]/table/tbody/tr[1]/td/div[1]/div'):
-            #     try:
-            #         name = self.driver.find_element(
-            #             By.XPATH, '/html/body/div[3]/div/div[1]/table/tbody/tr[1]/td/div[1]/div/table/'
-            #                       'tbody/tr[1]/td[2]').text[2:]
-            #     except NoSuchElementException:
-            #         name = 'N/A'
-            #
-            #     try:
-            #         sex = self.driver.find_element(
-            #             By.XPATH, '/html/body/div[3]/div/div[1]/table/tbody/tr[1]/td/div[1]/div/table/'
-            #                       'tbody/tr[2]/td[2]').text[2:]
-            #     except NoSuchElementException:
-            #         sex = 'N/A'
-            #
-            #     try:
-            #         phone_number = self.driver.find_element(
-            #             By.XPATH, '/html/body/div[3]/div/div[1]/table/tbody/tr[1]/td/div[1]/div/table/'
-            #                       'tbody/tr[6]/td[2]').text[2:]
-            #     except NoSuchElementException:
-            #         phone_number = 'NA'
-            #
-            #     try:
-            #         email = self.driver.find_element(
-            #             By.XPATH, '/html/body/div[3]/div/div[1]/table/tbody/tr[1]/td/div[1]/div/table/'
-            #                       'tbody/tr[8]/td[2]').text[2:]
-            #     except NoSuchElementException:
-            #         email = 'N/A'
-            #
-            #     try:
-            #         location = self.driver.find_element(
-            #             By.XPATH, '/html/body/div[3]/div/div[1]/table/tbody/tr[1]/td/div[1]/div/table/'
-            #                       'tbody/tr[9]/td[2]').text[2:]
-            #     except NoSuchElementException:
-            #         location = 'N/A'
-            #
-            #     try:
-            #         services = self.driver.find_element(
-            #             By.XPATH, '//*[@id="mainCellWrapper"]/div/table/tbody/tr/td/div[1]/div/table/'
-            #                       'tbody/tr[5]/td[2]').text[2:]
-            #     except NoSuchElementException:
-            #         services = 'N/A'
-            # else:
-            #     timestamp = 'not exist 2'
-            #     name = 'N/A'
-            #     sex = 'N/A'
-            #     phone_number = 'N/A'
-            #     email = 'N/A'
-            #     location = 'N/A'
-            #     services = 'N/A'
-
             # reassign variables for each post
             self.number_of_keywords_in_post = 0
             self.keywords_found_in_post = []
@@ -535,8 +485,17 @@ class RubratingsScraper(ScraperPrototype):
                     col[0].column_letter].width = adjusted_width
 
     def capture_screenshot(self, screenshot_name) -> None:
-        self.driver.save_screenshot(f'{self.screenshot_directory}/{screenshot_name}')
-        self.create_pdf()
+        try:
+            # Wait for the picture under the 'pic' class to be visible
+            WebDriverWait(self.driver, 10).until(
+                EC.visibility_of_element_located((By.CSS_SELECTOR, '.pic img'))
+            )
+
+            # Take screenshot after the picture is visible
+            self.driver.save_screenshot(f'{self.screenshot_directory}/{screenshot_name}')
+            self.create_pdf()
+        except Exception as e:
+            print(f"Error capturing screenshot: {e}")
 
     def create_pdf(self) -> None:
         screenshot_files = [os.path.join(self.screenshot_directory, filename) for filename in
@@ -560,7 +519,3 @@ class RubratingsScraper(ScraperPrototype):
         self.join_keywords = False
         self.keywords_found = []
         self.social_media_found = []
-
-
-
-

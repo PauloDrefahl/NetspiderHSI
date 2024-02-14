@@ -1,20 +1,18 @@
 import gevent.monkey
+
 gevent.monkey.patch_all()
 
-import os
 import threading
 import socket
 import time
-from flask import Flask, request
+import os
+from flask import Flask
 from flask_socketio import SocketIO
 from flask_cors import CORS
-from waitress import serve
 from Backend.Scraper import MegapersonalsScraper, SkipthegamesScraper, YesbackpageScraper, EscortalligatorScraper, \
     ErosScraper, RubratingsScraper
 
-# pyinstaller app.py --onefile --name=NetSpiderServer --hidden-import pyimod02_importers
-
-
+# pyinstaller app.py --onefile --name=NetSpiderServer --hidden-import gevent --hidden-import engineio.async_drivers.gevent --hidden-import pyimod02_importers
 
 app = Flask(__name__)
 CORS(app)
@@ -118,7 +116,6 @@ class ScraperThread(threading.Thread):
 # Defining Scraper Manager Obj for managing scraper and its thread
 scraper_manager = ScraperManager()
 
-
 '''
     ---------------------------------
     Socket Routes
@@ -142,7 +139,6 @@ def start_scraper(data):
 
 @socketio.on('stop_scraper')
 def stop_scraper():
-
     response = scraper_manager.manage_stop_scraper()
     socketio.emit('scraper_update', {'status': 'stopped'})
     return {'Response': response}
@@ -161,22 +157,9 @@ def handle_error(e):
     ---------------------------------
 '''
 
-# def write_open_ports(port):
-#     with open('open_ports.txt', 'a') as file:
-#         file.write(str(port) + '\n')
-#
-#
-# if __name__ == "__main__":
-#     print("active threads: ", threading.active_count())
-#     open_port = find_open_port()
-#     write_open_ports(open_port)
-#
-#     print(os.environ)
-#     socketio.run(app, host='127.0.0.1', port=open_port, allow_unsafe_werkzeug=True)
-
 
 def write_open_ports(ports):
-    with open('open_ports.txt', 'w') as file:
+    with open('C:\\Users\\Zach\\WebstormProjects\\ElectronTest\\open_ports.txt', 'w') as file:
         for port in ports:
             file.write(str(port) + '\n')
 
@@ -190,19 +173,19 @@ def find_open_port():
     return port
 
 
-def find_open_ports(num_ports):
-    open_ports = []
-    for _ in range(num_ports):
+def find_open_ports(num):
+    open_ports_list = []
+    for _ in range(num):
         with socket.socket(socket.AF_INET, socket.SOCK_STREAM) as s:
             s.bind(('127.0.0.1', 0))
-            open_ports.append(s.getsockname()[1])
-    return open_ports
+            open_ports_list.append(s.getsockname()[1])
+    return open_ports_list
 
 
 if __name__ == "__main__":
     print("active threads: ", threading.active_count())
 
-    num_ports = 1
+    num_ports = 1  # Change this to the desired number of open ports
     open_ports = find_open_ports(num_ports)
 
     write_open_ports(open_ports)
@@ -210,7 +193,6 @@ if __name__ == "__main__":
     print("Open Ports:", open_ports)
 
     # Use the open ports as needed in the rest of your program
-    print(os.environ)
     # Note: You may want to handle the case where `open_ports` is an empty list.
-    socketio.run(app, host='127.0.0.1', port=3030,
+    socketio.run(app, host='127.0.0.1', port=open_ports[0],
                  allow_unsafe_werkzeug=True)
