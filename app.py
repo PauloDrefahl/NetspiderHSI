@@ -77,7 +77,7 @@ class ScraperThread(threading.Thread):
         self.scraper.set_flagged_keywords(flagged_keywords)
         if kwargs['inclusive_search']:
             self.scraper.set_join_keywords()
-        if kwargs['search_text'] != '':
+        if kwargs['search_text'] != '':  # disables search text if blank
             self.scraper.keywords.add(kwargs['search_text'])
         self.scraper.set_search_mode(kwargs['search_mode'])
         self.scraper.set_city(kwargs['city'])
