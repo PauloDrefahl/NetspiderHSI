@@ -95,7 +95,7 @@ class ErosScraper(ScraperPrototype):
     Managing Scraper Run Time
     ---------------------------------------
     '''
-    def initialize(self, keywords) -> None:
+    def initialize(self) -> None:
         # set keywords value
         # self.keywords = keywords
 
