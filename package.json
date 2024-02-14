@@ -1,1 +1,1 @@
-{"name":"hello-world","version":"1.0.0","main":"main.js","devDependencies":{"electron":"^1.8.8"},"scripts":{"start":"electron ."},"dependencies":{"jquery":"^3.7.1"}}
+{"name":"hello-world","version":"1.0.0","main":"main.js","devDependencies":{"electron":"29.0.0-beta.7"},"scripts":{"start":"electron ."},"dependencies":{"electron-squirrel-startup":"^1.0.0","jquery":"^3.7.1","socket.io-client":"^4.7.4"}}
