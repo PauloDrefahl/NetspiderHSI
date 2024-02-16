@@ -15,10 +15,12 @@ document.addEventListener('DOMContentLoaded', () => {
     // Find the button elements by their IDs
     const startButton = document.getElementById('startButton');
     const stopButton = document.getElementById("stopButton");
+    const statusText = document.getElementById('status');
 
     const socket = window.socket
 
     const startScraper = async () => {
+        statusText.textContent = 'Status: On'
         console.log("clicked start scraper button")
         const data = {
             website: 'rubratings',
@@ -35,6 +37,7 @@ document.addEventListener('DOMContentLoaded', () => {
     };
 
     const stopScraper = async () => {
+        statusText.textContent = 'Status: Off'
         console.log("stop button clicked");
         socket.emit('stop_scraper');
     };
@@ -48,13 +51,15 @@ document.addEventListener('DOMContentLoaded', () => {
     socket.on('scraper_update', (data) => {
         console.log('Received scraper_update event:', data);
 
-        // Update the UI or take any action based on the data received from the server
         if (data.status === 'started') {
             console.log('Scraper is running...');
-        } else if (data.status === 'stopped') {
+        } else if (data.status === 'completed') {
+            statusText.textContent = 'Status: Off'
             console.log('Scraper completed');
+        } else if (data.status === 'stopped') {
+            console.log('Scraper Stopped')
         }
-        // Add more conditions or actions based on your server's 'scraper_update' data
+        // conditions based on server's 'scraper_update' data
     });
 
     const scraperStatus = async () => {
