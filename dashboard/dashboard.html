@@ -3,14 +3,22 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>HSI Netspider</title>
-    <link rel="stylesheet" href="dashboard.css">
-    <script src="main.js" defer></script>
-    <script src="RetrieveData.js" defer></script>
-    <script src="keywords.js"></script>
+    <title>DHS Netspider</title>
+    <link rel="stylesheet" href="css/dashboard.css">    
+    <link rel="stylesheet" href="css/icons.css">
+    <link rel="stylesheet" href="css/fileInput.css">
+    <link rel="stylesheet" href="css/help.css">
+    <link rel="stylesheet" href="css/keywords.css">
+    <link rel="stylesheet" href="css/navbar.css">
+    <link rel="stylesheet" href="css/scraper.css">
+
+    <script src="scripts/files.js" defer></script>
+    <script src="scripts/keywords.js" defer></script>
+    <script src="scripts/nav.js" defer></script>
+    <script src="scripts/scraper.js" defer></script>
+
     <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.6.0/jquery.min.js"></script>
-    <link rel="stylesheet" href="icons.css">
-    <link rel="icon" type="image/ico" href="./icons/spider-solid-2xl.svg">
+    
 </head>
 
 <body onload="populateKeysworkds()">
@@ -110,7 +118,7 @@
                 </div>
                 <h2>Start Scraper:</h2>
                 <div>
-                    <label onclick="startClock()" id="startButton">Start</label>
+                    <label onclick="StartScraper()" id="startButton">Start</label>
                     <label onclick="stopClock()" id="stopButton">Stop</label>
                 </div>
 
@@ -165,10 +173,10 @@
             <div id="header-keywords"  style="margin-bottom: 12%">
                 <h2 style="color: #09558B;"><img style="height: 20px; margin-right: 10px;" src="./icons/circle-question-solid.svg" class="blueIcon2">Resources and Support:</h2>
             </div>
-                <button class="button-hp" onclick="openUserGuide()">Open User Guide</button>
-                <button class="button-hp" onclick="openGitDocumentation()">Git Home Documentation</button>
-                <button class="button-hp" onclick="openLicenseAgreement()">License Agreement</button>
-                <button class="button-hp" onclick="emailSupport()">Email Support</button>
+                <button onclick="location.href='NetSpider_quick_guide_v1.pdf'" class="button-hp " target="_blank" onclick="openUserGuide()">User Guide</button>
+                <button onclick="location.href='https://github.com/PauloDrefahl/NetspiderHSI'" class="button-hp" target="_blank">Github Repository</button>
+                <button onclick="location.href='NetSpider_user_manual_v1.1.pdf'" class="button-hp" target="_blank">Developers Guide</button>
+                <button onclick="location.href='https://mit-license.org/'" class="button-hp" target="_blank">Licensing Agreement</button>
         </div>
     </div>
 </div>
