@@ -12,6 +12,7 @@
     <link rel="stylesheet" href="css/navbar.css">
     <link rel="stylesheet" href="css/scraper.css">
 
+    
     <script src="scripts/files.js" defer></script>
     <script src="scripts/keywords.js" defer></script>
     <script src="scripts/nav.js" defer></script>
@@ -85,11 +86,8 @@
                     <h2 style="margin-top: 30px; margin-bottom: 7px;"><img src="./icons/book-solid.svg" class="icon"/>Select Keyset:</h2>
                 <!-- Add the following within the #navbar div, after the last <a> tag -->
                     <div class="dropdown">
-                        <a href="#" class="dropdown-item" id="select-keyset">Select keyset</a>
-                        <div class="dropdown-content">
-                            <a href="#" class="dropdown-item" data-keyset="keyset1">keyset1</a>
-                            <a href="#" class="dropdown-item" data-keyset="keyset2">keyset2</a>
-                            <a href="#" class="dropdown-item" data-keyset="keyset3">keyset3</a>
+                        <a href="#" class="dropdown-item-keyset" >Select keyset</a>
+                        <div class="dropdown-content-keyset">
                         </div>
                     </div>
                 
@@ -118,7 +116,7 @@
                 </div>
                 <h2>Start Scraper:</h2>
                 <div>
-                    <label onclick="StartScraper()" id="startButton">Start</label>
+                    <label onclick="StartScraper(selectedWebsite, selectedLocation)" id="startButton">Start</label>
                     <label onclick="stopClock()" id="stopButton">Stop</label>
                 </div>
 
@@ -182,6 +180,8 @@
 </div>
 
 <script>
+
+
 $(document).ready(function() {
         $('#itemList').on('mousedown', 'option', function(e) {
             e.preventDefault();

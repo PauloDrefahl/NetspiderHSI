@@ -1,4 +1,5 @@
 // initialize clock
+
 let clockInterval;
 let secondsElapsed = 0;
 
@@ -44,19 +45,4 @@ function selectAllKeywords() {
 
 //----------------------------------------------------------------
 
-function StartScraper() {
-  startClock();
-  console.log("Selected items:");
-  
-  // Clear the selectedOptions array
-  selectedOptions = [];
-
-  // Get all selected options from the itemList
-  $("#itemList option:selected").each(function() {
-      selectedOptions.push($(this).val()); // Push the value of the selected option to the array
-  });
-
-  // Log the selected items
-  console.log(selectedOptions);
-}
 

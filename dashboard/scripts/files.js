@@ -87,7 +87,45 @@ document.getElementById('file2').addEventListener('change', function(e) {
             option.textContent = keyset;
             itemList.appendChild(option);
         });
+
+        keysets.forEach(function(keyset) {
+            addOptionKeyset(keyset);
+            
+        });
+
     };
 
     reader.readAsText(file);
 });
+
+
+function addOptionKeyset(keysets) {
+    var option2 = document.createElement('a');
+    option2.href = '#';
+    option2.textContent = keysets;
+
+    option2.classList.add('dropdown-item-keyset');
+
+    option2.addEventListener('click', function() {
+        var selectedKeyset = option2.textContent;
+        
+        // Update the label text to display the selected city
+        var selectKeyset = document.querySelector('.dropdown-item-keyset');
+        selectKeyset.textContent = selectedKeyset;
+        
+
+        // Remove "selected" class from all options
+        var allOptions = document.querySelectorAll('.dropdown-item-keyset');
+        allOptions.forEach(function(opt) {
+            opt.classList.remove('selected');
+        });
+  
+        // Add "selected" class to the clicked option
+        option2.classList.add('selected');
+        
+    });
+    document.querySelector('.dropdown-content-keyset').appendChild(option2);
+  }
+
+
+  

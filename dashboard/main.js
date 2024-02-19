@@ -66,6 +66,7 @@ document.addEventListener("DOMContentLoaded", function () {
     });
 });
 
+
 document.addEventListener("DOMContentLoaded", function () {
   var selectAllButton = document.getElementById("select-all-btn");
   var listbox = document.getElementById("ss_elem_list");
