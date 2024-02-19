@@ -1,3 +1,17 @@
+document.addEventListener("DOMContentLoaded", function () {
+    const fileInputs = document.querySelectorAll('.file-input');
+
+    fileInputs.forEach(input => {
+        input.addEventListener('change', function () {
+            if (this.files.length > 0) {
+                this.classList.add('file-selected');
+            } else {
+                this.classList.remove('file-selected');
+            }
+        });
+    });
+});
+
 document.getElementById('file1').addEventListener('change', function(e) {
     const file = e.target.files[0];
 
@@ -77,4 +91,3 @@ document.getElementById('file2').addEventListener('change', function(e) {
 
     reader.readAsText(file);
 });
-

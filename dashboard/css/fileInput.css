@@ -1,0 +1,73 @@
+
+/* Styles for the main content area */
+#content {
+    padding: 20px;
+    display: flex;
+    flex-wrap: wrap;
+    min-width: 963px;
+}
+ 
+/* New wrapper with margin on the left */
+#content-wrapper {
+    margin-top: 20px;
+    margin-left: 300px;
+    margin-right: 40px;
+    display: flex;
+    flex-wrap: wrap;
+}
+
+/* Styles for individual boxes in the content area */
+.box {
+    width: calc(29.33% - 20px);
+    margin: 0 auto;
+    padding: 20px; /* Increased padding */
+    border: 1px solid #ddd;
+    background-color: #fff;
+    text-align: center;
+    border-radius: 12px; /* Rounded corners */
+    transition: box-shadow 0.3s, transform 0.3s;
+    box-sizing: border-box;
+    box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1); /* Improved box shadow */
+}
+
+/* Heading styles within the boxes */
+.box h2 {
+    margin: 0 auto;
+    text-align: center;
+    color: #09558B;
+}
+
+/* Box hover effect */
+.box:hover {
+    box-shadow: 0 8px 16px rgba(0, 0, 0, 0.2); /* Enhanced box shadow on hover */
+    transform: scale(1.05);
+}
+
+
+/* Styles for file input */
+input[type="file"] {
+    width: 100%;
+    box-sizing: border-box;
+    margin-top: 20px; /* Increased margin */
+    text-align: center;
+    padding: 15px; /* Increased padding */
+    border: 2px solid #09558B; /* Thicker border */
+    border-radius: 8px;
+    border-style: dashed;
+    background-color: #fff;
+    transition: background-color 0.3s, border-color 0.3s;
+}
+
+/* Hover effect for file input */
+input[type="file"]:hover {
+    background-color: #f9f9f9;
+    border-color: #0852c9;
+    transition: background-color 1.5s;
+}
+
+input[type="file"].file-selected {
+    background:
+   linear-gradient(#fff 0 0) padding-box,
+   linear-gradient(to bottom, #09558B, green 49%, green) border-box; 
+   border: 2px dashed #fff;
+}
