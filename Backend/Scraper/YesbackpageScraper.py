@@ -333,6 +333,7 @@ class YesbackpageScraper(ScraperPrototype):
                     self.capture_screenshot(screenshot_name)
                     counter += 1
             self.RAW_format_data_to_excel()
+            self.CLEAN_format_data_to_excel()
 
     '''
     --------------------------
@@ -453,16 +454,18 @@ class YesbackpageScraper(ScraperPrototype):
         titled_columns = pd.DataFrame({
             'Post-identifier': self.post_identifier,
             'Link': self.link,
+            # -------
             'Location': self.location,
             'Posted On': self.posted_on,
             'Expires On': self.expires_on,
             'Phone-Number': self.phone_number,
-            'Name': self.name,
             'E-mail': self.email,
+            'Name': self.name,
             'Sex': self.sex,
             'Reply To': self.reply_to,
             'Description': self.description,
             'Services': self.services,
+            # -------
             'Payment-methods': self.payment_methods_found,
             'Social-media-found': self.social_media_found,
             'Keywords-found': self.keywords_found,
@@ -479,6 +482,79 @@ class YesbackpageScraper(ScraperPrototype):
                 for flagged_keyword in self.flagged_keywords:
                     if flagged_keyword in keywords:
                         worksheet["N" + str(i)].fill = PatternFill(
+                            fill_type='solid',
+                            start_color='ff0000',
+                            end_color='ff0000')
+                        worksheet["A" + str(i)].fill = PatternFill(
+                            fill_type='solid',
+                            start_color='ff0000',
+                            end_color='ff0000')
+
+            for col in worksheet.columns:  # dynamically adjust column sizes based on content of cell
+                max_length = 0
+                col = [cell for cell in col]
+                for cell in col:
+                    if len(str(cell.value)) > max_length:
+                        max_length = len(str(cell.value))
+                adjusted_width = (max_length + 2)
+                worksheet.column_dimensions[
+                    col[0].column_letter].width = adjusted_width
+
+    def CLEAN_format_data_to_excel(self) -> None:
+        personal_info = [
+            f"{name} ||| {sex} "
+            for name, sex in zip(
+                self.name, self.sex
+            )
+        ]
+
+        contact_info = [
+            f"{phone_number} ||| {email}"
+            for phone_number, email in zip(
+                self.phone_number, self.email
+            )
+        ]
+
+        overall_desc = [
+            f"{description} ||| {services} ||| {Reply_to}"
+            for description, services, Reply_to in zip(
+                self.description, self.services, self.reply_to
+            )
+        ]
+
+        post_time = [
+            f" Posted on: {posted_on} Expires on: {expires_on}"
+            for posted_on, expires_on in zip(
+                self.posted_on, self.expires_on
+            )
+        ]
+
+        titled_columns = pd.DataFrame({
+            'Post-identifier': self.post_identifier,
+            'Link': self.link,
+            #------
+            'Location': self.location,
+            'Timeline': post_time,
+            'Contacts': contact_info,
+            'Personal Info': personal_info,
+            'Overall Description': overall_desc,
+            #-----
+            'Payment-methods': self.payment_methods_found,
+            'Social-media-found': self.social_media_found,
+            'Keywords-found': self.keywords_found,
+            'Number-of-keywords-found': self.number_of_keywords_found
+        })
+        data = pd.DataFrame(titled_columns)
+        with pd.ExcelWriter(
+                f'{self.scraper_directory}/CLEAN-yesbackpage-{self.city}-{self.date_time}.xlsx',
+                engine='openpyxl') as writer:
+            data.to_excel(writer, index=False)
+            worksheet = writer.sheets['Sheet1']
+            for i in range(2, worksheet.max_row):
+                keywords = worksheet["K" + str(i)].value  # set the keywords var to each keyword in the cell
+                for flagged_keyword in self.flagged_keywords:
+                    if flagged_keyword in keywords:
+                        worksheet["K" + str(i)].fill = PatternFill(
                             fill_type='solid',
                             start_color='ff0000',
                             end_color='ff0000')

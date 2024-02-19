@@ -444,12 +444,14 @@ class RubratingsScraper(ScraperPrototype):
         titled_columns = pd.DataFrame({
             'Post-identifier': self.post_identifier,
             'Link': self.link,
+            # -------
             'Location': self.location,
             'Last-Activity': self.last_activity,
             'Phone-Number': self.phone_number,
             'Provider-ID': self.provider_id,
             'Post-Title': self.post_title,
             'Description': self.description,
+            # -------
             'Payment-methods': self.payment_methods_found,
             'Social-media-found': self.social_media_found,
             'Keywords-found': self.keywords_found,
@@ -466,6 +468,79 @@ class RubratingsScraper(ScraperPrototype):
                 for flagged_keyword in self.flagged_keywords:
                     if flagged_keyword in keywords:
                         worksheet["L" + str(i)].fill = PatternFill(
+                            fill_type='solid',
+                            start_color='ff0000',
+                            end_color='ff0000')
+                        worksheet["A" + str(i)].fill = PatternFill(
+                            fill_type='solid',
+                            start_color='ff0000',
+                            end_color='ff0000')
+
+            for col in worksheet.columns:  # dynamically adjust column sizes based on content of cell
+                max_length = 0
+                col = [cell for cell in col]
+                for cell in col:
+                    if len(str(cell.value)) > max_length:
+                        max_length = len(str(cell.value))
+                adjusted_width = (max_length + 2)
+                worksheet.column_dimensions[
+                    col[0].column_letter].width = adjusted_width
+
+    def CLEAN_format_data_to_excel(self) -> None:
+        personal_info = [
+            f"{id_poster}"
+            for id_poster in zip(
+                self.provider_id
+            )
+        ]
+
+        contact_info = [
+            f"{phone_number}"
+            for phone_number in zip(
+                self.phone_number
+            )
+        ]
+
+        overall_desc = [
+            f"{post_title} ||| {description}"
+            for post_title, description in zip(
+                self.provider_id, self.description
+            )
+        ]
+
+        post_time = [
+            f"Last Activity: {last_active}"
+            for last_active in zip(
+                self.last_activity
+            )
+        ]
+
+        titled_columns = pd.DataFrame({
+            'Post-identifier': self.post_identifier,
+            'Link': self.link,
+            # ------
+            'Location': self.location,
+            'Timeline': post_time,
+            'Contacts': contact_info,
+            'Personal Info': personal_info,
+            'Overall Description': overall_desc,
+            # ------
+            'Payment-methods': self.payment_methods_found,
+            'Social-media-found': self.social_media_found,
+            'Keywords-found': self.keywords_found,
+            'Number-of-keywords-found': self.number_of_keywords_found
+        })
+        data = pd.DataFrame(titled_columns)
+        with pd.ExcelWriter(
+                f'{self.scraper_directory}/CLEAN-rubratings-{self.city}-{self.date_time}.xlsx',
+                engine='openpyxl') as writer:
+            data.to_excel(writer, index=False)
+            worksheet = writer.sheets['Sheet1']
+            for i in range(2, worksheet.max_row):
+                keywords = worksheet["K" + str(i)].value  # set the keywords var to each keyword in the cell
+                for flagged_keyword in self.flagged_keywords:
+                    if flagged_keyword in keywords:
+                        worksheet["K" + str(i)].fill = PatternFill(
                             fill_type='solid',
                             start_color='ff0000',
                             end_color='ff0000')

@@ -198,7 +198,13 @@ class SkipthegamesScraper(ScraperPrototype):
         for link in links:
             self.driver.get(link)
             assert "Page not found" not in self.driver.page_source
-
+            '''
+            try:
+                timestamp = self.driver.find_element(
+                    By.CLASS_NAME, 'viewpostbody').text
+            except NoSuchElementException:
+                timestamp = 'N/A'
+            '''
             try:
                 about_info = self.driver.find_element(
                     By.XPATH, '/html/body/div[7]/div/div[2]/div/table/tbody').text
@@ -360,9 +366,12 @@ class SkipthegamesScraper(ScraperPrototype):
         titled_columns = {
             'Post-identifier': self.post_identifier,
             'Link': self.link,
-            'about-info': self.about_info,
+            'Location': self.city,
+            # -------
+            'About-info': self.about_info,
             'Description': self.description,
             'Services': self.services,
+            # -------
             'Payment-methods': self.payment_methods_found,
             'Social-media-found': self.social_media_found,
             'Keywords-found': self.keywords_found,
@@ -382,6 +391,65 @@ class SkipthegamesScraper(ScraperPrototype):
                 for flagged_keyword in self.flagged_keywords:
                     if flagged_keyword in keywords:
                         worksheet["G" + str(i)].fill = PatternFill(
+                            fill_type='solid',
+                            start_color='ff0000',
+                            end_color='ff0000')
+                        worksheet["A" + str(i)].fill = PatternFill(
+                            fill_type='solid',
+                            start_color='ff0000',
+                            end_color='ff0000')
+
+            for col in worksheet.columns:  # dynamically adjust column sizes based on content of cell
+                max_length = 0
+                col = [cell for cell in col]
+                for cell in col:
+                    if len(str(cell.value)) > max_length:
+                        max_length = len(str(cell.value))
+                adjusted_width = (max_length + 2)
+                worksheet.column_dimensions[
+                    col[0].column_letter].width = adjusted_width
+
+    def CLEAN_format_data_to_excel(self) -> None:
+        personal_info = [
+            f"{ab_info } "
+            for ab_info in zip(
+                self.about_info
+            )
+        ]
+
+        overall_desc = [
+            f"{description} ||| {services} "
+            for description, services in zip(
+                self.description, self.services
+            )
+        ]
+
+        titled_columns = pd.DataFrame({
+            'Post-identifier': self.post_identifier,
+            'Link': self.link,
+            # ------- use the setter attributes to add into the spreadsheet for location
+            'Location': self.city,
+            'Timeline': None,
+            'Contacts': None,
+            'Personal Info': personal_info,
+            'Overall Description': overall_desc,
+            # -------
+            'Payment-methods': self.payment_methods_found,
+            'Social-media-found': self.social_media_found,
+            'Keywords-found': self.keywords_found,
+            'Number-of-keywords-found': self.number_of_keywords_found
+        })
+        data = pd.DataFrame(titled_columns)
+        with pd.ExcelWriter(
+                f'{self.scraper_directory}/CLEAN-skipthegames-{self.city}-{self.date_time}.xlsx',
+                engine='openpyxl') as writer:
+            data.to_excel(writer, index=False)
+            worksheet = writer.sheets['Sheet1']
+            for i in range(2, worksheet.max_row):
+                keywords = worksheet["K" + str(i)].value  # set the keywords var to each keyword in the cell
+                for flagged_keyword in self.flagged_keywords:
+                    if flagged_keyword in keywords:
+                        worksheet["K" + str(i)].fill = PatternFill(
                             fill_type='solid',
                             start_color='ff0000',
                             end_color='ff0000')

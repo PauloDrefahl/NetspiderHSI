@@ -257,7 +257,7 @@ class ErosScraper(ScraperPrototype):
                     self.capture_screenshot(screenshot_name)
                     counter += 1
 
-            self.format_data_to_excel()
+            self.RAW_format_data_to_excel()
 
     '''
     --------------------------
@@ -360,23 +360,25 @@ class ErosScraper(ScraperPrototype):
     Formatting Data and Result Creation
     ---------------------------------
     '''
-    def format_data_to_excel(self) -> None:
+    def RAW_format_data_to_excel(self) -> None:
         titled_columns = {
             'Post-identifier': self.post_identifier,
-            'link': self.link,
-            'profile-header': self.profile_header,
-            'about-info': self.about_info,
-            'info-details': self.info_details,
-            'contact-details': self.contact_details,
-            'payment-methods': self.payment_methods_found,
-            'keywords-found': self.keywords_found,
-            'number-of-keywords-found': self.number_of_keywords_found,
-            'social-media-found': self.social_media_found
+            'Link': self.link,
+            # -------
+            'Profile-header': self.profile_header,
+            'About-info': self.about_info,
+            'Info-details': self.info_details,
+            'Contact-details': self.contact_details,
+            # -------
+            'Payment-methods': self.payment_methods_found,
+            'Social-media-found': self.social_media_found,
+            'Keywords-found': self.keywords_found,
+            'Number-of-keywords-found': self.number_of_keywords_found
         }
 
         data = pd.DataFrame(titled_columns)
         with pd.ExcelWriter(
-                f'{self.scraper_directory}/eros-{self.date_time}.xlsx',
+                f'{self.scraper_directory}/RAW-eros-{self.date_time}-{self.date_time}.xlsx',
                 engine='openpyxl') as writer:
             data.to_excel(writer, index=False)
             worksheet = writer.sheets['Sheet1']
@@ -404,6 +406,68 @@ class ErosScraper(ScraperPrototype):
                 adjusted_width = (max_length + 2)
                 worksheet.column_dimensions[
                     col[0].column_letter].width = adjusted_width
+
+    def CLEAN_format_data_to_excel(self) -> None:
+
+        contact_info = [
+            f"{contact_deets}"
+            for contact_deets in zip(
+                self.contact_details
+            )
+        ]
+
+        overall_desc = [
+            f"{profile_head} ||| {info_deets} "
+            for profile_head, info_deets in zip(
+                self.profile_header, self.info_details
+            )
+        ]
+
+
+        titled_columns = pd.DataFrame({
+            'Post-identifier': self.post_identifier,
+            'Link': self.link,
+            # -------
+            'Location': self.city,
+            'Timeline': None,
+            'Contacts': contact_info,
+            'Personal Info': self.about_info,
+            'Overall Description': overall_desc,
+            # ------
+            'Payment-methods': self.payment_methods_found,
+            'Social-media-found': self.social_media_found,
+            'Keywords-found': self.keywords_found,
+            'Number-of-keywords-found': self.number_of_keywords_found
+        })
+        data = pd.DataFrame(titled_columns)
+        with pd.ExcelWriter(
+                f'{self.scraper_directory}/CLEAN-eros-{self.date_time}-{self.date_time}.xlsx',
+                engine='openpyxl') as writer:
+            data.to_excel(writer, index=False)
+            worksheet = writer.sheets['Sheet1']
+            for i in range(2, worksheet.max_row):
+                keywords = worksheet["K" + str(i)].value  # set the keywords var to each keyword in the cell
+                for flagged_keyword in self.flagged_keywords:
+                    if flagged_keyword in keywords:
+                        worksheet["K" + str(i)].fill = PatternFill(
+                            fill_type='solid',
+                            start_color='ff0000',
+                            end_color='ff0000')
+                        worksheet["A" + str(i)].fill = PatternFill(
+                            fill_type='solid',
+                            start_color='ff0000',
+                            end_color='ff0000')
+
+            for col in worksheet.columns:  # dynamically adjust column sizes based on content of cell
+                max_length = 0
+                col = [cell for cell in col]
+                for cell in col:
+                    if len(str(cell.value)) > max_length:
+                        max_length = len(str(cell.value))
+                adjusted_width = (max_length + 2)
+                worksheet.column_dimensions[
+                    col[0].column_letter].width = adjusted_width
+
 
     def capture_screenshot(self, screenshot_name) -> None:
         self.driver.save_screenshot(f'{self.screenshot_directory}/{screenshot_name}')

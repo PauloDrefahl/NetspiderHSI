@@ -1,4 +1,5 @@
 import os
+import re
 import time
 from datetime import datetime
 import pandas as pd
@@ -213,6 +214,13 @@ class EscortalligatorScraper(ScraperPrototype):
             self.driver.get(link)
             assert "Page not found" not in self.driver.page_source
 
+            '''
+            try:
+                timestamp = self.driver.find_element(
+                    By.CLASS_NAME, 'viewpostbody').text
+            except NoSuchElementException:
+                timestamp = 'N/A'
+            '''
             try:
                 description = self.driver.find_element(
                     By.CLASS_NAME, 'viewpostbody').text
@@ -228,8 +236,10 @@ class EscortalligatorScraper(ScraperPrototype):
             try:
                 location_and_age = self.driver.find_element(
                     By.CLASS_NAME, 'viewpostlocationIconBabylon').text
+                age, location = self.parse_location_and_age(location_and_age)
             except NoSuchElementException:
-                location_and_age = 'N/A'
+                age = 'N/A'
+                location = 'N/A'
 
             # reassign variables for each post
             self.number_of_keywords_in_post = 0
@@ -373,9 +383,12 @@ class EscortalligatorScraper(ScraperPrototype):
         titled_columns = {
             'Post-identifier': self.post_identifier,
             'Link': self.links,
+            # -------
+            'Location': self.city,
             'Location/Age': self.location_and_age,
             'Phone-Number': self.phone_number,
             'Description': self.description,
+            # -------
             'Payment-methods': self.payment_methods_found,
             'Social-media-found': self.social_media_found,
             'Keywords-found': self.keywords_found,
@@ -411,6 +424,92 @@ class EscortalligatorScraper(ScraperPrototype):
                 adjusted_width = (max_length + 2)
                 worksheet.column_dimensions[
                     col[0].column_letter].width = adjusted_width
+
+    def CLEAN_format_data_to_excel(self) -> None:
+
+        # append certiain info together
+        contact_info = [
+            f"{phone_number}"
+            for phone_number in zip(
+                self.phone_number,
+            )
+        ]
+
+        overall_desc = [
+            f"{description} ||| {services} ||| {Reply_to}"
+            for description, services, Reply_to in zip(
+                self.description
+            )
+        ]
+
+        # define columns
+        titled_columns = pd.DataFrame({
+            # ---- abs identifiers
+            'Post-identifier': self.post_identifier,
+            'Link': self.links,  # could also be a keyword source too
+            # ------- time and place of posting
+            'Location': self.city,  # could also be a keyword source too
+            'Timeline': None,
+            # ------ methods of tracking
+            'Contacts': contact_info,  # could also be a keyword source too
+            # ----- keyword sources
+            'Personal Info': None,
+            'Overall Description': overall_desc,
+            # ------- other forms of transactions and communication
+            'Payment-methods': self.payment_methods_found,
+            'Social-media-found': self.social_media_found,
+            # ------- keyword stats
+            'Keywords-found': self.keywords_found,
+            'Number-of-keywords-found': self.number_of_keywords_found
+        })
+
+        data = pd.DataFrame(titled_columns)
+        with pd.ExcelWriter(
+                f'{self.scraper_directory}/CLEAN-escortalligator-{self.city}-{self.date_time}.xlsx',
+                engine='openpyxl') as writer:
+            data.to_excel(writer, index=False)
+            worksheet = writer.sheets['Sheet1']
+            for i in range(2, worksheet.max_row):
+                keywords = worksheet["K" + str(i)].value  # set the keywords var to each keyword in the cell
+                for flagged_keyword in self.flagged_keywords:
+                    if flagged_keyword in keywords:
+                        worksheet["K" + str(i)].fill = PatternFill(
+                            fill_type='solid',
+                            start_color='ff0000',
+                            end_color='ff0000')
+                        worksheet["A" + str(i)].fill = PatternFill(
+                            fill_type='solid',
+                            start_color='ff0000',
+                            end_color='ff0000')
+
+            for col in worksheet.columns:  # dynamically adjust column sizes based on content of cell
+                max_length = 0
+                col = [cell for cell in col]
+                for cell in col:
+                    if len(str(cell.value)) > max_length:
+                        max_length = len(str(cell.value))
+                adjusted_width = (max_length + 2)
+                worksheet.column_dimensions[
+                    col[0].column_letter].width = adjusted_width
+
+    def parse_location_and_age(data):
+        # Regular expression to match the age and location
+        # This pattern assumes the format "Age: <age>Location: <location>"
+        # \d+ matches one or more digits (the age)
+        # .*? matches any characters (the location), non-greedy
+        pattern = r"Age: (\d+)Location: (.*)"
+        match = re.search(pattern, data)
+
+        if match:
+            # If the pattern is found, extract the age and location
+            age = match.group(1)
+            location = match.group(2)
+        else:
+            # If the pattern is not found, set defaults
+            age = 'N/A'
+            location = 'N/A'
+
+        return age, location
 
     def capture_screenshot(self, screenshot_name) -> None:
         self.driver.save_screenshot(f'{self.screenshot_directory}/{screenshot_name}')

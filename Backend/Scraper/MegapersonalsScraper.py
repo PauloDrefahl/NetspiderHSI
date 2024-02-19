@@ -378,11 +378,13 @@ class MegapersonalsScraper(ScraperPrototype):
         titled_columns = {
             'Post-identifier': self.post_identifier,
             'Link': self.link,
+            # ------
             'City': self.contentCity,
             'Location': self.location,
             'Phone-number': self.phoneNumber,
             'Name': self.name,
             'Description': self.description,
+            # ------
             'Payment-methods': self.payment_methods_found,
             'Social-media-found': self.social_media_found,
             'Keywords-found': self.keywords_found,
@@ -402,6 +404,80 @@ class MegapersonalsScraper(ScraperPrototype):
                 for flagged_keyword in self.flagged_keywords:
                     if flagged_keyword in keywords:
                         worksheet["I" + str(i)].fill = PatternFill(
+                            fill_type='solid',
+                            start_color='ff0000',
+                            end_color='ff0000')
+                        worksheet["A" + str(i)].fill = PatternFill(
+                            fill_type='solid',
+                            start_color='ff0000',
+                            end_color='ff0000')
+
+            for col in worksheet.columns:  # dynamically adjust column sizes based on content of cell
+                max_length = 0
+                col = [cell for cell in col]
+                for cell in col:
+                    if len(str(cell.value)) > max_length:
+                        max_length = len(str(cell.value))
+                adjusted_width = (max_length + 2)
+                worksheet.column_dimensions[
+                    col[0].column_letter].width = adjusted_width
+
+    def CLEAN_format_data_to_excel(self) -> None:
+        location = [
+            f" {city} ||| {location} "
+            for city, location in zip(
+                self.contentCity, self.location
+            )
+        ]
+
+        personal_info = [
+            f"{name}"
+            for name in zip(
+                self.name
+            )
+        ]
+
+        contact_info = [
+            f"{phone_number}"
+            for phone_number in zip(
+                self.phoneNumber
+            )
+        ]
+
+        overall_desc = [
+            f"{description} "
+            for description in zip(
+                self.description
+            )
+        ]
+
+
+        titled_columns = pd.DataFrame({
+            'Post-identifier': self.post_identifier,
+            'Link': self.link,
+            # -------
+            'Location': location,
+            'Timeline': None,
+            'Contacts': contact_info,
+            'Personal Info': personal_info,
+            'Overall Description': overall_desc,
+            # -----
+            'Payment-methods': self.payment_methods_found,
+            'Social-media-found': self.social_media_found,
+            'Keywords-found': self.keywords_found,
+            'Number-of-keywords-found': self.number_of_keywords_found
+        })
+        data = pd.DataFrame(titled_columns)
+        with pd.ExcelWriter(
+                f'{self.scraper_directory}/CLEAN-megapersonals-{self.city}-{self.date_time}.xlsx',
+                engine='openpyxl') as writer:
+            data.to_excel(writer, index=False)
+            worksheet = writer.sheets['Sheet1']
+            for i in range(2, worksheet.max_row):
+                keywords = worksheet["K" + str(i)].value  # set the keywords var to each keyword in the cell
+                for flagged_keyword in self.flagged_keywords:
+                    if flagged_keyword in keywords:
+                        worksheet["K" + str(i)].fill = PatternFill(
                             fill_type='solid',
                             start_color='ff0000',
                             end_color='ff0000')
