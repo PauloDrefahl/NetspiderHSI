@@ -13,7 +13,7 @@
     <link rel="icon" type="image/ico" href="./icons/spider-solid-2xl.svg">
 </head>
 
-<body>
+<body onload="populateKeysworkds()">
 
 <div id="navbar">
     <img src="photos/logo-hsi.png">
@@ -49,19 +49,19 @@
                 <h2><img src="./icons/pager-solid.svg" class="icon"/>Select Website:</h2>
                 <!-- Add content for column 1 here -->
                 <div class="radio-buttons">
-                    <input type="radio" id="website1" name="website" checked>
+                    <input type="radio" id="website1" name="website" value="Escort Alligator" checked onclick="updateDropdown()">
                     <label for="website1">Escort Alligator</label>
 
-                    <input type="radio" id="website2" name="website">
+                    <input type="radio" id="website2" name="website" value="Mega Personals" onclick="updateDropdown()">
                     <label for="website2">Mega Personals</label>
 
-                    <input type="radio" id="website3" name="website">
+                    <input type="radio" id="website3" name="website" value="Skip The Games" onclick="updateDropdown()">
                     <label for="website3">Skip The Games</label>
 
-                    <input type="radio" id="website4" name="website">
+                    <input type="radio" id="website4" name="website" value="Yes Back Page" onclick="updateDropdown()">
                     <label for="website4">Yes Back Page</label>
 
-                    <input type="radio" id="website5" name="website">
+                    <input type="radio" id="website5" name="website" value="Eros" onclick="updateDropdown()">
                     <label for="website5">Eros</label>
                     <div class="divider"></div>
                 </div>
@@ -70,21 +70,18 @@
                     <div class="dropdown">
                         <a href="#" class="dropdown-item">Select Location</a>
                         <div class="dropdown-content">
-                            <a href="#" class="dropdown-item">Florida</a>
-                            <a href="#" class="dropdown-item">Fort Myers</a>
-                            <a href="#" class="dropdown-item">Naples
-                            </a>
+                            
                         </div>
                     </div>
 
                     <h2 style="margin-top: 30px; margin-bottom: 7px;"><img src="./icons/book-solid.svg" class="icon"/>Select Keyset:</h2>
                 <!-- Add the following within the #navbar div, after the last <a> tag -->
                     <div class="dropdown">
-                        <a href="#" class="dropdown-item">Select keyset</a>
+                        <a href="#" class="dropdown-item" id="select-keyset">Select keyset</a>
                         <div class="dropdown-content">
-                            <a href="#" class="dropdown-item">keyset1</a>
-                            <a href="#" class="dropdown-item">keyset2</a>
-                            <a href="#" class="dropdown-item">keyset3</a>
+                            <a href="#" class="dropdown-item" data-keyset="keyset1">keyset1</a>
+                            <a href="#" class="dropdown-item" data-keyset="keyset2">keyset2</a>
+                            <a href="#" class="dropdown-item" data-keyset="keyset3">keyset3</a>
                         </div>
                     </div>
                 
