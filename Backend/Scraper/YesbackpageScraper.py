@@ -452,15 +452,15 @@ class YesbackpageScraper(ScraperPrototype):
     def format_data_to_excel(self) -> None:
         titled_columns = pd.DataFrame({
             'Post-identifier': self.post_identifier,
-            'Posted On': self.posted_on,
-            'Expires On': self.expires_on,
-            'Reply To': self.reply_to,
-            'Phone-Number': self.phone_number,
             'Link': self.link,
             'Location': self.location,
+            'Posted On': self.posted_on,
+            'Expires On': self.expires_on,
+            'Phone-Number': self.phone_number,
             'Name': self.name,
-            'Sex': self.sex,
             'E-mail': self.email,
+            'Sex': self.sex,
+            'Reply To': self.reply_to,
             'Services': self.services,
             'Description': self.description,
             'payment-methods': self.payment_methods_found,
@@ -470,7 +470,7 @@ class YesbackpageScraper(ScraperPrototype):
         })
         data = pd.DataFrame(titled_columns)
         with pd.ExcelWriter(
-                f'{self.scraper_directory}/yesbackpage-{self.city}-{self.date_time}.xlsx',
+                f'{self.scraper_directory}/RAW-yesbackpage-{self.city}-{self.date_time}.xlsx',
                 engine='openpyxl') as writer:
             data.to_excel(writer, index=False)
             worksheet = writer.sheets['Sheet1']
