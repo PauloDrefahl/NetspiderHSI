@@ -254,7 +254,7 @@ class SkipthegamesScraper(ScraperPrototype):
                     self.capture_screenshot(screenshot_name)
                     counter += 1
 
-            self.format_data_to_excel()
+            self.RAW_format_data_to_excel()
 
     '''
     --------------------------
@@ -356,22 +356,22 @@ class SkipthegamesScraper(ScraperPrototype):
     Formatting Data and Result Creation
     ---------------------------------
     '''
-    def format_data_to_excel(self) -> None:
+    def RAW_format_data_to_excel(self) -> None:
         titled_columns = {
             'Post-identifier': self.post_identifier,
             'Link': self.link,
             'about-info': self.about_info,
-            'services': self.services,
             'Description': self.description,
-            'payment-methods': self.payment_methods_found,
-            'keywords-found': self.keywords_found,
-            'number-of-keywords-found': self.number_of_keywords_found,
-            'social-media-found': self.social_media_found
+            'Services': self.services,
+            'Payment-methods': self.payment_methods_found,
+            'Social-media-found': self.social_media_found,
+            'Keywords-found': self.keywords_found,
+            'Number-of-keywords-found': self.number_of_keywords_found
         }
 
         data = pd.DataFrame(titled_columns)
         with pd.ExcelWriter(
-                f'{self.scraper_directory}/skipthegames-{self.date_time}.xlsx',
+                f'{self.scraper_directory}/RAW-skipthegames-{self.city}-{self.date_time}.xlsx',
                 engine='openpyxl') as writer:
             data.to_excel(writer, index=False)
             worksheet = writer.sheets['Sheet1']

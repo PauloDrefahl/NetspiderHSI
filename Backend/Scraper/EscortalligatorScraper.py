@@ -269,7 +269,7 @@ class EscortalligatorScraper(ScraperPrototype):
                     self.capture_screenshot(screenshot_name)
                     counter += 1
 
-            self.format_data_to_excel()
+            self.RAW_format_data_to_excel()
 
     '''
     --------------------------
@@ -369,22 +369,22 @@ class EscortalligatorScraper(ScraperPrototype):
     Formatting Data and Result Creation
     ---------------------------------
     '''
-    def format_data_to_excel(self) -> None:
+    def RAW_format_data_to_excel(self) -> None:
         titled_columns = {
             'Post-identifier': self.post_identifier,
-            'Phone-Number': self.phone_number,
             'Link': self.links,
             'Location/Age': self.location_and_age,
+            'Phone-Number': self.phone_number,
             'Description': self.description,
-            'payment-methods': self.payment_methods_found,
-            'keywords-found': self.keywords_found,
-            'number-of-keywords-found': self.number_of_keywords_found,
-            'social-media-found': self.social_media_found
+            'Payment-methods': self.payment_methods_found,
+            'Social-media-found': self.social_media_found,
+            'Keywords-found': self.keywords_found,
+            'Number-of-keywords-found': self.number_of_keywords_found
         }
         # count = 2
         data = pd.DataFrame(titled_columns)
         with pd.ExcelWriter(
-                f'{self.scraper_directory}/escortalligator-{self.date_time}.xlsx',
+                f'{self.scraper_directory}/RAW-escortalligator-{self.city}-{self.date_time}.xlsx',
                 engine='openpyxl') as writer:
             data.to_excel(writer, index=False)
             worksheet = writer.sheets['Sheet1']
