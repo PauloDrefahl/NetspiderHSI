@@ -4,6 +4,9 @@ body {
     margin: 0;
     padding: 0;
     background-color: #f4f4f4;
+    background-image: url('/dashboard/documents/white-triangle-pattern-seamless-background-2.jpg'); /* Specify the URL of your background image */
+    background-size: contain; /* Fit the background image within the container */
+    background-repeat: repeat; /* Prevent the background image from repeating */
 }
 
 * {

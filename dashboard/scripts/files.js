@@ -76,7 +76,7 @@ document.getElementById('file2').addEventListener('change', function(e) {
 
     reader.onload = function(e) {
         const contents = e.target.result;
-        const jsonData = JSON.parse(contents); // Parse JSON data
+        jsonData = JSON.parse(contents); // Parse JSON data
         const keysets = Object.keys(jsonData); // Extract keys
 
         const itemList = document.getElementById('itemListSet');
@@ -90,7 +90,6 @@ document.getElementById('file2').addEventListener('change', function(e) {
 
         keysets.forEach(function(keyset) {
             addOptionKeyset(keyset);
-            
         });
 
     };
@@ -112,7 +111,7 @@ function addOptionKeyset(keysets) {
         // Update the label text to display the selected city
         var selectKeyset = document.querySelector('.dropdown-item-keyset');
         selectKeyset.textContent = selectedKeyset;
-        
+        selectKeywords(selectedKeyset);
 
         // Remove "selected" class from all options
         var allOptions = document.querySelectorAll('.dropdown-item-keyset');
@@ -125,7 +124,23 @@ function addOptionKeyset(keysets) {
         
     });
     document.querySelector('.dropdown-content-keyset').appendChild(option2);
-  }
+}
 
 
+function selectKeywords(selectedKeyset) {
+    selectedOptions = []; // Clear the array first
+    // Get the selected keyset
+    
+    // Get the keywords related to the selected keyset
+    selectedOptions = jsonData[selectedKeyset];
+
+    for (var i = 0; i < itemList.options.length; i++) {
+        // Check if the keyword belongs to the selected keyset
+        if (selectedOptions.includes(itemList.options[i].value)) {
+            itemList.options[i].selected = true;
+        } else {
+            itemList.options[i].selected = false;
+        }
+    }
+}
   
