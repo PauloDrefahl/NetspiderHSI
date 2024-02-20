@@ -4,6 +4,9 @@ body {
     margin: 0;
     padding: 0;
     background-color: #f4f4f4;
+    background-image: url('/dashboard/documents/white-triangle-pattern-seamless-background-2.jpg'); /* Specify the URL of your background image */
+    background-size: contain; /* Fit the background image within the container */
+    background-repeat: repeat; /* Prevent the background image from repeating */
 }
 
 * {
@@ -285,6 +288,7 @@ input[type="file"].file-selected {
 
 
 /* Medium box under the Big box w/ 3 sections */
+
 #med-box {
     display: grid;
     grid-template-columns: repeat(2, 1fr); /* Two equal-width columns */
@@ -345,8 +349,8 @@ input[type="file"].file-selected {
 }
 
 #header-keywords{
+    padding-top: 2%;
     margin: 0 auto;
-    padding-top: 10px;
     border: 1px solid #ddd;
     background-color: #fff;
     text-align: center;
@@ -356,6 +360,10 @@ input[type="file"].file-selected {
     transition: transform 0.3s, box-shadow 0.3s;
     grid-column: span 2;
     
+}
+
+#header-keywords h2 {
+    margin: 0 auto;
 }
 
 .listbox-area2{
@@ -471,11 +479,12 @@ input[type="file"].file-selected {
 }
 
 /* Specifically for bottom warning in medium box*/
-#med-box h3 {
+#med-box .column h3 {
     color: #09558B;
     text-align: center;
     padding: 5px;
     border: 2px solid #000000;
+    padding: 2%;
     border-radius: 12px; /* Rounded corners */
     background-color: #09558B;
     color: #fff;
@@ -573,9 +582,26 @@ input[type="file"].file-selected {
     box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
     border-radius: 8px;
     z-index: 1;
+    overflow-y: auto;
+    max-height: 150px;
 }
 
 .dropdown:hover .dropdown-content {
+    display: block;
+    width: 100%;
+}
+
+.dropdown-content-keyset {
+    display: none;
+    position: absolute;
+    background-color: #fff;
+    box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+    border-radius: 8px;
+    overflow-y: auto;
+    max-height: 150px;
+}
+
+.dropdown:hover .dropdown-content-keyset {
     display: block;
     width: 100%;
 }
@@ -591,6 +617,21 @@ input[type="file"].file-selected {
 }
 
 .dropdown-item:hover {
+    background-color: #09558B;
+    color: white;
+}
+
+.dropdown-item-keyset {
+    text-align: center;
+    padding: 10px 10px 10px 10px;
+    color: #09558B;
+    width: 95%;
+    text-decoration: none;
+    display: inline-block;
+    transition: background-color 0.3s, color 0.3s;
+}
+
+.dropdown-item-keyset:hover {
     background-color: #09558B;
     color: white;
 }
@@ -957,3 +998,4 @@ option.selected {
     box-shadow: 0 8px 16px rgba(0, 0, 0, 0.2); /* Enhanced box shadow on hover */
     transform: scale(1.05);
 }
+
