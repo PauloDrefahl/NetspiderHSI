@@ -800,6 +800,7 @@ button[aria-disabled="true"] {
     transition: background-color 0.3s, color 0.3s, border-color 0.3s;
     box-shadow: 0 6px 8px 0 rgba(0,0,0,0.24),0 8.5px 25px 0 rgba(0,0,0,0.19);
     cursor: pointer;
+    resize: none;
 }
 
 /* WILL EVENTUALLY NEED SEPERATE BOXES FOR BOTH EDITOR SECTIONS*/
