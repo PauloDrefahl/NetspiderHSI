@@ -1,3 +1,4 @@
+/* 3 SMALL FILE BOXES AT TOP */
 
 /* Styles for the main content area */
 #content {
@@ -43,6 +44,11 @@
     transform: scale(1.05);
 }
 
+/* Add this CSS for the hover effect */
+.box.hover-effect {
+    box-shadow: 0 8px 16px rgba(0, 0, 0, 0.2); /* Enhanced box shadow on hover */
+    transform: scale(1.05);
+}
 
 /* Styles for file input */
 input[type="file"] {
