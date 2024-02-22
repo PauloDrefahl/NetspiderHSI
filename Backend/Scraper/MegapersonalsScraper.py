@@ -136,11 +136,11 @@ class MegapersonalsScraper(ScraperPrototype):
         links = self.get_links()
 
         # create directories for screenshot and excel
-        self.scraper_directory = f'{self.path}/megapersonals_{self.date_time}'
+        self.scraper_directory = f'{self.path}/megapersonals-{self.city}-{self.date_time}'
         os.mkdir(self.scraper_directory)
 
         self.screenshot_directory = f'{self.scraper_directory}/screenshots'
-        self.pdf_filename = f'{self.screenshot_directory}/megapersonals.pdf'
+        self.pdf_filename = f'{self.screenshot_directory}/megapersonals-{self.city}-{self.date_time}.pdf'
         os.mkdir(self.screenshot_directory)
 
         self.get_data(links)
@@ -270,6 +270,7 @@ class MegapersonalsScraper(ScraperPrototype):
                     self.capture_screenshot(screenshot_name)
                     counter += 1
             self.RAW_format_data_to_excel()
+            self.CLEAN_format_data_to_excel()
 
     '''
     --------------------------
@@ -456,10 +457,11 @@ class MegapersonalsScraper(ScraperPrototype):
             'Post-identifier': self.post_identifier,
             'Link': self.link,
             # -------
+            'City': self.city,
             'Location': location,
-            'Timeline': None,
+            'Timeline': 'N/A',
             'Contacts': contact_info,
-            'Personal Info': personal_info,
+            'Personal Info': self.name,
             'Overall Description': overall_desc,
             # -----
             'Payment-methods': self.payment_methods_found,

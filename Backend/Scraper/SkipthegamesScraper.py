@@ -132,10 +132,10 @@ class SkipthegamesScraper(ScraperPrototype):
         links = self.get_links()
 
         # create directories for screenshot and excel
-        self.scraper_directory = f'{self.path}/skipthegames_{self.date_time}'
+        self.scraper_directory = f'{self.path}/skipthegames-{self.city}-{self.date_time}'
         os.mkdir(self.scraper_directory)
         self.screenshot_directory = f'{self.scraper_directory}/screenshots'
-        self.pdf_filename = f'{self.screenshot_directory}/skipthegames.pdf'
+        self.pdf_filename = f'{self.screenshot_directory}/skipthegames-{self.city}-{self.date_time}.pdf'
         os.mkdir(self.screenshot_directory)
 
         self.get_data(links)
@@ -261,6 +261,7 @@ class SkipthegamesScraper(ScraperPrototype):
                     counter += 1
 
             self.RAW_format_data_to_excel()
+            self.CLEAN_format_data_to_excel()
 
     '''
     --------------------------
@@ -366,7 +367,7 @@ class SkipthegamesScraper(ScraperPrototype):
         titled_columns = {
             'Post-identifier': self.post_identifier,
             'Link': self.link,
-            'Location': self.city,
+            'City': self.city,
             # -------
             'About-info': self.about_info,
             'Description': self.description,
@@ -428,9 +429,10 @@ class SkipthegamesScraper(ScraperPrototype):
             'Post-identifier': self.post_identifier,
             'Link': self.link,
             # ------- use the setter attributes to add into the spreadsheet for location
-            'Location': self.city,
-            'Timeline': None,
-            'Contacts': None,
+            'City': self.city,
+            'Location': 'N/A',
+            'Timeline': 'N/A',
+            'Contacts': 'N/A',
             'Personal Info': personal_info,
             'Overall Description': overall_desc,
             # -------

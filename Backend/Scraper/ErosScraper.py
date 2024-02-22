@@ -120,12 +120,12 @@ class ErosScraper(ScraperPrototype):
         links = self.get_links()
 
         # Create directory for search data
-        self.scraper_directory = f'{self.path}/eros_{self.date_time}'
+        self.scraper_directory = f'{self.path}/eros-{self.date_time}-{self.date_time}'
         os.mkdir(self.scraper_directory)
 
         # Create directory for search screenshots
         self.screenshot_directory = f'{self.scraper_directory}/screenshots'
-        self.pdf_filename = f'{self.screenshot_directory}/eros.pdf'
+        self.pdf_filename = f'{self.screenshot_directory}/eros-{self.date_time}-{self.date_time}.pdf'
         os.mkdir(self.screenshot_directory)
 
         # Get data from posts
@@ -258,6 +258,7 @@ class ErosScraper(ScraperPrototype):
                     counter += 1
 
             self.RAW_format_data_to_excel()
+            self.CLEAN_format_data_to_excel()
 
     '''
     --------------------------
@@ -364,6 +365,8 @@ class ErosScraper(ScraperPrototype):
         titled_columns = {
             'Post-identifier': self.post_identifier,
             'Link': self.link,
+            'City': self.city,
+            'Location': 'N/A',
             # -------
             'Profile-header': self.profile_header,
             'About-info': self.about_info,

@@ -142,12 +142,12 @@ class YesbackpageScraper(ScraperPrototype):
         links = self.get_links()
 
         # Create directory for search data
-        self.scraper_directory = f'{self.path}/yesbackpage_{self.city}_{self.date_time}'
+        self.scraper_directory = f'{self.path}/yesbackpage-{self.city}-{self.date_time}'
         os.mkdir(self.scraper_directory)
 
         # Create directory for search screenshots
         self.screenshot_directory = f'{self.scraper_directory}/screenshots'
-        self.pdf_filename = f'{self.screenshot_directory}/yesbackpage.pdf'
+        self.pdf_filename = f'{self.screenshot_directory}/yesbackpage-{self.city}-{self.date_time}.pdf'
         os.mkdir(self.screenshot_directory)
         print("number of threads while running: ", threading.active_count())
         print("keywords inside scraper:", self.keywords)
@@ -532,13 +532,14 @@ class YesbackpageScraper(ScraperPrototype):
         titled_columns = pd.DataFrame({
             'Post-identifier': self.post_identifier,
             'Link': self.link,
-            #------
+            # ------
+            'City': self.city,
             'Location': self.location,
             'Timeline': post_time,
             'Contacts': contact_info,
             'Personal Info': personal_info,
             'Overall Description': overall_desc,
-            #-----
+            # -----
             'Payment-methods': self.payment_methods_found,
             'Social-media-found': self.social_media_found,
             'Keywords-found': self.keywords_found,

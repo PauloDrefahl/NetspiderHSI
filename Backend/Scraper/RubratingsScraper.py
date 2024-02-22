@@ -128,12 +128,12 @@ class RubratingsScraper(ScraperPrototype):
         links = self.get_links()
 
         # Create directory for search data
-        self.scraper_directory = f'{self.path}/rubratings_{self.city}_{self.date_time}'
+        self.scraper_directory = f'{self.path}/rubratings-{self.city}-{self.date_time}'
         os.mkdir(self.scraper_directory)
 
         # Create directory for search screenshots
         self.screenshot_directory = f'{self.scraper_directory}/screenshots'
-        self.pdf_filename = f'{self.screenshot_directory}/rubratings.pdf'
+        self.pdf_filename = f'{self.screenshot_directory}/rubratings-{self.city}-{self.date_time}.pdf'
         os.mkdir(self.screenshot_directory)
         print("keywords inside scraper:", self.keywords)
         self.get_data(links)
@@ -325,6 +325,7 @@ class RubratingsScraper(ScraperPrototype):
                     self.capture_screenshot(screenshot_name)
                     counter += 1
             self.RAW_format_data_to_excel()
+            self.CLEAN_format_data_to_excel()
 
     '''
     --------------------------
@@ -445,6 +446,7 @@ class RubratingsScraper(ScraperPrototype):
             'Post-identifier': self.post_identifier,
             'Link': self.link,
             # -------
+            'City': self.city,
             'Location': self.location,
             'Last-Activity': self.last_activity,
             'Phone-Number': self.phone_number,
@@ -519,6 +521,7 @@ class RubratingsScraper(ScraperPrototype):
             'Post-identifier': self.post_identifier,
             'Link': self.link,
             # ------
+            'City': self.city,
             'Location': self.location,
             'Timeline': post_time,
             'Contacts': contact_info,

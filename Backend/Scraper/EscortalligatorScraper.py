@@ -73,6 +73,9 @@ class EscortalligatorScraper(ScraperPrototype):
         self.links = []
         self.post_identifier = []
         self.payment_methods_found = []
+        self.timestamps = []
+        self.age = []
+        self.locationSplits = []
 
         self.number_of_keywords_found = []
         self.keywords_found = []
@@ -112,6 +115,7 @@ class EscortalligatorScraper(ScraperPrototype):
     Managing Scraper Run Time
     ---------------------------------------
     '''
+
     def initialize(self) -> None:
         # set keywords value
         #self.keywords = keywords
@@ -135,12 +139,12 @@ class EscortalligatorScraper(ScraperPrototype):
         links = self.get_links()
 
         # Create directory for search data
-        self.scraper_directory = f'{self.path}/escortalligator_{self.date_time}'
+        self.scraper_directory = f'{self.path}/escortalligator-{self.city}-{self.date_time}'
         os.mkdir(self.scraper_directory)
 
         # Create directory for search screenshots
         self.screenshot_directory = f'{self.scraper_directory}/screenshots'
-        self.pdf_filename = f'{self.screenshot_directory}/escortalligator.pdf'
+        self.pdf_filename = f'{self.screenshot_directory}/escortalligator-{self.city}-{self.date_time}.pdf'
         os.mkdir(self.screenshot_directory)
 
         # Get data from posts
@@ -214,13 +218,13 @@ class EscortalligatorScraper(ScraperPrototype):
             self.driver.get(link)
             assert "Page not found" not in self.driver.page_source
 
-            '''
+
             try:
                 timestamp = self.driver.find_element(
-                    By.CLASS_NAME, 'viewpostbody').text
+                    By.CLASS_NAME, 'postCreatedOn').text
             except NoSuchElementException:
                 timestamp = 'N/A'
-            '''
+
             try:
                 description = self.driver.find_element(
                     By.CLASS_NAME, 'viewpostbody').text
@@ -236,10 +240,11 @@ class EscortalligatorScraper(ScraperPrototype):
             try:
                 location_and_age = self.driver.find_element(
                     By.CLASS_NAME, 'viewpostlocationIconBabylon').text
-                age, location = self.parse_location_and_age(location_and_age)
+                age, locationSplits = self.parse_location_and_age(location_and_age)
             except NoSuchElementException:
+                location_and_age = 'N/A'
                 age = 'N/A'
-                location = 'N/A'
+                locationSplits = 'N/A'
 
             # reassign variables for each post
             self.number_of_keywords_in_post = 0
@@ -248,76 +253,80 @@ class EscortalligatorScraper(ScraperPrototype):
             if self.join_keywords and self.only_posts_with_payment_methods:
                 if self.check_keywords(phone_number) or self.check_keywords(location_and_age) or \
                         self.check_keywords(description):
-                    counter = self.join_with_payment_methods(counter, description, link, location_and_age, phone_number)
+                    counter = self.join_with_payment_methods(counter, description, link, location_and_age, locationSplits, age, phone_number, timestamp)
 
             elif self.join_keywords or self.only_posts_with_payment_methods:
                 if self.join_keywords:
-                    if self.check_keywords(phone_number) or self.check_keywords(location_and_age) or \
+                    if self.check_keywords(phone_number) or self.check_keywords(location_and_age)  or \
                             self.check_keywords(description):
-                        self.check_keywords_found(description, location_and_age, phone_number)
-                        counter = self.join_inclusive(counter, description, link, location_and_age, phone_number)
+                        self.check_keywords_found(description, locationSplits, age, phone_number, link)
+                        counter = self.join_inclusive(counter, description, link, location_and_age, locationSplits, age, phone_number, timestamp)
 
                 elif self.only_posts_with_payment_methods:
                     if len(self.keywords) > 0:
                         if self.check_keywords(phone_number) or self.check_keywords(location_and_age) or \
                                 self.check_keywords(description):
-                            self.check_keywords_found(description, location_and_age, phone_number)
+                            self.check_keywords_found(description, location_and_age, locationSplits, age, phone_number, link)
 
-                    counter = self.payment_methods_only(counter, description, link, location_and_age, phone_number)
+                    counter = self.payment_methods_only(counter, description, link, location_and_age, locationSplits, age, phone_number, timestamp)
             else:
                 if len(self.keywords) > 0:
                     if self.check_keywords(phone_number) or self.check_keywords(location_and_age) or \
                             self.check_keywords(description):
-                        self.check_keywords_found(description, location_and_age, phone_number)
-                        self.append_data(counter, description, link, location_and_age, phone_number)
+                        self.check_keywords_found(description, location_and_age, locationSplits, age, phone_number, link)
+                        self.append_data(counter, description, link, location_and_age, locationSplits, age, phone_number, timestamp)
                         screenshot_name = str(counter) + ".png"
                         self.capture_screenshot(screenshot_name)
                         counter += 1
                 else:
-                    self.append_data(counter, description, link, location_and_age, phone_number)
+                    self.append_data(counter, description, link, location_and_age, locationSplits, age, phone_number, timestamp)
                     screenshot_name = str(counter) + ".png"
                     self.capture_screenshot(screenshot_name)
                     counter += 1
 
             self.RAW_format_data_to_excel()
+            self.CLEAN_format_data_to_excel()
 
     '''
     --------------------------
     Appending Data
     --------------------------
     '''
-    def append_data(self, counter, description, link, location_and_age, phone_number) -> None:
+    def append_data(self, counter, description, link, location_and_age, locationSplits, age, phone_number, timestamp) -> None:
         self.post_identifier.append(counter)
         self.phone_number.append(phone_number)
         self.links.append(link)
         self.location_and_age.append(location_and_age)
+        self.locationSplits.append(locationSplits)
+        self.age.append(age)
         self.description.append(description)
         self.check_and_append_payment_methods(description)
         self.keywords_found.append(', '.join(self.keywords_found_in_post) or 'N/A')
         self.number_of_keywords_found.append(self.number_of_keywords_in_post or 'N/A')
         self.check_for_social_media(description)
+        self.timestamps.append(timestamp)
 
-    def join_inclusive(self, counter, description, link, location_and_age, phone_number):
+    def join_inclusive(self, counter, description, link, location_and_age, locationSplits, age, phone_number, timestamp):
         if len(self.keywords) == len(set(self.keywords_found_in_post)):
-            self.append_data(counter, description, link, location_and_age, phone_number)
+            self.append_data(counter, description, link, location_and_age, locationSplits, age, phone_number, timestamp)
             screenshot_name = str(counter) + ".png"
             self.capture_screenshot(screenshot_name)
 
             return counter + 1
         return counter
 
-    def payment_methods_only(self, counter, description, link, location_and_age, phone_number):
+    def payment_methods_only(self, counter, description, link, location_and_age, locationSplits, age, phone_number, timestamp):
         if self.check_for_payment_methods(description):
-            self.append_data(counter, description, link, location_and_age, phone_number)
+            self.append_data(counter, description, link, location_and_age, locationSplits, age, phone_number, timestamp)
             screenshot_name = str(counter) + ".png"
             self.capture_screenshot(screenshot_name)
 
             return counter + 1
         return counter
 
-    def join_with_payment_methods(self, counter, description, link, location_and_age, phone_number):
+    def join_with_payment_methods(self, counter, description, link, location_and_age, locationSplits, age, phone_number, timestamp):
         if self.check_for_payment_methods(description) and len(self.keywords) == len(set(self.keywords_found_in_post)):
-            self.append_data(counter, description, link, location_and_age, phone_number)
+            self.append_data(counter, description, link, location_and_age, locationSplits, age, phone_number, timestamp)
             screenshot_name = str(counter) + ".png"
             self.capture_screenshot(screenshot_name)
 
@@ -329,10 +338,13 @@ class EscortalligatorScraper(ScraperPrototype):
     Checking and Running Append
     --------------------------
     '''
-    def check_keywords_found(self, description, location_and_age, phone_number):
+    def check_keywords_found(self, description, location_and_age, locationSplits, age, phone_number, link):  # add link as well?
         self.check_and_append_keywords(description)
         self.check_and_append_keywords(location_and_age)
+        self.check_and_append_keywords(locationSplits)
+        self.check_and_append_keywords(age)
         self.check_and_append_keywords(phone_number)
+        self.check_and_append_keywords(link)
 
     def check_for_payment_methods(self, description) -> bool:
         for payment in self.known_payment_methods:
@@ -384,13 +396,20 @@ class EscortalligatorScraper(ScraperPrototype):
             'Post-identifier': self.post_identifier,
             'Link': self.links,
             # -------
-            'Location': self.city,
-            'Location/Age': self.location_and_age,
+            'City': self.city,
+            'Location': self.locationSplits,
+            # ------
+            'Timestamp': self.timestamps,
+            # -------
             'Phone-Number': self.phone_number,
+            # ---------
+            'Age': self.age,
+            # ---------
             'Description': self.description,
             # -------
             'Payment-methods': self.payment_methods_found,
             'Social-media-found': self.social_media_found,
+            # ---------
             'Keywords-found': self.keywords_found,
             'Number-of-keywords-found': self.number_of_keywords_found
         }
@@ -402,11 +421,11 @@ class EscortalligatorScraper(ScraperPrototype):
             data.to_excel(writer, index=False)
             worksheet = writer.sheets['Sheet1']
             for i in range(2, worksheet.max_row):
-                keywords = worksheet["G" + str(
+                keywords = worksheet["K" + str(
                     i)].value  # set the keywords var to each keyword in the cell
                 for flagged_keyword in self.flagged_keywords:
                     if flagged_keyword in keywords:
-                        worksheet["G" + str(i)].fill = PatternFill(
+                        worksheet["K" + str(i)].fill = PatternFill(
                             fill_type='solid',
                             start_color='ff0000',
                             end_color='ff0000')
@@ -425,20 +444,20 @@ class EscortalligatorScraper(ScraperPrototype):
                 worksheet.column_dimensions[
                     col[0].column_letter].width = adjusted_width
 
+    #call it
     def CLEAN_format_data_to_excel(self) -> None:
 
-        # append certiain info together
+        # append certain info together
         contact_info = [
             f"{phone_number}"
             for phone_number in zip(
                 self.phone_number,
             )
         ]
-
-        overall_desc = [
-            f"{description} ||| {services} ||| {Reply_to}"
-            for description, services, Reply_to in zip(
-                self.description
+        location = [
+            f"{city}||| {local}"
+            for city, local in zip(
+                self.city, self.locationSplits
             )
         ]
 
@@ -448,13 +467,14 @@ class EscortalligatorScraper(ScraperPrototype):
             'Post-identifier': self.post_identifier,
             'Link': self.links,  # could also be a keyword source too
             # ------- time and place of posting
-            'Location': self.city,  # could also be a keyword source too
-            'Timeline': None,
+            'City': self.city,
+            'Location': self.locationSplits,  # could also be a keyword source too
+            'Timeline': self.timestamps,
             # ------ methods of tracking
             'Contacts': contact_info,  # could also be a keyword source too
             # ----- keyword sources
-            'Personal Info': None,
-            'Overall Description': overall_desc,
+            'Personal Info': self.age,
+            'Overall Description': self.description,
             # ------- other forms of transactions and communication
             'Payment-methods': self.payment_methods_found,
             'Social-media-found': self.social_media_found,
@@ -492,22 +512,22 @@ class EscortalligatorScraper(ScraperPrototype):
                 worksheet.column_dimensions[
                     col[0].column_letter].width = adjusted_width
 
-    def parse_location_and_age(data):
-        # Regular expression to match the age and location
-        # This pattern assumes the format "Age: <age>Location: <location>"
-        # \d+ matches one or more digits (the age)
-        # .*? matches any characters (the location), non-greedy
-        pattern = r"Age: (\d+)Location: (.*)"
-        match = re.search(pattern, data)
+    def parse_location_and_age(self, location_and_age_str):
+        # Example input: "Age: 24Location:  Incall and outcall Daytona"
+        age = 'N/A'
+        location = 'N/A'
 
-        if match:
-            # If the pattern is found, extract the age and location
-            age = match.group(1)
-            location = match.group(2)
-        else:
-            # If the pattern is not found, set defaults
-            age = 'N/A'
-            location = 'N/A'
+        # Splitting the string based on 'Location:' to separate age and location
+        parts = location_and_age_str.split('Location:')
+
+        # Extracting age part and removing 'Age:' prefix
+        if len(parts) > 0:
+            age_part = parts[0].strip()
+            age = age_part.replace('Age:', '').strip()
+
+        # Extracting location if present
+        if len(parts) > 1:
+            location = parts[1].strip()
 
         return age, location
 
@@ -525,6 +545,8 @@ class EscortalligatorScraper(ScraperPrototype):
     def reset_variables(self) -> None:
         self.phone_number = []
         self.description = []
+        self.locationSplits = []
+        self.age = []
         self.location_and_age = []
         self.links = []
         self.post_identifier = []
