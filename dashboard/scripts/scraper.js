@@ -58,7 +58,7 @@ function StartScraper() {
     // stopButton.disabled = false
     console.log("Selected Website: ", selectedWebsite, "Selected Location: ", selectedLocation);
 
-    // Clear the selectedOptions array
+    // Clear the selectedKeywords array
     selectedKeywords = [];
 
     // Get all selected options from the itemList
@@ -69,7 +69,7 @@ function StartScraper() {
     selectedKeywords = selectedKeywords.concat(flaggedKeywords);
 
     // Log the selected items
-    console.log("Keywords: ", selectedOptions);
+    console.log("Keywords: ", selectedKeywords);
     statusText.textContent = 'Status: On'
     console.log("clicked start scraper button")
     const data = {

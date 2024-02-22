@@ -171,38 +171,21 @@ document.addEventListener('DOMContentLoaded', function () {
 document.addEventListener("DOMContentLoaded", function() {
     const itemList = document.getElementById("itemList");
 
-    // itemList.addEventListener('click', function (event) {
-    //     event.preventDefault()
-    //     const selectedItem = event.target
-    //     selectedItem.style.backgroundColor = selectedItem.backgroundColor === "#50b8ff" ? "None" : "#50b8ff";
-    // })
-    $(document).ready(function() {
-        $('#itemList').on('mousedown', 'option', function(e) {
-            e.preventDefault();
-            e.stopImmediatePropagation()
-            // var originalScrollTop = $(this).parent().scrollTop();
-            // console.log(originalScrollTop);
-            $(this).prop('selected', !$(this).prop('selected'));
-            // var self = this;
-            $(this).parent().focus();
-            // setTimeout(function() {
-            //     $(self).parent().scrollTop(originalScrollTop);
-            // }, 0);
-            return false;
-        });
+    // Add click event listener to list items
+    itemList.addEventListener("click", function(event) {
+        const selectedItem = event.target;
+        if (selectedItem.tagName === "OPTION") {
+            selectedItem.selected = !selectedItem.selected;
+            selectedItem.classList.toggle("selected");
+        }
     });
 
+    // Add double click event listener to list items
     itemList.addEventListener("dblclick", function(event) {
-        event.preventDefault()
+        event.preventDefault(); // Prevent default double-click behavior
         const flaggedItem = event.target;
-
-        if(flaggedItem.tagName === "OPTION") {
-            flaggedItem.style.backgroundColor = flaggedItem.style.backgroundColor === "red" ? "" : "red";
-            if(flaggedItem.style.backgroundColor === "red") {
-                flagKeyword(flaggedItem.textContent); // Add keyword to the flaggedKeywords array
-            } else {
-                unflagKeyword(flaggedItem.textContent); // Remove keyword from the flaggedKeywords array
-            }
+        if (flaggedItem.tagName === "OPTION") {
+            flaggedItem.classList.toggle("flagged");
         }
     });
 
