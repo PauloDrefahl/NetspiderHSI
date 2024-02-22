@@ -117,7 +117,7 @@
                 <h2>Start Scraper:</h2>
                 <div>
                     <label onclick="StartScraper(selectedWebsite, selectedLocation)" id="startButton">Start</label>
-                    <label onclick="stopClock()" id="stopButton">Stop</label>
+                    <label onclick="StopScraper()" id="stopButton">Stop</label>
                 </div>
 
                 <div id="additionalDiv">
@@ -182,24 +182,27 @@
 <script>
 
 
-$(document).ready(function() {
-        $('#itemList').on('mousedown', 'option', function(e) {
-            e.preventDefault();
-            var originalScrollTop = $(this).parent().scrollTop();
-            console.log(originalScrollTop);
-            $(this).prop('selected', !$(this).prop('selected'));
-            var self = this;
-            $(this).parent().focus();
-            setTimeout(function() {
-                $(self).parent().scrollTop(originalScrollTop);
-            }, 0);
-            return false;
-        });
-    });
+    // $(document).ready(function() {
+    //     $('#itemList').on('mousedown', 'option', function(e) {
+    //         e.preventDefault();
+    //         e.stopImmediatePropagation()
+    //         // var originalScrollTop = $(this).parent().scrollTop();
+    //         // console.log(originalScrollTop);
+    //         $(this).prop('selected', !$(this).prop('selected'));
+    //         // var self = this;
+    //         $(this).parent().focus();
+    //         // setTimeout(function() {
+    //         //     $(self).parent().scrollTop(originalScrollTop);
+    //         // }, 0);
+    //         return false;
+    //     });
+    // });
+
 
     $(document).ready(function() {
         $('#itemListSet').on('mousedown', 'option', function(e) {
             e.preventDefault();
+            e.stopPropagation();
             var originalScrollTop = $(this).parent().scrollTop();
             console.log(originalScrollTop);
             $(this).prop('selected', !$(this).prop('selected'));

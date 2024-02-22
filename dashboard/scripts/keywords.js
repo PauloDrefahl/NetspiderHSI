@@ -1,35 +1,41 @@
-var selectedWebsite = ""; // Declare selectedWebsite globally
-var selectedLocation = ""; // Declare selectedLocation globally
+let selectedWebsite = ""; // Declare selectedWebsite globally
+let selectedLocation = ""; // Declare selectedLocation globally
+let flaggedKeywords = []; // Declare flagged keywords list globally
 
 document.addEventListener("DOMContentLoaded", function() {
     // Get reference to the select element and the button
-    var itemList = document.getElementById("itemList");
-    var selectAllBtn = document.getElementById("select-all-btn");
+    const itemList = document.getElementById("itemList");
+    const selectAllBtn = document.getElementById("select-all-btn");
 
     // Add click event listener to the button
     selectAllBtn.addEventListener("click", function() {
         // Check if all options are currently selected
-        var allSelected = true;
-        for (var i = 0; i < itemList.options.length; i++) {
-            if (!itemList.options[i].selected) {
+        let allSelected = true;
+        for (let j = 0; j < itemList.options.length; j++) {
+            if (itemList.options[j].style.backgroundColor === "red") {
+                itemList.options[j].style.backgroundColor = ""; // Remove red background color
+                unflagKeyword(itemList.options[j].textContent); // Remove keyword from flaggedKeywords array
+            }
+            if (!itemList.options[j].selected) {
                 allSelected = false;
                 break;
             }
         }
 
         // Toggle selection
-        for (var i = 0; i < itemList.options.length; i++) {
+        for (let i = 0; i < itemList.options.length; i++) {
             itemList.options[i].selected = !allSelected;
         }
     });
+
 });
 
 
 // function to change shown locations based on Website Choice
 function updateDropdown() {
-    var radioValue = document.querySelector('input[name="website"]:checked').value;
+    let radioValue = document.querySelector('input[name="website"]:checked').value;
     selectedWebsite = radioValue; // Assign value to selectedWebsite globally
-    var dropdownContent = document.querySelector('.dropdown-content');
+    let dropdownContent = document.querySelector('.dropdown-content');
 
     dropdownContent.innerHTML = ''; // Clear previous options
 
@@ -76,8 +82,8 @@ function updateDropdown() {
       addOption('Tampa');
       addOption('Treasure Coast');
       addOption('West Palm Beach');
-      addOption('Jacksonville');      
-  } else if (radioValue == 'Skip The Games') {
+      addOption('Jacksonville');
+  } else if (radioValue === 'Skip The Games') {
       addOption('Bonita Springs');
       addOption('Bradenton');
       addOption('Cape Coral');
@@ -98,7 +104,7 @@ function updateDropdown() {
       addOption('Sarasota');
       addOption('West Palm Beach');
       addOption('Venice');
-  } else if(radioValue == 'Yes Back Page'){
+  } else if(radioValue === 'Yes Back Page'){
       addOption('Florida');
       addOption('Broward');
       addOption('Daytona Beach');
@@ -130,19 +136,19 @@ function updateDropdown() {
 }
 // Actually displays dropdown
 function addOption(location) {
-    var option = document.createElement('a');
+    let option = document.createElement('a');
     option.href = '#';
     option.textContent = location;
     option.classList.add('dropdown-item');
     option.addEventListener('click', function() {
         selectedLocation = location; // Assign value to selectedLocation globally
-        
+
         // Update the label text to display the selected city
-        var selectLocationLabel = document.querySelector('.dropdown-item');
+        let selectLocationLabel = document.querySelector('.dropdown-item');
         selectLocationLabel.textContent = selectedLocation;
 
         // Remove "selected" class from all options
-        var allOptions = document.querySelectorAll('.dropdown-item');
+        let allOptions = document.querySelectorAll('.dropdown-item');
         allOptions.forEach(function(opt) {
             opt.classList.remove('selected');
         });
@@ -152,15 +158,71 @@ function addOption(location) {
     });
     document.querySelector('.dropdown-content').appendChild(option);
 
-    
-
 
 }
 
 document.addEventListener('DOMContentLoaded', function () {
-    var selectLocationLink = document.querySelector('.dropdown-item');
+    let selectLocationLink = document.querySelector('.dropdown-item');
     selectLocationLink.addEventListener('click', function (event) {
         event.preventDefault(); // Prevent the default behavior
     });
 });
 
+document.addEventListener("DOMContentLoaded", function() {
+    const itemList = document.getElementById("itemList");
+
+    // itemList.addEventListener('click', function (event) {
+    //     event.preventDefault()
+    //     const selectedItem = event.target
+    //     selectedItem.style.backgroundColor = selectedItem.backgroundColor === "#50b8ff" ? "None" : "#50b8ff";
+    // })
+    $(document).ready(function() {
+        $('#itemList').on('mousedown', 'option', function(e) {
+            e.preventDefault();
+            e.stopImmediatePropagation()
+            // var originalScrollTop = $(this).parent().scrollTop();
+            // console.log(originalScrollTop);
+            $(this).prop('selected', !$(this).prop('selected'));
+            // var self = this;
+            $(this).parent().focus();
+            // setTimeout(function() {
+            //     $(self).parent().scrollTop(originalScrollTop);
+            // }, 0);
+            return false;
+        });
+    });
+
+    itemList.addEventListener("dblclick", function(event) {
+        event.preventDefault()
+        const flaggedItem = event.target;
+
+        if(flaggedItem.tagName === "OPTION") {
+            flaggedItem.style.backgroundColor = flaggedItem.style.backgroundColor === "red" ? "" : "red";
+            if(flaggedItem.style.backgroundColor === "red") {
+                flagKeyword(flaggedItem.textContent); // Add keyword to the flaggedKeywords array
+            } else {
+                unflagKeyword(flaggedItem.textContent); // Remove keyword from the flaggedKeywords array
+            }
+        }
+    });
+
+});
+
+
+
+function flagKeyword(keyword) {
+    keyword = keyword.trim(); // Remove leading and trailing whitespace characters
+    if (!flaggedKeywords.includes(keyword)) {
+        flaggedKeywords.push(keyword); // Add keyword to the flaggedKeywords array if not already present
+    }
+    console.log("Flagged Keywords:", flaggedKeywords);
+}
+
+function unflagKeyword(keyword) {
+    keyword = keyword.trim(); // Remove leading and trailing whitespace characters
+    const index = flaggedKeywords.indexOf(keyword);
+    if (index !== -1) {
+        flaggedKeywords.splice(index, 1); // Remove keyword from the flaggedKeywords array
+    }
+    console.log("Flagged Keywords:", flaggedKeywords);
+}

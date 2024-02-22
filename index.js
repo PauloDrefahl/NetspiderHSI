@@ -41,7 +41,7 @@ const createWindow = () => {
         height: 1200,
         webPreferences: {
             nodeIntegration: true,
-            preload: path.join(__dirname, 'dashboard/preload.js')
+            preload: path.join(__dirname, 'dashboard/scripts/preload.js')
         },
     });
 
