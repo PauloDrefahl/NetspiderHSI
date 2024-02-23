@@ -3,34 +3,6 @@ let selectedLocation = ""; // Declare selectedLocation globally
 let flaggedKeywords = []; // Declare flagged keywords list globally
 let selectedKeywords = []; // Declare selected keywords list globally
 
-// function for selecting all keywords
-document.addEventListener("DOMContentLoaded", function() {
-    // Get reference to the select element and the button
-    const itemList = document.getElementById("itemList");
-    const selectAllBtn = document.getElementById("select-all-btn");
-
-    // Add click event listener to the button
-    selectAllBtn.addEventListener("click", function() {
-        // Toggle selection for all options
-        for (let i = 0; i < itemList.options.length; i++) {
-            const option = itemList.options[i];
-            option.selected = !option.selected;
-
-            // Update styling and arrays based on selection status
-            if (option.selected) {
-                option.classList.add("selected"); // Apply selected styling
-                selectKeyword(option.textContent); // Add keyword to selectedKeywords array
-            } else {
-                option.classList.remove("selected"); // Remove selected styling
-                option.classList.remove('flagged'); // remove flagged styling
-                unselectKeyword(option.textContent); // Remove keyword from selectedKeywords array
-                unflagKeyword(option.textContent);
-            }
-        }
-    });
-
-});
-
 // function to change shown locations based on Website Choice
 function updateDropdown() {
     let radioValue = document.querySelector('input[name="website"]:checked').value;
@@ -205,6 +177,35 @@ document.addEventListener("DOMContentLoaded", function() {
 
 });
 
+// function for selecting all keywords
+document.addEventListener("DOMContentLoaded", function() {
+    // Get reference to the select element and the button
+    const itemList = document.getElementById("itemList");
+    const selectAllBtn = document.getElementById("select-all-btn");
+
+    // Add click event listener to the button
+    selectAllBtn.addEventListener("click", function() {
+        // Toggle selection for all options
+        for (let i = 0; i < itemList.options.length; i++) {
+            const option = itemList.options[i];
+            option.selected = !option.selected;
+
+            // Update styling and arrays based on selection status
+            if (option.selected) {
+                option.classList.add("selected"); // Apply selected styling
+                selectKeyword(option.textContent); // Add keyword to selectedKeywords array
+            } else {
+                option.classList.remove("selected"); // Remove selected styling
+                option.classList.remove('flagged'); // remove flagged styling
+                unselectKeyword(option.textContent); // Remove keyword from selectedKeywords array
+                unflagKeyword(option.textContent);
+            }
+        }
+    });
+
+});
+
+//function for selecting keywords in key set
 function selectKeysetKeywords(selectedKeyset) {
     const itemList = document.getElementById("itemList");
 
@@ -228,6 +229,7 @@ function selectKeysetKeywords(selectedKeyset) {
     }
 }
 
+// selected keyword is added to selectedKeywords array
 function selectKeyword(keyword) {
     keyword = keyword.trim();
     if (!flaggedKeywords.includes(keyword)) {
@@ -238,6 +240,7 @@ function selectKeyword(keyword) {
     console.log("Selected Keywords:", selectedKeywords);
 }
 
+// remove keyword from selectedKeywords array
 function unselectKeyword(keyword) {
     keyword = keyword.trim();
     if (!flaggedKeywords.includes(keyword)) {
@@ -249,6 +252,7 @@ function unselectKeyword(keyword) {
     console.log("Selected Keywords:", selectedKeywords);
 }
 
+// flagged keyword is added to both selectedKeywords array and flaggedKeywords
 function flagKeyword(flaggedKeyword) {
     flaggedKeyword = flaggedKeyword.trim(); // Remove leading and trailing whitespace characters
     if (!flaggedKeywords.includes(flaggedKeyword)) {
@@ -260,6 +264,7 @@ function flagKeyword(flaggedKeyword) {
     console.log("Flagged Keywords:", flaggedKeywords);
 }
 
+// flagged keyword is removed from both selectedKeywords array and flaggedKeywords
 function unflagKeyword(flaggedKeyword) {
     flaggedKeyword = flaggedKeyword.trim(); // Remove leading and trailing whitespace characters
     const index = flaggedKeywords.indexOf(flaggedKeyword);
@@ -272,3 +277,33 @@ function unflagKeyword(flaggedKeyword) {
     }
     console.log("Flagged Keywords:", flaggedKeywords);
 }
+
+
+// adding keyword to keywords file
+document.addEventListener("DOMContentLoaded", function() {
+    window.editFile = undefined;
+    const addKeywordButton = document.getElementById('addKeyword');
+    const keywordInput = document.getElementById('addKeywordText');
+
+    addKeywordButton.addEventListener('click', function () {
+        const keyword = keywordInput.value.trim(); // Fetch current value when button is clicked
+        console.log("add keyword button clicked");
+        console.log("keyword added:", keyword);
+        if(keyword !== ''){
+            console.log(keywordsFile)
+            window.editFile.addKeywordToFile(keywordsFile.path, keyword);
+            keywordInput.value = ''; // clear input
+        }
+    });
+
+    // const editListItem = document.getElementById('itemListKeywords')
+    // editListItem.addEventListener("click", function(event) {
+    //     const selectedItem = event.target;
+    //     if (selectedItem.tagName === "OPTION") {
+    //         selectedItem.selected = !selectedItem.selected;
+    //         selectedItem.classList.toggle("selected");
+    //
+    //     }
+    // });
+
+});

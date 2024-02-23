@@ -1,3 +1,6 @@
+let keywordsFile = ''
+let keywordsSetFile = ''
+
 document.addEventListener("DOMContentLoaded", function () {
     const fileInputs = document.querySelectorAll('.file-input');
 
@@ -14,6 +17,7 @@ document.addEventListener("DOMContentLoaded", function () {
 
 document.getElementById('file1').addEventListener('change', function(e) {
     const file = e.target.files[0];
+    keywordsFile = file
 
     if (!file) {
         return;
@@ -40,6 +44,7 @@ document.getElementById('file1').addEventListener('change', function(e) {
 
 document.getElementById('file1').addEventListener('change', function(e) {
     const file = e.target.files[0];
+    keywordsFile = file
 
     if (!file) {
         return;
@@ -99,22 +104,22 @@ document.getElementById('file2').addEventListener('change', function(e) {
 
 
 function addOptionKeyset(keysets) {
-    var option2 = document.createElement('a');
+    const option2 = document.createElement('a');
     option2.href = '#';
     option2.textContent = keysets;
 
     option2.classList.add('dropdown-item-keyset');
 
     option2.addEventListener('click', function() {
-        var selectedKeyset = option2.textContent;
-        
+        const selectedKeyset = option2.textContent;
+
         // Update the label text to display the selected city
-        var selectKeyset = document.querySelector('.dropdown-item-keyset');
+        const selectKeyset = document.querySelector('.dropdown-item-keyset');
         selectKeyset.textContent = selectedKeyset;
         selectKeysetKeywords(selectedKeyset);
 
         // Remove "selected" class from all options
-        var allOptions = document.querySelectorAll('.dropdown-item-keyset');
+        const allOptions = document.querySelectorAll('.dropdown-item-keyset');
         allOptions.forEach(function(opt) {
             opt.classList.remove('selected');
         });
@@ -126,21 +131,4 @@ function addOptionKeyset(keysets) {
     document.querySelector('.dropdown-content-keyset').appendChild(option2);
 }
 
-
-// function selectKeysetKeywords(selectedKeyset) {
-//     selectedOptions = []; // Clear the array first
-//     // Get the selected keyset
-//
-//     // Get the keywords related to the selected keyset
-//     selectedOptions = jsonData[selectedKeyset];
-//
-//     for (var i = 0; i < itemList.options.length; i++) {
-//         // Check if the keyword belongs to the selected keyset
-//         if (selectedOptions.includes(itemList.options[i].value)) {
-//             itemList.options[i].selected = true;
-//         } else {
-//             itemList.options[i].selected = false;
-//         }
-//     }
-// }
   

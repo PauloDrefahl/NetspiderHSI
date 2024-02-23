@@ -22,3 +22,15 @@ contextBridge.exposeInMainWorld('socket', {
         socket.emit(channel, ...args);
     },
 });
+
+contextBridge.exposeInMainWorld('editFile', {
+    addKeywordToFile: (keywordsFile, keyword) => {
+        fs.appendFile(keywordsFile, '\n' + keyword, (err) => {
+            if (err) {
+                console.error('Error appending keyword to file:', err);
+            } else {
+                console.log('Keyword appended to file successfully');
+            }
+        });
+    }
+});
