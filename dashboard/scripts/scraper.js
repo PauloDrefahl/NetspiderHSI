@@ -38,7 +38,7 @@ updateClock()
 
 //----------------------------------------------------------------
 
-let selectedKeywords = [];
+// let selectedKeywords = [];
 const itemList = document.getElementById("itemList");
 
 // Function to handle selecting all keywords
@@ -54,12 +54,10 @@ const itemList = document.getElementById("itemList");
 
 function StartScraper() {
     startClock();
-    // startButton.disabled = true
-    // stopButton.disabled = false
     console.log("Selected Website: ", selectedWebsite, "Selected Location: ", selectedLocation);
 
     // Clear the selectedKeywords array
-    selectedKeywords = [];
+    // selectedKeywords = [];
 
     // Get all selected options from the itemList
     $("#itemList option:selected").each(function () {
@@ -90,8 +88,6 @@ function StartScraper() {
 
 const StopScraper = async () => {
     stopClock()
-    startButton.disabled = false
-    stopButton.disabled = true
     statusText.textContent = 'Status: Off'
     console.log("stop button clicked");
     // window.socket.emit('stop_scraper');

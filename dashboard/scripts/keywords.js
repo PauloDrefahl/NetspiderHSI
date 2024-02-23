@@ -1,6 +1,7 @@
 let selectedWebsite = ""; // Declare selectedWebsite globally
 let selectedLocation = ""; // Declare selectedLocation globally
 let flaggedKeywords = []; // Declare flagged keywords list globally
+let selectedKeywords = []; // Declare selected keywords list globally
 
 document.addEventListener("DOMContentLoaded", function() {
     // Get reference to the select element and the button
@@ -177,6 +178,12 @@ document.addEventListener("DOMContentLoaded", function() {
         if (selectedItem.tagName === "OPTION") {
             selectedItem.selected = !selectedItem.selected;
             selectedItem.classList.toggle("selected");
+            if(selectedItem.classList.contains("selected")){
+                selectKeyword(selectedItem.textContent)
+            }
+            else {
+                unselectKeyword(selectedItem.textContent)
+            }
         }
     });
 
@@ -186,26 +193,58 @@ document.addEventListener("DOMContentLoaded", function() {
         const flaggedItem = event.target;
         if (flaggedItem.tagName === "OPTION") {
             flaggedItem.classList.toggle("flagged");
+            if(flaggedItem.classList.contains("flagged")) {
+                flagKeyword(flaggedItem.textContent)
+            }
+            else {
+                unflagKeyword(flaggedItem.textContent)
+            }
         }
     });
 
 });
 
-
-
-function flagKeyword(keyword) {
-    keyword = keyword.trim(); // Remove leading and trailing whitespace characters
+function selectKeyword(keyword) {
+    keyword = keyword.trim();
     if (!flaggedKeywords.includes(keyword)) {
-        flaggedKeywords.push(keyword); // Add keyword to the flaggedKeywords array if not already present
+        if (!selectedKeywords.includes(keyword)) {
+            selectedKeywords.push(keyword); // Add keyword to the selectedKeywords array if not already present
+        }
+    }
+    console.log("Selected Keywords:", selectedKeywords);
+}
+
+function unselectKeyword(keyword) {
+    keyword = keyword.trim();
+    if (!flaggedKeywords.includes(keyword)) {
+        const index = selectedKeywords.indexOf(keyword);
+        if (index !== -1) {
+            selectedKeywords.splice(index, 1); // Remove keyword from the selectedKeywords array
+        }
+    }
+    console.log("Selected Keywords:", selectedKeywords);
+}
+
+function flagKeyword(flaggedKeyword) {
+    flaggedKeyword = flaggedKeyword.trim(); // Remove leading and trailing whitespace characters
+    if (!flaggedKeywords.includes(flaggedKeyword)) {
+        flaggedKeywords.push(flaggedKeyword); // Add keyword to the flaggedKeywords array if not already present
+        if (!selectedKeywords.includes(flaggedKeyword)) {
+            selectedKeywords.push(flaggedKeyword); // Add keyword to the selectedKeywords array if not already present
+        }
     }
     console.log("Flagged Keywords:", flaggedKeywords);
 }
 
-function unflagKeyword(keyword) {
-    keyword = keyword.trim(); // Remove leading and trailing whitespace characters
-    const index = flaggedKeywords.indexOf(keyword);
+function unflagKeyword(flaggedKeyword) {
+    flaggedKeyword = flaggedKeyword.trim(); // Remove leading and trailing whitespace characters
+    const index = flaggedKeywords.indexOf(flaggedKeyword);
     if (index !== -1) {
         flaggedKeywords.splice(index, 1); // Remove keyword from the flaggedKeywords array
+    }
+    const selectedIndex = selectedKeywords.indexOf(flaggedKeyword);
+    if (selectedIndex !== -1) {
+        selectedKeywords.splice(selectedIndex, 1); // Remove keyword from the selectedKeywords array
     }
     console.log("Flagged Keywords:", flaggedKeywords);
 }
