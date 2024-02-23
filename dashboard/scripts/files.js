@@ -1,5 +1,6 @@
 let keywordsFile = ''
 let keywordsSetFile = ''
+let resultFolder = ''
 
 document.addEventListener("DOMContentLoaded", function () {
     const fileInputs = document.querySelectorAll('.file-input');

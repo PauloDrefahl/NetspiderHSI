@@ -79,7 +79,7 @@ function StartScraper() {
         inclusive_search: inclusiveSearch.checked,
         path: 'C:\\Users\\Zach\\PycharmProjects\\NetSpiderHSI\\result'
     };
-    // window.socket.emit('start_scraper', data);
+    window.socket.emit('start_scraper', data);
     console.log("emitted data", data);
     console.log("flagged keywords", flaggedKeywords)
     console.log("selected keywords", selectedKeywords)
@@ -89,7 +89,7 @@ const StopScraper = async () => {
     stopClock()
     statusText.textContent = 'Status: Off'
     console.log("stop button clicked");
-    // window.socket.emit('stop_scraper');
+    window.socket.emit('stop_scraper');
 };
 
 window.socket.on('connect', () => {
