@@ -111,7 +111,7 @@ function addOptionKeyset(keysets) {
         // Update the label text to display the selected city
         var selectKeyset = document.querySelector('.dropdown-item-keyset');
         selectKeyset.textContent = selectedKeyset;
-        selectKeywords(selectedKeyset);
+        selectKeysetKeywords(selectedKeyset);
 
         // Remove "selected" class from all options
         var allOptions = document.querySelectorAll('.dropdown-item-keyset');
@@ -127,20 +127,20 @@ function addOptionKeyset(keysets) {
 }
 
 
-function selectKeywords(selectedKeyset) {
-    selectedOptions = []; // Clear the array first
-    // Get the selected keyset
-    
-    // Get the keywords related to the selected keyset
-    selectedOptions = jsonData[selectedKeyset];
-
-    for (var i = 0; i < itemList.options.length; i++) {
-        // Check if the keyword belongs to the selected keyset
-        if (selectedOptions.includes(itemList.options[i].value)) {
-            itemList.options[i].selected = true;
-        } else {
-            itemList.options[i].selected = false;
-        }
-    }
-}
+// function selectKeysetKeywords(selectedKeyset) {
+//     selectedOptions = []; // Clear the array first
+//     // Get the selected keyset
+//
+//     // Get the keywords related to the selected keyset
+//     selectedOptions = jsonData[selectedKeyset];
+//
+//     for (var i = 0; i < itemList.options.length; i++) {
+//         // Check if the keyword belongs to the selected keyset
+//         if (selectedOptions.includes(itemList.options[i].value)) {
+//             itemList.options[i].selected = true;
+//         } else {
+//             itemList.options[i].selected = false;
+//         }
+//     }
+// }
   

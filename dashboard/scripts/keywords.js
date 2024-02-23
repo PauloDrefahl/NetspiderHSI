@@ -3,6 +3,7 @@ let selectedLocation = ""; // Declare selectedLocation globally
 let flaggedKeywords = []; // Declare flagged keywords list globally
 let selectedKeywords = []; // Declare selected keywords list globally
 
+// function for selecting all keywords
 document.addEventListener("DOMContentLoaded", function() {
     // Get reference to the select element and the button
     const itemList = document.getElementById("itemList");
@@ -10,27 +11,25 @@ document.addEventListener("DOMContentLoaded", function() {
 
     // Add click event listener to the button
     selectAllBtn.addEventListener("click", function() {
-        // Check if all options are currently selected
-        let allSelected = true;
-        for (let j = 0; j < itemList.options.length; j++) {
-            if (itemList.options[j].style.backgroundColor === "red") {
-                itemList.options[j].style.backgroundColor = ""; // Remove red background color
-                unflagKeyword(itemList.options[j].textContent); // Remove keyword from flaggedKeywords array
-            }
-            if (!itemList.options[j].selected) {
-                allSelected = false;
-                break;
-            }
-        }
-
-        // Toggle selection
+        // Toggle selection for all options
         for (let i = 0; i < itemList.options.length; i++) {
-            itemList.options[i].selected = !allSelected;
+            const option = itemList.options[i];
+            option.selected = !option.selected;
+
+            // Update styling and arrays based on selection status
+            if (option.selected) {
+                option.classList.add("selected"); // Apply selected styling
+                selectKeyword(option.textContent); // Add keyword to selectedKeywords array
+            } else {
+                option.classList.remove("selected"); // Remove selected styling
+                option.classList.remove('flagged'); // remove flagged styling
+                unselectKeyword(option.textContent); // Remove keyword from selectedKeywords array
+                unflagKeyword(option.textContent);
+            }
         }
     });
 
 });
-
 
 // function to change shown locations based on Website Choice
 function updateDropdown() {
@@ -169,6 +168,8 @@ document.addEventListener('DOMContentLoaded', function () {
     });
 });
 
+
+// functions for selecting and unselecting keywords
 document.addEventListener("DOMContentLoaded", function() {
     const itemList = document.getElementById("itemList");
 
@@ -203,6 +204,29 @@ document.addEventListener("DOMContentLoaded", function() {
     });
 
 });
+
+function selectKeysetKeywords(selectedKeyset) {
+    const itemList = document.getElementById("itemList");
+
+    // Get the keywords related to the selected keyset
+    let selectedOptions = jsonData[selectedKeyset];
+
+    for (let i = 0; i < itemList.options.length; i++) {
+        const option = itemList.options[i];
+        const keyword = option.textContent.trim();
+        const isSelected = selectedOptions.includes(keyword); // Check if keyword is in selectedOptions
+
+        if (isSelected && !option.classList.contains('selected')) {
+            console.log("Adding 'selected' class to:", keyword);
+            option.classList.add('selected');
+            selectKeyword(keyword);
+        } else if (!isSelected && option.classList.contains('selected')) {
+            console.log("Removing 'selected' class from:", keyword);
+            option.classList.remove('selected');
+            unselectKeyword(keyword);
+        }
+    }
+}
 
 function selectKeyword(keyword) {
     keyword = keyword.trim();

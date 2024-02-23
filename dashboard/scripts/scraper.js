@@ -60,11 +60,9 @@ function StartScraper() {
     // selectedKeywords = [];
 
     // Get all selected options from the itemList
-    $("#itemList option:selected").each(function () {
-        selectedKeywords.push($(this).val()); // Push the value of the selected option to the array
-    });
-
-    selectedKeywords = selectedKeywords.concat(flaggedKeywords);
+    // $("#itemList option:selected").each(function () {
+    //     selectedKeywords.push($(this).val()); // Push the value of the selected option to the array
+    // });
 
     // Log the selected items
     console.log("Keywords: ", selectedKeywords);
@@ -84,6 +82,7 @@ function StartScraper() {
     // window.socket.emit('start_scraper', data);
     console.log("emitted data", data);
     console.log("flagged keywords", flaggedKeywords)
+    console.log("selected keywords", selectedKeywords)
 }
 
 const StopScraper = async () => {
@@ -114,7 +113,6 @@ window.socket.on('scraper_update', (data) => {
     }
 
 });
-
 
 const scraperStatus = async () => {
     window.socket.emit('scraper_status')
