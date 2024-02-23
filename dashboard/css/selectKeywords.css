@@ -86,7 +86,6 @@ button#select-all-button[aria-expanded="false"]:not(:hover)::after {
     transition: background-color 0.3s, color 0.3s, border-color 0.3s;
 }
 
-
 #itemList{
     width: 100%;
     height: 320px;
@@ -136,4 +135,16 @@ button#select-all-button[aria-expanded="false"]:not(:hover)::after {
 
 #header-keywords h2 {
     margin: 0 auto;
+}
+
+.listbox-area {
+    border: 10px solid #09558B; /* Border with the color #09558B */
+    padding: 10px; /* Optional: Add padding to the listbox area */
+    border-radius: 12px;
+}
+
+.listbox-area2 {
+    border: 10px solid #09558B; /* Border with the color #09558B */
+    padding: 10px; /* Optional: Add padding to the listbox area */
+    border-radius: 12px;
 }

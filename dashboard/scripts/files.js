@@ -143,4 +143,23 @@ function selectKeywords(selectedKeyset) {
         }
     }
 }
-  
+
+
+async function selectFolder() {
+    try {
+        const handle = await window.showDirectoryPicker();
+        console.log('Selected folder:', handle);
+
+        // Get the name of the selected folder
+        const folderName = handle.name;
+
+        // Display the name of the selected folder
+        document.getElementById('selected-folder').textContent = `Folder: ${folderName}`;
+        console.log('Folder name:', path.dirname(folderName));
+    } catch (error) {
+        console.error('Error selecting folder:', error);
+    }
+}
+
+// Event listener for button click
+document.getElementById('select-folder-button').addEventListener('click', selectFolder);

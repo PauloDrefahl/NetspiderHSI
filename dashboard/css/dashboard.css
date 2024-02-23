@@ -20,6 +20,7 @@ body {
     display: flex;
     align-items: center; /* Center items horizontally */
     justify-content: center; /* Center items vertically */
+    padding: 10px;  
 }
 
 /* Big box under the three existing boxes */
@@ -174,4 +175,3 @@ body {
     font-size: 17px;
     margin-bottom: 20px;
 }
-

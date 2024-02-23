@@ -35,9 +35,10 @@
     height:  fit-content;
 }
 
-#header-keywords{
-    margin: 0 auto;
-    border: 1px solid #ddd;
+#header-keywords {
+    margin: 0;
+    border: 2px solid #ddd; /* Increased border width */
+    padding: 10px;
     background-color: #fff;
     text-align: center;
     width: 80%;
@@ -45,11 +46,10 @@
     box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
     transition: transform 0.3s, box-shadow 0.3s;
     grid-column: span 2;
-    
 }
 
 #header-keywords h2 {
-    margin: 0 auto;
+    margin: 0;
 }
 
 .create-set-btn{
@@ -77,4 +77,3 @@
         transform: scale(1.05);
         box-shadow: 0 8px 16px rgba(0, 0, 0, 0.2);
 }
-
