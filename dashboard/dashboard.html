@@ -4,13 +4,16 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>DHS Netspider</title>
+    <link rel="icon" type="icons" href="icons/spider-solid.svg"> 
     <link rel="stylesheet" href="css/dashboard.css">    
     <link rel="stylesheet" href="css/icons.css">
     <link rel="stylesheet" href="css/fileInput.css">
     <link rel="stylesheet" href="css/help.css">
-    <link rel="stylesheet" href="css/keywords.css">
     <link rel="stylesheet" href="css/navbar.css">
-    <link rel="stylesheet" href="css/scraper.css">
+    <link rel="stylesheet" href="css/scrapersettings.css">
+    <link rel="stylesheet" href="css/website.css">
+    <link rel="stylesheet" href="css/editKeywords.css">
+    <link rel="stylesheet" href="css/selectKeywords.css">
 
     
     <script src="scripts/files.js" defer></script>
@@ -27,10 +30,12 @@
 <div id="navbar">
     <img src="photos/logo-hsi.png">
     <h1>Homeland Security Netspider</h1>
+    
     <a href="#" id="settings-link"  ><img src="./icons/gear-solid.svg" class="icon"/>Settings</a>
     <a href="#" id="netspider-link"><img src="./icons/spider-solid.svg" class="icon"/>Netspider</a>
     <a href="#med-box" id="keyword-link"><img src="./icons/key-solid.svg" class="icon"/>Keyword</a>
     <a href="#small-box" id="help-link"><img src="./icons/circle-question-solid.svg" class="icon"/>Help</a>
+
     <a href="../index.html" id="logout-link" class="last-child-divider"><img src="./icons/right-from-bracket-solid.svg" class="icon"/>Logout</a>
     <img src="photos/fgcu-logo.png" class="fgcu-logo">
     <div class="divider"></div>
@@ -46,19 +51,19 @@
         <div class="box" id="keyword-box">
             <h2><img src="./icons/book-solid.svg" class="icon"/> Select Keysets File</h2>
             <input type="file" id="file2" name="file2" class="file-input">
+        </div> 
+        <div class="box" id="folder-box">
+            <h2><img src="./icons/folder-open-regular.svg" class="icon"/> Select Results Folder</h2>
+            <input type="button" value="Select Folder" id="select-folder-button" class="select-folder-button">
+            <p id="selected-folder"></p>
         </div>
-        <div class="box" id="keyword-box">
-            <h2><img src="./icons/folder-open-regular.svg" class="icon"/>Select Results Folder</h2>
-            <input type="file" id="file3" name="file3" class="file-input">
-        </div>
-
         <!-- Big box under the three existing boxes -->
         <div id="big-box">
             <div class="column">
                 <h2><img src="./icons/pager-solid.svg" class="icon"/>Select Website:</h2>
                 <!-- Add content for column 1 here -->
                 <div class="radio-buttons">
-                    <input type="radio" id="website1" name="website" value="Escort Alligator" checked onclick="updateDropdown()">
+                    <input type="radio" id="website1" name="website" value="Escort Alligator" onclick="updateDropdown()">
                     <label for="website1">Escort Alligator</label>
 
                     <input type="radio" id="website2" name="website" value="Mega Personals" onclick="updateDropdown()">
@@ -114,7 +119,7 @@
                     <p> <input type="checkbox" id="hide_browser" name="hide_browser">Hide Browser while Running</p>
                     <div class="divider"></div>
                 </div>
-                <h2>Start Scraper:</h2>
+                <h2><img src="./icons/play-solid.svg" class="icon"/>Start Scraper:</h2>
                 <div>
                     <label onclick="StartScraper(selectedWebsite, selectedLocation)" id="startButton">Start</label>
                     <label onclick="StopScraper()" id="stopButton">Stop</label>
@@ -234,8 +239,5 @@
         document.getElementById("settings-link").focus();
     }
 </script>
-
 </body>
-
-
 </html>

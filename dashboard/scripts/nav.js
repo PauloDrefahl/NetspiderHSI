@@ -2,14 +2,16 @@
 var aria = aria || {}; 
 
 document.addEventListener("DOMContentLoaded", function () {
+
     var settingsLink = document.getElementById("settings-link");
     var netspiderLink = document.getElementById("netspider-link");
     var keywordLink = document.getElementById("keyword-link");
     var HelpLink = document.getElementById("help-link");
+
     var boxes = document.querySelectorAll(".box");
     var bigBox = document.getElementById("big-box");
     var medBox = document.getElementById("med-box");
-    var sBox = document.getElementById("small-box");
+    var smBox = document.getElementById("small-box");
 
     settingsLink.addEventListener("click", function () {
         // Trigger hover effect on the three boxes
@@ -34,7 +36,7 @@ document.addEventListener("DOMContentLoaded", function () {
     });
 
     keywordLink.addEventListener("click", function () {
-        // Trigger hover effect on the big box
+        // Trigger hover effect on the med box
         medBox.classList.add("hover-effect");
 
         setTimeout(function () {
@@ -43,11 +45,12 @@ document.addEventListener("DOMContentLoaded", function () {
     });
 
     HelpLink.addEventListener("click", function () {
-      // Trigger hover effect on the big box
-      sBox.classList.add("hover-effect");
+        // Trigger hover effect on the small box
+        smBox.classList.add("hover-effect");
 
-      setTimeout(function () {
-          sBox.classList.remove("hover-effect");
-      }, 1000);
-  });
+         setTimeout(function () {
+            smBox.classList.remove("hover-effect");
+         }, 1000);
+    });
+
 });
