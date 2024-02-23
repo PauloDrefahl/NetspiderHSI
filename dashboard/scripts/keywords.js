@@ -284,6 +284,8 @@ document.addEventListener("DOMContentLoaded", function() {
     window.editFile = undefined;
     const addKeywordButton = document.getElementById('addKeyword');
     const keywordInput = document.getElementById('addKeywordText');
+    const itemList = document.getElementById('itemList');
+    const editListItem = document.getElementById('itemListKeywords');
 
     addKeywordButton.addEventListener('click', function () {
         const keyword = keywordInput.value.trim(); // Fetch current value when button is clicked
@@ -293,6 +295,17 @@ document.addEventListener("DOMContentLoaded", function() {
             console.log(keywordsFile)
             window.editFile.addKeywordToFile(keywordsFile.path, keyword);
             keywordInput.value = ''; // clear input
+
+            // Create a new <option> element
+            const option = document.createElement('option');
+            option.textContent = keyword;
+
+            // Append the new option to the end of the list
+            itemList.appendChild(option);
+
+            // Clone the option and append it to the edit list
+            const editOption = option.cloneNode(true);
+            editListItem.appendChild(editOption);
         }
     });
 
