@@ -2,6 +2,7 @@ let selectedWebsite = ""; // Declare selectedWebsite globally
 let selectedLocation = ""; // Declare selectedLocation globally
 let flaggedKeywords = []; // Declare flagged keywords list globally
 let selectedKeywords = []; // Declare selected keywords list globally
+let selectedKeywordRemove = []
 
 // function to change shown locations based on Website Choice
 function updateDropdown() {
@@ -284,13 +285,29 @@ function unflagKeyword(flaggedKeyword) {
 }
 
 
-// adding keyword to keywords file
+// adding and removing keyword to keywords file
 document.addEventListener("DOMContentLoaded", function () {
     window.editFile = undefined;
     const addKeywordButton = document.getElementById('addKeyword');
+    const deleteKeywordButton = document.getElementById('deleteKeyword');
     const keywordInput = document.getElementById('addKeywordText');
-    const itemList = document.getElementById('itemList');
     const editListItem = document.getElementById('itemListKeywords');
+    const listItem = document.getElementById('itemList');
+
+    editListItem.addEventListener("click", function (event) {
+        const editSelectedItem = event.target;
+        if (editSelectedItem.tagName === "OPTION") {
+            editSelectedItem.selected = !editSelectedItem.selected;
+            editSelectedItem.classList.toggle("selected");
+            if (editSelectedItem.classList.contains("selected")) {
+                selectKeywordEditList(editSelectedItem.textContent)
+            } else {
+                unselectKeywordEditList(editSelectedItem.textContent)
+            }
+
+        }
+
+    });
 
     addKeywordButton.addEventListener('click', function () {
         const keyword = keywordInput.value.trim(); // Fetch current value when button is clicked
@@ -314,14 +331,64 @@ document.addEventListener("DOMContentLoaded", function () {
         }
     });
 
-    // const editListItem = document.getElementById('itemListKeywords')
-    // editListItem.addEventListener("click", function(event) {
-    //     const selectedItem = event.target;
-    //     if (selectedItem.tagName === "OPTION") {
-    //         selectedItem.selected = !selectedItem.selected;
-    //         selectedItem.classList.toggle("selected");
-    //
-    //     }
-    // });
+    deleteKeywordButton.addEventListener('click', function () {
+        window.editFile.removeKeywordsFromFile(keywordsFile.path, selectedKeywordRemove);
+        // Iterate over selected keywords to remove
+        selectedKeywordRemove.forEach(selectedKeyword => {
+            // Trim the selectedKeyword to remove leading and trailing whitespace
+            const trimmedKeyword = selectedKeyword.trim();
 
+            // Find the option element with the text content equal to the selected keyword
+            const optionsToRemoveEditList = Array.from(editListItem.options).filter(option => option.textContent.trim() === trimmedKeyword);
+            const optionsToRemoveList = Array.from(listItem.options).filter(option => option.textContent.trim() === trimmedKeyword);
+            console.log("Searching for:", trimmedKeyword);
+            console.log("Options to remove:", optionsToRemoveEditList);
+
+            // If any options exist, remove them
+            if (optionsToRemoveEditList.length > 0 && optionsToRemoveList.length > 0) {
+                optionsToRemoveEditList.forEach(option => option.remove());
+                optionsToRemoveList.forEach(option => option.remove());
+                console.log("Options removed successfully");
+
+                // Remove the keyword from selectedKeywords and flaggedKeywords arrays
+                const selectedKeywordIndex = selectedKeywords.indexOf(trimmedKeyword);
+                if (selectedKeywordIndex !== -1) {
+                    selectedKeywords.splice(selectedKeywordIndex, 1);
+                }
+
+                const flaggedKeywordIndex = flaggedKeywords.indexOf(trimmedKeyword);
+                if (flaggedKeywordIndex !== -1) {
+                    flaggedKeywords.splice(flaggedKeywordIndex, 1);
+                }
+            } else {
+                console.log("No options found to remove for keyword:", trimmedKeyword);
+            }
+        });
+
+        // Clear the selectedKeywordRemove array after removal
+        selectedKeywordRemove = [];
+
+        // Log the updated list of keywords after removal
+        console.log("Keywords removed:", selectedKeywordRemove);
+    });
+
+    function selectKeywordEditList(selectedKeyword) {
+        selectedKeyword = selectedKeyword.trim(); // Remove leading and trailing whitespace characters
+        if (!selectedKeywordRemove.includes(selectedKeyword)) {
+            selectedKeywordRemove.push(selectedKeyword); // Add keyword to the flaggedKeywords array if not already present
+            if (!selectedKeywordRemove.includes(selectedKeyword)) {
+                selectedKeywordRemove.push(selectedKeyword); // Add keyword to the selectedKeywords array if not already present
+            }
+        }
+        console.log("Keywords to be removed:", selectedKeywordRemove);
+    }
+
+    function unselectKeywordEditList(selectedKeyword) {
+        selectedKeyword = selectedKeyword.trim(); // Remove leading and trailing whitespace characters
+        const index = selectedKeywordRemove.indexOf(selectedKeyword);
+        if (index !== -1) {
+            selectedKeywordRemove.splice(index, 1); // Remove keyword from the selectedKeywordRemove array
+        }
+        console.log("Keywords to be removed:", selectedKeywordRemove);
+    }
 });

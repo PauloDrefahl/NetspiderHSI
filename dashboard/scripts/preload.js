@@ -31,6 +31,34 @@ contextBridge.exposeInMainWorld('editFile', {
             } else {
                 console.log('Keyword appended to file successfully');
             }
+        })
+    },
+    removeKeywordsFromFile: (keywordsFile, keywordsToRemove) => {
+        fs.readFile(keywordsFile, 'utf-8', (err, data) => {
+            if (err) {
+                console.error('Error reading file:', err);
+                return;
+            }
+
+            // Split the file content into lines
+            let lines = data.split('\n');
+
+            // Remove each keyword from the lines
+            keywordsToRemove.forEach(keyword => {
+                lines = lines.filter(line => line.trim() !== keyword);
+            });
+
+            // Join the lines back into a single string
+            const updatedContent = lines.join('\n');
+
+            // Write the updated content back to the file
+            fs.writeFile(keywordsFile, updatedContent, 'utf-8', (err) => {
+                if (err) {
+                    console.error('Error writing file:', err);
+                } else {
+                    console.log('Keywords removed from file successfully');
+                }
+            });
         });
     }
 });

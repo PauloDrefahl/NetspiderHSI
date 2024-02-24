@@ -153,7 +153,7 @@
                     <select id="itemListKeywords" multiple="multiple"></select>
                 </div>
                 <div class="button-container">
-                    <button class="deleteButton" style="width: 60%; display: inline-block; white-space: nowrap; padding-right: 10px;">Delete Keyword<img style="height: 12px; margin-left: 5%;" src="./icons/trash-solid.svg"/> </button>
+                    <button class="deleteButton" id="deleteKeyword" style="width: 60%; display: inline-block; white-space: nowrap; padding-right: 10px;">Delete Keyword<img style="height: 12px; margin-left: 5%;" src="./icons/trash-solid.svg"/> </button>
                 </div>
             </div>
             <div class="column">
@@ -220,20 +220,20 @@
         });
     });
 
-    $(document).ready(function() {
-        $('#itemListKeywords').on('mousedown', 'option', function(e) {
-            e.preventDefault();
-            var originalScrollTop = $(this).parent().scrollTop();
-            console.log(originalScrollTop);
-            $(this).prop('selected', !$(this).prop('selected'));
-            var self = this;
-            $(this).parent().focus();
-            setTimeout(function() {
-                $(self).parent().scrollTop(originalScrollTop);
-            }, 0);
-            return false;
-        });
-    });
+    // $(document).ready(function() {
+    //     $('#itemListKeywords').on('mousedown', 'option', function(e) {
+    //         e.preventDefault();
+    //         var originalScrollTop = $(this).parent().scrollTop();
+    //         console.log(originalScrollTop);
+    //         $(this).prop('selected', !$(this).prop('selected'));
+    //         var self = this;
+    //         $(this).parent().focus();
+    //         setTimeout(function() {
+    //             $(self).parent().scrollTop(originalScrollTop);
+    //         }, 0);
+    //         return false;
+    //     });
+    // });
     
     function FocusON() {
         document.getElementById("settings-link").focus();
