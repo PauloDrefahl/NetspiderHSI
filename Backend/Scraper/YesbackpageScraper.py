@@ -167,22 +167,7 @@ class YesbackpageScraper(ScraperPrototype):
 
     def open_webpage(self) -> None:
         self.driver.implicitly_wait(10)
-        if self.search_mode:
-            self.driver.get(self.url)
-        else:
-            self.driver.execute_script(f'window.open("{self.url}", "_blank");')
-            original_window = self.driver.current_window_handle
-            time.sleep(5)
-            if len(self.driver.window_handles) >= 2:
-                # Switch to the new tab
-                self.driver.switch_to.window(self.driver.window_handles[-1])
-
-                # Close the original tab
-                self.driver.switch_to.window(original_window)
-                self.driver.close()
-
-                # Switch back to the new tab
-                self.driver.switch_to.window(self.driver.window_handles[-1])
+        self.driver.get(self.url)
         self.driver.maximize_window()
         assert "Page not found" not in self.driver.page_source
 

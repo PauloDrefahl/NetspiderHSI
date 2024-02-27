@@ -49,6 +49,7 @@ class ScraperManager:
             return {"Response": "No active Scraper Thread, Forceful Stop Attempted"}
 
     def get_scraper_status(self):
+        print(self.scraper_thread.is_alive())
         if self.scraper_thread and self.scraper_thread.is_alive():
             socketio.emit('scraper_update', {'status': 'scraper thread alive'})
         else:
@@ -72,7 +73,7 @@ class ScraperThread(threading.Thread):
             self.scraper = YesbackpageScraper()
         elif kwargs['website'] == 'rubratings':
             self.scraper = RubratingsScraper()
-        self.scraper.keywords = keywords
+        self.scraper.set_keywords(keywords)
         self.scraper.set_path(kwargs['path'])
         self.scraper.set_flagged_keywords(flagged_keywords)
         if kwargs['inclusive_search']:
@@ -80,6 +81,8 @@ class ScraperThread(threading.Thread):
         if kwargs['search_text'] != '':  # disables search text if blank
             self.scraper.keywords.add(kwargs['search_text'])
         self.scraper.set_search_mode(kwargs['search_mode'])
+        if kwargs['payment_methods_only']:
+            self.scraper.set_only_posts_with_payment_methods()
         self.scraper.set_city(kwargs['city'])
         self._stop_event = threading.Event()
 
@@ -142,10 +145,9 @@ def get_status():
 
 @socketio.on('start_scraper')
 def start_scraper(data):
-    # print(data)
     socketio.emit('scraper_update', {'status': 'started'})
+    print(data)
     response = scraper_manager.start_scraper(data)
-
     return {'Response': response}
 
 
@@ -156,9 +158,10 @@ def stop_scraper():
     return {'Response': response}
 
 
-@socketio.on_error('scraper_error')
+@socketio.on_error_default
 def handle_error(e):
     print(f"An error occurred: {str(e)}")
+    socketio.emit('scraper_update', {'status': 'error', 'error': str(e)})
     response = {"error": str(e)}
     return response, 500
 
@@ -181,7 +184,6 @@ def find_open_port():
     s.bind(('127.0.0.1', 0))
     port = s.getsockname()[1]
     s.close()
-    # os.environ['NETSPIDER_PORT'] = str(port)
     return port
 
 
