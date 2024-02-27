@@ -3,6 +3,8 @@ import os
 from datetime import datetime
 from shutil import copy2
 from PyPDF2 import PdfMerger
+import openpyxl
+from openpyxl.utils import get_column_letter
 pdf_merger = PdfMerger()
 
 '''
@@ -68,7 +70,7 @@ for folder in selected_folders:
         df = pd.read_excel(file_path)
         dataframes.append(df)
 
-    # -----
+# -----
 
     # Copy PNG files from 'screenshots' subfolder
     screenshots_path = os.path.join(folder_path, 'screenshots')
@@ -100,8 +102,38 @@ for folder in selected_folders:
 # Concatenate all DataFrames in the list
 combined_df = pd.concat(dataframes, ignore_index=True)
 
+# If you want to make sure that no NaN values remain, do another fill na here
+combined_df.fillna('N/A', inplace=True)
+
+# Reset the 'Post-identifier' to be a continuous sequence of numbers
+#combined_df['Continuous_Post_identifier'] = range(len(combined_df))
+
+# Replace the existing 'Post-identifier' column with a continuous sequence of numbers
+combined_df['Post-identifier'] = range(len(combined_df))
+
 # Save the appended DataFrame to the new spreadsheet inside the new folder
 combined_df.to_excel(new_file_path, index=False)
+workbook = openpyxl.load_workbook(new_file_path)
+worksheet = workbook.active
+
+# Loop through each column in the worksheet
+for col in worksheet.columns:
+    max_length = 0
+    column = col[0].column  # Get the column name
+    # Iterate over all cells in a column to find the maximum length
+    for cell in col:
+        try:  # Necessary to avoid error on empty cells
+            if len(str(cell.value)) > max_length:
+                max_length = len(cell.value)
+        except:
+            pass
+    # Adjust the column width
+    adjusted_width = (max_length + 2)
+    worksheet.column_dimensions[get_column_letter(column)].width = adjusted_width
+
+# Save the workbook
+workbook.save(new_file_path)
+workbook.close()
 
 # -----
 

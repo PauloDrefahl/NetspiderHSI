@@ -229,27 +229,27 @@ class SkipthegamesScraper(ScraperPrototype):
 
             if self.join_keywords and self.only_posts_with_payment_methods:
                 if self.check_keywords(about_info) or self.check_keywords(services) or self.check_keywords(description):
-                    self.check_keywords_found(about_info, services, description)
+                    self.check_keywords_found(about_info, services, description, link)
                     counter = self.join_with_payment_methods(about_info, counter, description, link, services)
 
             elif self.join_keywords or self.only_posts_with_payment_methods:
                 if self.join_keywords:
                     if self.check_keywords(about_info) or self.check_keywords(services) or self.check_keywords(
                             description):
-                        self.check_keywords_found(about_info, services, description)
+                        self.check_keywords_found(about_info, services, description, link)
                         counter = self.join_inclusive(about_info, counter, description, link, services)
 
                 elif self.only_posts_with_payment_methods:
                     if len(self.keywords) > 0:
                         if self.check_keywords(about_info) or self.check_keywords(services) or self.check_keywords(
                                 description):
-                            self.check_keywords_found(about_info, services, description)
+                            self.check_keywords_found(about_info, services, description, link)
                     counter = self.payment_methods_only(about_info, counter, description, link, services)
             else:
                 if len(self.keywords) > 0:
                     if self.check_keywords(about_info) or self.check_keywords(services) or self.check_keywords(
                             description):
-                        self.check_keywords_found(about_info, services, description)
+                        self.check_keywords_found(about_info, services, description, link)
                         self.append_data(about_info, counter, description, link, services)
                         screenshot_name = str(counter) + ".png"
                         self.capture_screenshot(screenshot_name)
@@ -313,10 +313,11 @@ class SkipthegamesScraper(ScraperPrototype):
     Checking and Running Append
     --------------------------
     '''
-    def check_keywords_found(self, about_info, services, description) -> None:
+    def check_keywords_found(self, about_info, services, description, link) -> None:
         self.check_and_append_keywords(about_info)
         self.check_and_append_keywords(services)
         self.check_and_append_keywords(description)
+        self.check_and_append_keywords(link)
 
     def check_for_payment_methods(self, description) -> bool:
         for payment in self.known_payment_methods:
@@ -367,7 +368,7 @@ class SkipthegamesScraper(ScraperPrototype):
         titled_columns = {
             'Post-identifier': self.post_identifier,
             'Link': self.link,
-            'City': self.city,
+            'Inputted City / Region': self.city,
             # -------
             'About-info': self.about_info,
             'Description': self.description,
@@ -429,8 +430,8 @@ class SkipthegamesScraper(ScraperPrototype):
             'Post-identifier': self.post_identifier,
             'Link': self.link,
             # ------- use the setter attributes to add into the spreadsheet for location
-            'City': self.city,
-            'Location': 'N/A',
+            'Inputted City / Region': self.city,
+            'Specified Location': 'N/A',
             'Timeline': 'N/A',
             'Contacts': 'N/A',
             'Personal Info': personal_info,

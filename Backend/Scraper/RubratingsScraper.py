@@ -281,7 +281,7 @@ class RubratingsScraper(ScraperPrototype):
                         self.check_keywords(location) or self.check_keywords(provider_id) \
                         or self.check_keywords(post_title) or self.check_keywords(description):
                     self.check_keywords_found(last_activity, phone_number, location, provider_id, post_title,
-                                              description)
+                                              description, link)
                     counter = self.join_with_payment_methods(counter, link, last_activity, phone_number, location,
                                                              provider_id, post_title, description)
 
@@ -291,7 +291,7 @@ class RubratingsScraper(ScraperPrototype):
                             self.check_keywords(location) or self.check_keywords(provider_id) \
                             or self.check_keywords(post_title) or self.check_keywords(description):
                         self.check_keywords_found(last_activity, phone_number, location, provider_id, post_title,
-                                                  description)
+                                                  description, link)
                         counter = self.join_inclusive(counter, link, last_activity, phone_number, location, provider_id,
                                                       post_title, description)
 
@@ -301,7 +301,7 @@ class RubratingsScraper(ScraperPrototype):
                                 self.check_keywords(location) or self.check_keywords(provider_id) \
                                 or self.check_keywords(post_title) or self.check_keywords(description):
                             self.check_keywords_found(last_activity, phone_number, location, provider_id, post_title,
-                                                      description)
+                                                      description, link)
 
                     counter = self.payment_methods_only(counter, link, last_activity, phone_number, location,
                                                         provider_id, post_title, description)
@@ -312,7 +312,7 @@ class RubratingsScraper(ScraperPrototype):
                             self.check_keywords(location) or self.check_keywords(provider_id) \
                             or self.check_keywords(post_title) or self.check_keywords(description):
                         self.check_keywords_found(last_activity, phone_number, location, provider_id, post_title,
-                                                  description)
+                                                  description, link)
                         self.append_data(counter, link, last_activity, phone_number, location, provider_id,
                                          post_title, description)
                         screenshot_name = str(counter) + ".png"
@@ -387,13 +387,14 @@ class RubratingsScraper(ScraperPrototype):
     Checking and Running Append
     --------------------------
     '''
-    def check_keywords_found(self, last_activity, phone_number, location, provider_id, post_title, description) -> None:
+    def check_keywords_found(self, last_activity, phone_number, location, provider_id, post_title, description, link) -> None:
         self.check_and_append_keywords(last_activity)
         self.check_and_append_keywords(phone_number)
         self.check_and_append_keywords(location)
         self.check_and_append_keywords(provider_id)
         self.check_and_append_keywords(post_title)
         self.check_and_append_keywords(description)
+        self.check_and_append_keywords(link)
 
     def check_for_payment_methods(self, description) -> bool:
         for payment in self.known_payment_methods:
@@ -446,8 +447,8 @@ class RubratingsScraper(ScraperPrototype):
             'Post-identifier': self.post_identifier,
             'Link': self.link,
             # -------
-            'City': self.city,
-            'Location': self.location,
+            'Inputted City / Region': self.city,
+            'Specified Location': self.location,
             'Last-Activity': self.last_activity,
             'Phone-Number': self.phone_number,
             'Provider-ID': self.provider_id,
@@ -521,8 +522,8 @@ class RubratingsScraper(ScraperPrototype):
             'Post-identifier': self.post_identifier,
             'Link': self.link,
             # ------
-            'City': self.city,
-            'Location': self.location,
+            'Inputted City / Region': self.city,
+            'Specified Location': self.location,
             'Timeline': post_time,
             'Contacts': contact_info,
             'Personal Info': personal_info,

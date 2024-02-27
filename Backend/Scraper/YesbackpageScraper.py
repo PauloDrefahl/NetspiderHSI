@@ -257,6 +257,7 @@ class YesbackpageScraper(ScraperPrototype):
                     email = self.driver.find_element(
                         By.XPATH, '/html/body/div[3]/div/div[1]/table/tbody/tr[1]/td/div[1]/div/table/'
                                   'tbody/tr[8]/td[2]').text[2:]
+                    # email = self.validate_email(email)
                 except NoSuchElementException:
                     email = 'N/A'
 
@@ -292,7 +293,7 @@ class YesbackpageScraper(ScraperPrototype):
                 if self.check_keywords(description) or self.check_keywords(name) or self.check_keywords(sex) \
                         or self.check_keywords(phone_number) or self.check_keywords(email) \
                         or self.check_keywords(location) or self.check_keywords(services):
-                    self.check_keywords_found(description, name, sex, phone_number, email, location, services)
+                    self.check_keywords_found(description, name, sex, phone_number, email, location, services, link)
                     counter = self.join_with_payment_methods(counter, description, email, link, location, name,
                                                              phone_number, services, sex, posted_on, expires_on, reply_to)
 
@@ -301,7 +302,7 @@ class YesbackpageScraper(ScraperPrototype):
                     if self.check_keywords(description) or self.check_keywords(name) or self.check_keywords(sex) \
                             or self.check_keywords(phone_number) or self.check_keywords(email) \
                             or self.check_keywords(location) or self.check_keywords(services):
-                        self.check_keywords_found(description, name, sex, phone_number, email, location, services)
+                        self.check_keywords_found(description, name, sex, phone_number, email, location, services, link)
                         counter = self.join_inclusive(counter, description, email, link, location, name, phone_number,
                                                       services, sex, posted_on, expires_on, reply_to)
 
@@ -310,7 +311,7 @@ class YesbackpageScraper(ScraperPrototype):
                         if self.check_keywords(description) or self.check_keywords(name) or self.check_keywords(sex) \
                                 or self.check_keywords(phone_number) or self.check_keywords(email) \
                                 or self.check_keywords(location) or self.check_keywords(services):
-                            self.check_keywords_found(description, name, sex, phone_number, email, location, services)
+                            self.check_keywords_found(description, name, sex, phone_number, email, location, services, link)
 
                     counter = self.payment_methods_only(counter, description, email, link, location, name,
                                                         phone_number, services, sex, posted_on, expires_on, reply_to)
@@ -320,7 +321,7 @@ class YesbackpageScraper(ScraperPrototype):
                     if self.check_keywords(description) or self.check_keywords(name) or self.check_keywords(sex) \
                             or self.check_keywords(phone_number) or self.check_keywords(email) \
                             or self.check_keywords(location) or self.check_keywords(services):
-                        self.check_keywords_found(description, name, sex, phone_number, email, location, services)
+                        self.check_keywords_found(description, name, sex, phone_number, email, location, services, link)
                         self.append_data(counter, description, email, link, location, name, phone_number, services,
                                          sex, posted_on, expires_on, reply_to)
                         screenshot_name = str(counter) + ".png"
@@ -396,7 +397,7 @@ class YesbackpageScraper(ScraperPrototype):
     Checking and Running Append
     --------------------------
     '''
-    def check_keywords_found(self, description, name, sex, phone_number, email, location, services) -> None:
+    def check_keywords_found(self, description, name, sex, phone_number, email, location, services, link) -> None:
         self.check_and_append_keywords(description)
         self.check_and_append_keywords(name)
         self.check_and_append_keywords(sex)
@@ -404,6 +405,7 @@ class YesbackpageScraper(ScraperPrototype):
         self.check_and_append_keywords(email)
         self.check_and_append_keywords(location)
         self.check_and_append_keywords(services)
+        self.check_and_append_keywords(link)
 
     def check_for_payment_methods(self, description) -> bool:
         for payment in self.known_payment_methods:
@@ -455,7 +457,8 @@ class YesbackpageScraper(ScraperPrototype):
             'Post-identifier': self.post_identifier,
             'Link': self.link,
             # -------
-            'Location': self.location,
+            'Inputted City / Region': self.city,
+            'Specified Location': self.location,
             'Posted On': self.posted_on,
             'Expires On': self.expires_on,
             'Phone-Number': self.phone_number,
@@ -533,9 +536,9 @@ class YesbackpageScraper(ScraperPrototype):
             'Post-identifier': self.post_identifier,
             'Link': self.link,
             # ------
-            'City': self.city,
-            'Location': self.location,
-            'Timeline': post_time,
+            'Inputted City / Region': self.city,
+            'Specified Location': self.location,
+            'Timeline': self.posted_on,
             'Contacts': contact_info,
             'Personal Info': personal_info,
             'Overall Description': overall_desc,
@@ -575,11 +578,41 @@ class YesbackpageScraper(ScraperPrototype):
                     col[0].column_letter].width = adjusted_width
 
     def parse_timestamp(self, timestamp_str):
-        # Example input: "Posted on: Sunday, 04 February, 2024 07:25 Expires On: Monday, 19 February, 2024 07:25 Reply to: (Not Shown)"
+        # Initialize all parts as 'N/A' to handle missing parts
+        posted_on, updated_on, expires_on, reply_to = ('N/A',) * 4
+
+        # Split the string by 'Expires On:' to separate the first half and the 'Expires On:' part
         parts = timestamp_str.split('Expires On:')
-        posted_on = parts[0].replace('Posted on:', '').strip() if len(parts) > 0 else 'N/A'
-        expires_on, reply_to = parts[1].split('Reply to:') if len(parts) > 1 else ('N/A', 'N/A')
-        return posted_on, expires_on.strip(), reply_to.strip()
+        first_half = parts[0].strip() if len(parts) > 0 else 'N/A'
+
+        # Check if 'Updated On:' is in the first half
+        if 'Updated On:' in first_half:
+            posted_on, updated_on = first_half.split('Updated On:')
+            posted_on = posted_on.replace('Posted on:', '').strip()
+            updated_on = updated_on.strip()
+        else:
+            # If there's no 'Updated On:', the whole first half is 'Posted on:'
+            posted_on = first_half.replace('Posted on:', '').strip()
+
+        # Now, handle the 'Expires On:' part
+        if len(parts) > 1:
+            second_half = parts[1].strip()
+            if 'Reply to:' in second_half:
+                expires_on, reply_to = second_half.split('Reply to:')
+                expires_on = expires_on.strip()
+                reply_to = reply_to.strip()
+            else:
+                expires_on = second_half.strip()
+
+        print(f"Posted on: {posted_on}")
+        print(f"Updated on: {updated_on if updated_on != 'N/A' else 'No update info'}")
+        print(f"Expires on: {expires_on}")
+        print(f"Reply to: {reply_to if reply_to != 'N/A' else 'No reply info'}")
+
+        return posted_on, expires_on, reply_to
+
+    def validate_email(self, email):
+        return email if "@" in email else "N/A"
 
     def capture_screenshot(self, screenshot_name) -> None:
         self.driver.save_screenshot(f'{self.screenshot_directory}/{screenshot_name}')

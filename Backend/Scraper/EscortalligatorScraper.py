@@ -259,7 +259,7 @@ class EscortalligatorScraper(ScraperPrototype):
                 if self.join_keywords:
                     if self.check_keywords(phone_number) or self.check_keywords(location_and_age)  or \
                             self.check_keywords(description):
-                        self.check_keywords_found(description, locationSplits, age, phone_number, link)
+                        self.check_keywords_found(description, location_and_age, locationSplits, age, phone_number, link)
                         counter = self.join_inclusive(counter, description, link, location_and_age, locationSplits, age, phone_number, timestamp)
 
                 elif self.only_posts_with_payment_methods:
@@ -396,8 +396,8 @@ class EscortalligatorScraper(ScraperPrototype):
             'Post-identifier': self.post_identifier,
             'Link': self.links,
             # -------
-            'City': self.city,
-            'Location': self.locationSplits,
+            'Inputted City / Region': self.city,
+            'Specified Location': self.locationSplits,
             # ------
             'Timestamp': self.timestamps,
             # -------
@@ -467,8 +467,8 @@ class EscortalligatorScraper(ScraperPrototype):
             'Post-identifier': self.post_identifier,
             'Link': self.links,  # could also be a keyword source too
             # ------- time and place of posting
-            'City': self.city,
-            'Location': self.locationSplits,  # could also be a keyword source too
+            'Inputted City / Region': self.city,
+            'Specified Location': self.locationSplits,  # could also be a keyword source too
             'Timeline': self.timestamps,
             # ------ methods of tracking
             'Contacts': contact_info,  # could also be a keyword source too

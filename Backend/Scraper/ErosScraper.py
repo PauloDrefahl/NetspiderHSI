@@ -228,7 +228,7 @@ class ErosScraper(ScraperPrototype):
                 if self.join_keywords:
                     if self.check_keywords(profile_header) or self.check_keywords(description) \
                             or self.check_keywords(info_details) or self.check_keywords(contact_details):
-                        self.check_keywords_found(contact_details, description, info_details, profile_header)
+                        self.check_keywords_found(contact_details, description, info_details, profile_header, link)
                         counter = self.join_inclusive(contact_details, counter, description, info_details, link,
                                                       profile_header)
 
@@ -236,7 +236,7 @@ class ErosScraper(ScraperPrototype):
                     if len(self.keywords) > 0:
                         if self.check_keywords(profile_header) or self.check_keywords(description) \
                                 or self.check_keywords(info_details) or self.check_keywords(contact_details):
-                            self.check_keywords_found(contact_details, description, info_details, profile_header)
+                            self.check_keywords_found(contact_details, description, info_details, profile_header, link)
 
                     counter = self.payment_methods_only(contact_details, counter, description, info_details, link,
                                                         profile_header)
@@ -245,7 +245,7 @@ class ErosScraper(ScraperPrototype):
                 if len(self.keywords) > 0:
                     if self.check_keywords(profile_header) or self.check_keywords(description) \
                             or self.check_keywords(info_details) or self.check_keywords(contact_details):
-                        self.check_keywords_found(contact_details, description, info_details, profile_header)
+                        self.check_keywords_found(contact_details, description, info_details, profile_header, link)
                         self.append_data(contact_details, counter, description, info_details, link, profile_header)
                         screenshot_name = str(counter) + ".png"
                         self.capture_screenshot(screenshot_name)
@@ -310,11 +310,12 @@ class ErosScraper(ScraperPrototype):
     Checking and Running Append
     --------------------------
     '''
-    def check_keywords_found(self, contact_details, description, info_details, profile_header):
+    def check_keywords_found(self, contact_details, description, info_details, profile_header, link):
         self.check_and_append_keywords(contact_details)
         self.check_and_append_keywords(description)
         self.check_and_append_keywords(info_details)
         self.check_and_append_keywords(profile_header)
+        self.check_and_append_keywords(link)
 
     def check_for_payment_methods(self, description) -> bool:
         for payment in self.known_payment_methods:
@@ -365,8 +366,8 @@ class ErosScraper(ScraperPrototype):
         titled_columns = {
             'Post-identifier': self.post_identifier,
             'Link': self.link,
-            'City': self.city,
-            'Location': 'N/A',
+            'Inputted City / Region': self.city,
+            'Specified Location': 'N/A',
             # -------
             'Profile-header': self.profile_header,
             'About-info': self.about_info,
@@ -431,8 +432,9 @@ class ErosScraper(ScraperPrototype):
             'Post-identifier': self.post_identifier,
             'Link': self.link,
             # -------
-            'Location': self.city,
-            'Timeline': None,
+            'Inputted City / Region': self.city,
+            'Specified Location': 'N/A',
+            'Timeline': 'N/A',
             'Contacts': contact_info,
             'Personal Info': self.about_info,
             'Overall Description': overall_desc,
