@@ -156,3 +156,16 @@ option.selected {
 option.flagged {
     background-color: #ff0000;
 }
+
+.selecet-folder{
+    width: 100%;
+    padding: 10px;
+    margin-top: 20px;
+    border: 2px solid #09558B;
+    border-radius: 8px;
+    border-style: dashed;
+    height: 50%;
+    background-color: #fff;
+    transition: background-color 0.3s, color 0.3s, border-color 0.3s;
+    cursor: pointer;
+}

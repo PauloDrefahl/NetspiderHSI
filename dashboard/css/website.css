@@ -66,8 +66,8 @@
     box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
     border-radius: 0px;
     z-index: 1;
-    overflow-y: auto;
-    max-height: 150px;
+    overflow-y: none;
+    max-height: 100px;
 }
 
 .dropdown:hover .dropdown-content {
@@ -82,7 +82,8 @@
     box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
     border-radius: 0px;
     overflow-y: auto;
-    max-height: 150px;
+    overflow-x: hidden;
+    max-height: 100px;
 }
 
 .dropdown:hover .dropdown-content-keyset {
