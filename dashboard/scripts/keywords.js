@@ -189,6 +189,9 @@ document.addEventListener("DOMContentLoaded", function () {
     // Get reference to the select element and the button
     const itemList = document.getElementById("itemList");
     const selectAllBtn = document.getElementById("select-all-btn");
+    const dropdownContentKeyset = document.querySelector('.dropdown-content-keyset');
+
+    // Function to parse the text file and update the keyset
 
     // Add click event listener to the button
     selectAllBtn.addEventListener("click", function () {
@@ -210,47 +213,61 @@ document.addEventListener("DOMContentLoaded", function () {
         }
     });
 
-    document.querySelector('.dropdown-content-keyset').addEventListener('click', function(event) {
-        if(event.target.classList.contains('dropdown-item-keyset')) {
+    // Add event listener to the dropdown options
+    dropdownContentKeyset.addEventListener("click", function (event) {
+        // Check if the clicked element has the class "dropdown-item-keyset"
+        if (event.target.classList.contains('dropdown-item-keyset')) {
+            // Get the text content of the clicked element
             const selectedKeyset = event.target.textContent.trim();
+            console.log("option selected: ", selectedKeyset)
+
+            // Pass the selected keyset to the function
             selectKeysetKeywords(selectedKeyset);
-
-            // Remove "selected" class from all keyset options
-            const allOptions = document.querySelectorAll('.dropdown-item-keyset');
-            allOptions.forEach(function(opt) {
-                opt.classList.remove('selected');
-            });
-
-            // Add "selected" class to the clicked keyset option
-            event.target.classList.add('selected');
         }
     });
 
-    // Call addOptionKeyset for each keyset when the page loads
-    // Replace `keysets` with the actual array of keysets you have
-    keysets.forEach(addOptionKeyset);
 });
 
 //function for selecting keywords in key set
-function selectKeysetKeywords(selectedKeyset) {
+function selectKeysetKeywords(selectedKeyset, callback) {
     const itemList = document.getElementById("itemList");
 
-    // Get the keywords related to the selected keyset
-    let selectedOptions = jsonData[selectedKeyset];
-
-    for (let i = 0; i < itemList.options.length; i++) {
-        const option = itemList.options[i];
-        const keyword = option.textContent.trim();
-        const isSelected = selectedOptions.includes(keyword); // Check if keyword is in selectedOptions
-
-        if (isSelected && !option.classList.contains('selected')) {
-            option.classList.add('selected');
-            selectKeyword(keyword);
-        } else if (!isSelected && option.classList.contains('selected')) {
-            option.classList.remove('selected');
-            unselectKeyword(keyword);
+    // Reload keysets from file and wait for completion
+    window.editFile.reloadKeysetsFromFile(keywordsSetFile.path, (error, updatedData) => {
+        if (error) {
+            console.error('Error reloading keysets:', error);
+            return;
         }
-    }
+
+        // Get the updated keywords related to the selected keyset
+        let selectedOptions = updatedData[selectedKeyset];
+        console.log("updated jsonData: ", updatedData);
+        console.log("selected options: ", selectedOptions);
+
+        // Check if selectedOptions is undefined or not an array
+        if (selectedOptions && Array.isArray(selectedOptions)) {
+            for (let i = 0; i < itemList.options.length; i++) {
+                const option = itemList.options[i];
+                const keyword = option.textContent.trim();
+                const isSelected = selectedOptions.includes(keyword); // Check if keyword is in selectedOptions
+
+                if (isSelected && !option.classList.contains('selected')) {
+                    option.classList.add('selected');
+                    selectKeyword(keyword);
+                } else if (!isSelected && option.classList.contains('selected')) {
+                    option.classList.remove('selected');
+                    unselectKeyword(keyword);
+                }
+            }
+        } else {
+            console.error(`Selected options for keyset "${selectedKeyset}" not found or not an array.`);
+        }
+
+        // Execute the callback function if provided
+        if (callback) {
+            callback();
+        }
+    });
 }
 
 // selected keyword is added to selectedKeywords array
@@ -472,20 +489,21 @@ document.addEventListener("DOMContentLoaded", function () {
         if (selectedKeysetEditList !== '') {
             // Call the removeKeyset function
             window.editFile.removeKeyset(keywordsSetFile.path, selectedKeysetEditList);
+
             // Remove the option element from the edit keyset list
-            console.log("here")
-            const optionToRemove = editKeysetList.querySelector(`option[value="${selectedKeysetEditList}"]`);
-            if (optionToRemove) {
-                optionToRemove.remove();
+            const optionsToRemove = Array.from(editKeysetList.options).filter(option => option.value === selectedKeysetEditList);
+            if (optionsToRemove.length > 0) {
+                optionsToRemove.forEach(option => option.remove());
                 console.log(`Keyset "${selectedKeysetEditList}" removed from the list.`);
             } else {
                 console.log(`Keyset "${selectedKeysetEditList}" not found in the list.`);
             }
+
             // Remove the keyset from the dropdown menu
-            const dropdownKeysetItems = document.querySelectorAll(`.dropdown-content-keyset a`);
+            const dropdownKeysetItems = document.querySelectorAll('.dropdown-content-keyset a');
             if (dropdownKeysetItems) {
                 dropdownKeysetItems.forEach(item => {
-                    if(item.textContent.trim() === selectedKeysetEditList){
+                    if (item.textContent.trim() === selectedKeysetEditList) {
                         item.remove();
                     }
                 });
@@ -500,6 +518,7 @@ document.addEventListener("DOMContentLoaded", function () {
             console.log('Please select a keyset to delete.');
         }
     });
+
 
     function selectKeywordEditList(selectedKeyword) {
         selectedKeyword = selectedKeyword.trim(); // Remove leading and trailing whitespace characters
