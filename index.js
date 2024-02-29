@@ -43,6 +43,7 @@ const createWindow = () => {
             nodeIntegration: true,
             preload: path.join(__dirname, 'dashboard/scripts/preload.js')
         },
+        icon: 'dashboard/icons/download-removebg-preview.ico'
     });
 
     // and load the index.html of the app.
