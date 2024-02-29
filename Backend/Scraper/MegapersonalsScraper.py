@@ -232,7 +232,7 @@ class MegapersonalsScraper(ScraperPrototype):
                 if self.check_keywords(description) or self.check_keywords(name) \
                         or self.check_keywords(phone_number) or self.check_keywords(city) \
                         or self.check_keywords(location):
-                    self.check_keywords_found(city, description, location, name, phone_number)
+                    self.check_keywords_found(city, description, location, name, phone_number, link)
                     counter = self.join_with_payment_methods(city, counter, description, link, location, name,
                                                              phone_number)
 
@@ -241,7 +241,7 @@ class MegapersonalsScraper(ScraperPrototype):
                     if self.check_keywords(description) or self.check_keywords(name) \
                             or self.check_keywords(phone_number) or self.check_keywords(city) \
                             or self.check_keywords(location):
-                        self.check_keywords_found(city, description, location, name, phone_number)
+                        self.check_keywords_found(city, description, location, name, phone_number, link)
                         counter = self.join_inclusive(city, counter, description, link, location, name,
                                                       phone_number)
 
@@ -250,7 +250,7 @@ class MegapersonalsScraper(ScraperPrototype):
                         if self.check_keywords(description) or self.check_keywords(name) \
                                 or self.check_keywords(phone_number) or self.check_keywords(city) \
                                 or self.check_keywords(location):
-                            self.check_keywords_found(city, description, location, name, phone_number)
+                            self.check_keywords_found(city, description, location, name, phone_number, link)
 
                     counter = self.payment_methods_only(city, counter, description, link, location, name,
                                                         phone_number)
@@ -259,7 +259,7 @@ class MegapersonalsScraper(ScraperPrototype):
                     if self.check_keywords(description) or self.check_keywords(name) \
                             or self.check_keywords(phone_number) or self.check_keywords(city) \
                             or self.check_keywords(location):
-                        self.check_keywords_found(city, description, location, name, phone_number)
+                        self.check_keywords_found(city, description, location, name, phone_number, link)
                         self.append_data(city, counter, description, link, location, name, phone_number)
                         screenshot_name = str(counter) + ".png"
                         self.capture_screenshot(screenshot_name)
@@ -323,12 +323,13 @@ class MegapersonalsScraper(ScraperPrototype):
     Checking and Running Append
     --------------------------
     '''
-    def check_keywords_found(self, city, description, location, name, phone_number) -> None:
+    def check_keywords_found(self, city, description, location, name, phone_number, link) -> None:
         self.check_and_append_keywords(city)
         self.check_and_append_keywords(description)
         self.check_and_append_keywords(location)
         self.check_and_append_keywords(name)
         self.check_and_append_keywords(phone_number)
+        self.check_and_append_keywords(link)
 
     def check_for_payment_methods(self, description) -> bool:
         for payment in self.known_payment_methods:
@@ -380,8 +381,9 @@ class MegapersonalsScraper(ScraperPrototype):
             'Post-identifier': self.post_identifier,
             'Link': self.link,
             # ------
-            'City': self.contentCity,
-            'Location': self.location,
+            'Inputted City / Region': self.city,
+            'Specified City / Region': self.contentCity,
+            'Specified Location': self.location,
             'Phone-number': self.phoneNumber,
             'Name': self.name,
             'Description': self.description,
@@ -457,8 +459,8 @@ class MegapersonalsScraper(ScraperPrototype):
             'Post-identifier': self.post_identifier,
             'Link': self.link,
             # -------
-            'City': self.city,
-            'Location': location,
+            'Inputted City / Region': self.city,
+            'Specified Location': location,
             'Timeline': 'N/A',
             'Contacts': contact_info,
             'Personal Info': self.name,
