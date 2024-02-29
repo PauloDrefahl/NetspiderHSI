@@ -1,7 +1,7 @@
 // preload.js
 // See the Electron documentation for details on how to use preload scripts:
 // https://www.electronjs.org/docs/latest/tutorial/process-model#preload-scripts
-const { ipcRenderer, contextBridge } = require('electron');
+const { ipcRenderer, contextBridge, shell } = require('electron');
 const io = require('socket.io-client');
 const fs = require('fs');
 
@@ -156,6 +156,22 @@ contextBridge.exposeInMainWorld('editFile', {
                 }
             }
         });
+    },
+    openResults: (folderPath) => {
+        // Check if folderPath is provided
+        if (!folderPath) {
+            console.error('Folder path is required.');
+            return;
+        }
+
+        // Open the folder using the shell module
+        shell.openPath(folderPath)
+            .then(() => {
+                console.log('Folder opened successfully.');
+            })
+            .catch((error) => {
+                console.error('Error opening folder:', error);
+            });
     }
 
 });

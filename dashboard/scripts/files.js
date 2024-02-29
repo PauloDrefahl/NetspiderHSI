@@ -132,3 +132,10 @@ function addOptionKeyset(keysets) {
     });
     document.querySelector('.dropdown-content-keyset').appendChild(option2);
 }
+
+document.addEventListener("DOMContentLoaded", function (){
+    const openResultsFolderButton = document.getElementById('open-results-folder-btn');
+    openResultsFolderButton.addEventListener('click', function () {
+       window.editFile.openResults('C:\\Users\\Zach\\PycharmProjects\\NetSpiderHSI\\result')
+    });
+})
