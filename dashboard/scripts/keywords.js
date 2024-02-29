@@ -229,32 +229,45 @@ document.addEventListener("DOMContentLoaded", function () {
 });
 
 //function for selecting keywords in key set
-function selectKeysetKeywords(selectedKeyset) {
+function selectKeysetKeywords(selectedKeyset, callback) {
     const itemList = document.getElementById("itemList");
 
-    // Get the keywords related to the selected keyset
-    let selectedOptions = jsonData[selectedKeyset];
-    console.log("jsonData: ", jsonData);
-    console.log("selected options: ", selectedOptions);
-
-    // Check if selectedOptions is undefined or not an array
-    if (selectedOptions && Array.isArray(selectedOptions)) {
-        for (let i = 0; i < itemList.options.length; i++) {
-            const option = itemList.options[i];
-            const keyword = option.textContent.trim();
-            const isSelected = selectedOptions.includes(keyword); // Check if keyword is in selectedOptions
-
-            if (isSelected && !option.classList.contains('selected')) {
-                option.classList.add('selected');
-                selectKeyword(keyword);
-            } else if (!isSelected && option.classList.contains('selected')) {
-                option.classList.remove('selected');
-                unselectKeyword(keyword);
-            }
+    // Reload keysets from file and wait for completion
+    window.editFile.reloadKeysetsFromFile(keywordsSetFile.path, (error, updatedData) => {
+        if (error) {
+            console.error('Error reloading keysets:', error);
+            return;
         }
-    } else {
-        console.error(`Selected options for keyset "${selectedKeyset}" not found or not an array.`);
-    }
+
+        // Get the updated keywords related to the selected keyset
+        let selectedOptions = updatedData[selectedKeyset];
+        console.log("updated jsonData: ", updatedData);
+        console.log("selected options: ", selectedOptions);
+
+        // Check if selectedOptions is undefined or not an array
+        if (selectedOptions && Array.isArray(selectedOptions)) {
+            for (let i = 0; i < itemList.options.length; i++) {
+                const option = itemList.options[i];
+                const keyword = option.textContent.trim();
+                const isSelected = selectedOptions.includes(keyword); // Check if keyword is in selectedOptions
+
+                if (isSelected && !option.classList.contains('selected')) {
+                    option.classList.add('selected');
+                    selectKeyword(keyword);
+                } else if (!isSelected && option.classList.contains('selected')) {
+                    option.classList.remove('selected');
+                    unselectKeyword(keyword);
+                }
+            }
+        } else {
+            console.error(`Selected options for keyset "${selectedKeyset}" not found or not an array.`);
+        }
+
+        // Execute the callback function if provided
+        if (callback) {
+            callback();
+        }
+    });
 }
 
 // selected keyword is added to selectedKeywords array
@@ -466,7 +479,6 @@ document.addEventListener("DOMContentLoaded", function () {
             });
 
             console.log(`Keyset "${setNameValue}" added to the list.`);
-            window.editFile.reloadKeysetsFromFile(keywordsSetFile.path);
         } else {
             console.log('Set name and selected keywords are required.');
         }
@@ -502,7 +514,6 @@ document.addEventListener("DOMContentLoaded", function () {
 
             // Clear selectedKeysetEditList after deletion
             selectedKeysetEditList = '';
-            window.editFile.reloadKeysetsFromFile(keywordsSetFile.path);
         } else {
             console.log('Please select a keyset to delete.');
         }

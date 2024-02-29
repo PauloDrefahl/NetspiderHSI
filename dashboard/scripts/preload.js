@@ -131,20 +131,29 @@ contextBridge.exposeInMainWorld('editFile', {
             }
         });
     },
-    reloadKeysetsFromFile: (filePath) => {
+    reloadKeysetsFromFile: (filePath, callback) => {
         fs.readFile(filePath, 'utf-8', (err, data) => {
             if (err) {
                 console.error('Error reading file:', err);
+                if (callback) {
+                    callback(err);
+                }
                 return;
             }
 
             try {
                 // Parse the JSON data from the file
-                const jsonDataReloaded = JSON.parse(data);
+                jsonData = JSON.parse(data);
+                console.log("reloaded json data", jsonData)
                 console.log('Keysets reloaded from file successfully');
-                return jsonDataReloaded;
+                if (callback) {
+                    callback(null, jsonData);
+                }
             } catch (error) {
                 console.error('Error parsing JSON:', error);
+                if (callback) {
+                    callback(error);
+                }
             }
         });
     }
