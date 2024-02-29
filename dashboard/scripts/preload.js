@@ -130,6 +130,23 @@ contextBridge.exposeInMainWorld('editFile', {
                 console.log('Keyset not found:', keysetName);
             }
         });
+    },
+    reloadKeysetsFromFile: (filePath) => {
+        fs.readFile(filePath, 'utf-8', (err, data) => {
+            if (err) {
+                console.error('Error reading file:', err);
+                return;
+            }
+
+            try {
+                // Parse the JSON data from the file
+                const jsonDataReloaded = JSON.parse(data);
+                console.log('Keysets reloaded from file successfully');
+                return jsonDataReloaded;
+            } catch (error) {
+                console.error('Error parsing JSON:', error);
+            }
+        });
     }
 
 });

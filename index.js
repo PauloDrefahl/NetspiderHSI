@@ -57,7 +57,7 @@ app.on('ready', () => {
     // Add a delay before creating the window
     setTimeout(() => {
         createWindow();
-    }, 3000); // 3000 milliseconds = 3 seconds
+    }, 1000); // 3000 milliseconds = 3 seconds
 });
 
 // Quit when all windows are closed, except on macOS. There, it's common

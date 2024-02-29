@@ -83,12 +83,12 @@ document.getElementById('file2').addEventListener('change', function(e) {
 
     reader.onload = function(e) {
         const contents = e.target.result;
-        let jsonData = JSON.parse(contents); // Parse JSON data
+        jsonData = JSON.parse(contents); // Parse JSON data
         const keysets = Object.keys(jsonData); // Extract keys
 
         const itemList = document.getElementById('itemListSet');
         itemList.innerHTML = ''; // Clear previous content
-        
+
         keysets.forEach(function(keyset) {
             const option = document.createElement('option');
             option.textContent = keyset;
@@ -118,7 +118,7 @@ function addOptionKeyset(keysets) {
         // Update the label text to display the selected city
         const selectKeyset = document.querySelector('.dropdown-item-keyset');
         selectKeyset.textContent = selectedKeyset;
-        selectKeysetKeywords(selectedKeyset);
+        // selectKeysetKeywords(selectedKeyset);
 
         // Remove "selected" class from all options
         const allOptions = document.querySelectorAll('.dropdown-item-keyset');
