@@ -83,7 +83,7 @@ document.getElementById('file2').addEventListener('change', function(e) {
 
     reader.onload = function(e) {
         const contents = e.target.result;
-        jsonData = JSON.parse(contents); // Parse JSON data
+        let jsonData = JSON.parse(contents); // Parse JSON data
         const keysets = Object.keys(jsonData); // Extract keys
 
         const itemList = document.getElementById('itemListSet');
@@ -132,5 +132,3 @@ function addOptionKeyset(keysets) {
     });
     document.querySelector('.dropdown-content-keyset').appendChild(option2);
 }
-
-  

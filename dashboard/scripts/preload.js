@@ -93,5 +93,43 @@ contextBridge.exposeInMainWorld('editFile', {
                 }
             });
         });
+    },
+    removeKeyset: (keywordSetsFile, keysetName) => {
+        fs.readFile(keywordSetsFile, 'utf-8', (err, data) => {
+            if (err) {
+                console.error('Error reading file:', err);
+                return;
+            }
+
+            let keywordSets;
+            try {
+                // Parse the JSON data from the file
+                keywordSets = JSON.parse(data);
+            } catch (error) {
+                console.error('Error parsing JSON:', error);
+                return;
+            }
+
+            // Check if the keyset exists
+            if (keywordSets.hasOwnProperty(keysetName)) {
+                // Delete the keyset
+                delete keywordSets[keysetName];
+
+                // Convert the updated object back to JSON
+                const updatedContent = JSON.stringify(keywordSets);
+
+                // Write the updated content back to the file
+                fs.writeFile(keywordSetsFile, updatedContent, 'utf-8', (err) => {
+                    if (err) {
+                        console.error('Error writing file:', err);
+                    } else {
+                        console.log('Keyset removed from file successfully');
+                    }
+                });
+            } else {
+                console.log('Keyset not found:', keysetName);
+            }
+        });
     }
+
 });
