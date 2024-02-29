@@ -159,8 +159,8 @@
             <div class="column">
                 <h3>Enter Set Name:</h3>
                 <div class="input-container">
-                    <input type="text" class="setname-input" placeholder="Type new set name">
-                    <button class="create-set-btn">Create Set</button>
+                    <input type="text" class="setname-input" placeholder="Type new set name" id="setname">
+                    <button class="create-set-btn" id="create-set">Create Set</button>
                 </div>
                 <div class="listbox-area2">
                     <select id="itemListSet" multiple="multiple"></select>
@@ -204,21 +204,21 @@
     // });
 
 
-    $(document).ready(function() {
-        $('#itemListSet').on('mousedown', 'option', function(e) {
-            e.preventDefault();
-            e.stopPropagation();
-            var originalScrollTop = $(this).parent().scrollTop();
-            console.log(originalScrollTop);
-            $(this).prop('selected', !$(this).prop('selected'));
-            var self = this;
-            $(this).parent().focus();
-            setTimeout(function() {
-                $(self).parent().scrollTop(originalScrollTop);
-            }, 0);
-            return false;
-        });
-    });
+    // $(document).ready(function() {
+    //     $('#itemListSet').on('mousedown', 'option', function(e) {
+    //         e.preventDefault();
+    //         e.stopPropagation();
+    //         var originalScrollTop = $(this).parent().scrollTop();
+    //         console.log(originalScrollTop);
+    //         $(this).prop('selected', !$(this).prop('selected'));
+    //         var self = this;
+    //         $(this).parent().focus();
+    //         setTimeout(function() {
+    //             $(self).parent().scrollTop(originalScrollTop);
+    //         }, 0);
+    //         return false;
+    //     });
+    // });
 
     // $(document).ready(function() {
     //     $('#itemListKeywords').on('mousedown', 'option', function(e) {

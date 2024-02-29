@@ -60,5 +60,38 @@ contextBridge.exposeInMainWorld('editFile', {
                 }
             });
         });
+    },
+    addKeyset: (keywordSetsFile, keywordsToAdd, setName) => {
+        fs.readFile(keywordSetsFile, 'utf-8', (err, data) => {
+            if (err) {
+                console.error('Error reading file:', err);
+                return;
+            }
+
+            let keywordSets;
+            try {
+                // Parse the JSON data from the file
+                keywordSets = JSON.parse(data);
+                console.log(keywordSets)
+            } catch (error) {
+                console.error('Error parsing JSON:', error);
+                return;
+            }
+
+            // Add the new keyset
+            keywordSets[setName] = keywordsToAdd;
+
+            // Convert the updated object back to JSON
+            const updatedContent = JSON.stringify(keywordSets);
+
+            // Write the updated content back to the file
+            fs.writeFile(keywordSetsFile, updatedContent, 'utf-8', (err) => {
+                if (err) {
+                    console.error('Error writing file:', err);
+                } else {
+                    console.log('Keyset added to file successfully');
+                }
+            });
+        });
     }
 });

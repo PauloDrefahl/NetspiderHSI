@@ -2,7 +2,7 @@ let selectedWebsite = ""; // Declare selectedWebsite globally
 let selectedLocation = ""; // Declare selectedLocation globally
 let flaggedKeywords = []; // Declare flagged keywords list globally
 let selectedKeywords = []; // Declare selected keywords list globally
-let selectedKeywordRemove = []
+let selectedKeywordsInEditList = [] // Declare selected keywords in Edit list globally
 
 // function to change shown locations based on Website Choice
 function updateDropdown() {
@@ -291,6 +291,8 @@ document.addEventListener("DOMContentLoaded", function () {
     const keywordInput = document.getElementById('addKeywordText');
     const editListItem = document.getElementById('itemListKeywords');
     const listItem = document.getElementById('itemList');
+    const addKeysetButton = document.getElementById('create-set');
+    const setName = document.getElementById('setname');
 
     editListItem.addEventListener("click", function (event) {
         const editSelectedItem = event.target;
@@ -330,9 +332,9 @@ document.addEventListener("DOMContentLoaded", function () {
     });
 
     deleteKeywordButton.addEventListener('click', function () {
-        window.editFile.removeKeywordsFromFile(keywordsFile.path, selectedKeywordRemove);
+        window.editFile.removeKeywordsFromFile(keywordsFile.path, selectedKeywordsInEditList);
         // Iterate over selected keywords to remove
-        selectedKeywordRemove.forEach(selectedKeyword => {
+        selectedKeywordsInEditList.forEach(selectedKeyword => {
             // Trim the selectedKeyword to remove leading and trailing whitespace
             const trimmedKeyword = selectedKeyword.trim();
 
@@ -363,30 +365,48 @@ document.addEventListener("DOMContentLoaded", function () {
             }
         });
 
-        // Clear the selectedKeywordRemove array after removal
-        selectedKeywordRemove = [];
+        // Clear the selectedKeywordsInEditList array after removal
+        selectedKeywordsInEditList = [];
 
         // Log the updated list of keywords after removal
-        console.log("Keywords removed:", selectedKeywordRemove);
+        console.log("Keywords removed:", selectedKeywordsInEditList);
     });
+
+    addKeysetButton.addEventListener('click', function () {
+        const setNameValue = setName.value.trim();
+
+        if (setNameValue !== '' && selectedKeywordsInEditList.length > 0) {
+            // Call the addKeyset function
+            window.editFile.addKeyset(keywordsSetFile.path, selectedKeywordsInEditList, setNameValue);
+
+            // Clear input fields
+            setName.value = '';
+
+            // Clear selected keywords in edit list
+            selectedKeywordsInEditList = [];
+        } else {
+            console.log('Set name and selected keywords are required.');
+        }
+    });
+
 
     function selectKeywordEditList(selectedKeyword) {
         selectedKeyword = selectedKeyword.trim(); // Remove leading and trailing whitespace characters
-        if (!selectedKeywordRemove.includes(selectedKeyword)) {
-            selectedKeywordRemove.push(selectedKeyword); // Add keyword to the flaggedKeywords array if not already present
-            if (!selectedKeywordRemove.includes(selectedKeyword)) {
-                selectedKeywordRemove.push(selectedKeyword); // Add keyword to the selectedKeywords array if not already present
+        if (!selectedKeywordsInEditList.includes(selectedKeyword)) {
+            selectedKeywordsInEditList.push(selectedKeyword); // Add keyword to the flaggedKeywords array if not already present
+            if (!selectedKeywordsInEditList.includes(selectedKeyword)) {
+                selectedKeywordsInEditList.push(selectedKeyword); // Add keyword to the selectedKeywords array if not already present
             }
         }
-        console.log("Keywords to be removed:", selectedKeywordRemove);
+        console.log("Keywords selected in Edit List:", selectedKeywordsInEditList);
     }
 
     function unselectKeywordEditList(selectedKeyword) {
         selectedKeyword = selectedKeyword.trim(); // Remove leading and trailing whitespace characters
-        const index = selectedKeywordRemove.indexOf(selectedKeyword);
+        const index = selectedKeywordsInEditList.indexOf(selectedKeyword);
         if (index !== -1) {
-            selectedKeywordRemove.splice(index, 1); // Remove keyword from the selectedKeywordRemove array
+            selectedKeywordsInEditList.splice(index, 1); // Remove keyword from the selectedKeywordsInEditList array
         }
-        console.log("Keywords to be removed:", selectedKeywordRemove);
+        console.log("Keywords selected in Edit List:", selectedKeywordsInEditList);
     }
 });

@@ -73,6 +73,7 @@ document.getElementById('file1').addEventListener('change', function(e) {
 
 document.getElementById('file2').addEventListener('change', function(e) {
     const file = e.target.files[0];
+    keywordsSetFile = file;
 
     if (!file) {
         return;
