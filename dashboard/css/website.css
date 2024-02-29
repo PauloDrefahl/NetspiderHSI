@@ -65,8 +65,8 @@
     background-color: #fff;
     box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
     border-radius: 0px;
+    overflow-y: auto;
     z-index: 1;
-    overflow-y: none;
     max-height: 100px;
 }
 
@@ -98,7 +98,6 @@
     width: 95%;
     text-decoration: none;
     display: inline-block;
-    transition: background-color 0.3s, color 0.3s;
 }
 
 .dropdown-item:hover {
