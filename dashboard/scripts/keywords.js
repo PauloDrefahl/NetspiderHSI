@@ -14,7 +14,7 @@ function updateDropdown() {
 
     if (radioValue === 'Escort Alligator') {
         selectedWebsite = 'escortalligator';
-        addOption('dayton');
+        addOption('daytona');
         addOption('fort lauderdale');
         addOption('fort myers');
         addOption('gainesville');
@@ -37,7 +37,7 @@ function updateDropdown() {
         addOption('jacksonville');
     } else if (radioValue === 'Mega Personals') {
         selectedWebsite = 'megapersonals';
-        addOption('dayton');
+        addOption('daytona');
         addOption('fort lauderdale');
         addOption('fort myers');
         addOption('gainesville');
@@ -224,11 +224,9 @@ function selectKeysetKeywords(selectedKeyset) {
         const isSelected = selectedOptions.includes(keyword); // Check if keyword is in selectedOptions
 
         if (isSelected && !option.classList.contains('selected')) {
-            console.log("Adding 'selected' class to:", keyword);
             option.classList.add('selected');
             selectKeyword(keyword);
         } else if (!isSelected && option.classList.contains('selected')) {
-            console.log("Removing 'selected' class from:", keyword);
             option.classList.remove('selected');
             unselectKeyword(keyword);
         }
