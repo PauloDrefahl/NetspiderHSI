@@ -165,7 +165,7 @@ contextBridge.exposeInMainWorld('editFile', {
         }
 
         // Open the folder using the shell module
-        shell.openPath(folderPath)
+        shell.openExternal('file://' + folderPath)
             .then(() => {
                 console.log('Folder opened successfully.');
             })
