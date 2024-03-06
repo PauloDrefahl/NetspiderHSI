@@ -59,7 +59,10 @@ class ScraperManager:
 class ScraperThread(threading.Thread):
     def __init__(self, kwargs):
         keywords = set(kwargs['keywords'].split(','))
-        flagged_keywords = set(kwargs['flagged_keywords'].split(','))
+        if kwargs['flagged_keywords'] == '':
+            flagged_keywords = []
+        else:
+            flagged_keywords = set(kwargs['flagged_keywords'].split(','))
         super(ScraperThread, self).__init__()
         if kwargs['website'] == 'eros':
             self.scraper = ErosScraper()
