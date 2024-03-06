@@ -98,6 +98,21 @@ socialMedia_found_column = 'Social-media-found'
 keywords_found_column = 'Keywords-found'
 number_of_keywords_found_column = 'Number-of-keywords-found'
 
+#df[# Splitting the keywords into lists
+# Splitting the 'Keywords-found' into lists and removing rows with 'service' as the only keyword
+df['Keywords-found-list'] = df['Keywords-found'].apply(lambda x: x.split(',') if pd.notnull(x) and x.strip().lower() != 'service' else [])
+
+# Splitting 'Social-media-found' into lists
+df['Social-media-found-list'] = df['Social-media-found'].apply(lambda x: x.replace('\n', ',').split(',') if pd.notnull(x) else [])
+
+# Exploding the DataFrame for keywords
+df_exploded_keywords = df.explode('Keywords-found-list')
+
+# Exploding the DataFrame for social media
+df_exploded_social_media = df.explode('Social-media-found-list')
+
+#df[payment_methods_column] = df[payment_methods_column].apply(lambda x: x.split(',') if pd.notnull(x) else [])
+
 #df.replace(['N/A', "('N/A',)"], np.nan, inplace=True)
 
 # For columns where 'N/A' means the data should be ignored, drop those cells.
@@ -130,6 +145,9 @@ number_of_keywords_found_column = 'Number-of-keywords-found'
 #df[timeline_column] = pd.to_datetime(df[timeline_column], errors='coerce')
 print(df[timeline_column])
 print(df[city_column])
+print(df[keywords_found_column])
+print(df[socialMedia_found_column])
+print(df[payment_methods_column])
 '''
     ---------------------------------
     corelations
@@ -158,10 +176,32 @@ plt.xticks(rotation=45)  # Rotate labels if they overlap
 plt.show()
 
 # location vs social media
-sns.countplot(x=city_column, hue=socialMedia_found_column, data=df)
-plt.title('Location vs. Social Media Presence')
+# Filter out empty strings which might have come from the split operation
+df_exploded_social_media = df_exploded_social_media[df_exploded_social_media['Social-media-found-list'].str.strip() != '']
+
+# Calculating social media presence by location
+social_media_mapping = {
+    'snap': 'Snapchat',
+    'snapchat': 'Snapchat',
+    'whatsapp': 'WhatsApp',
+    'telegram': 'Telegram',
+    # Add more mappings as needed
+}
+
+# Assuming 'Social-media-found-list' is the column after exploding and cleaning
+df_exploded_social_media['Normalized Social Media'] = df_exploded_social_media['Social-media-found-list'].map(social_media_mapping).fillna(df_exploded_social_media['Social-media-found-list'])
+
+## Aggregate data by location and normalized social media name
+normalized_social_media_counts = df_exploded_social_media.groupby(['Inputted City / Region', 'Normalized Social Media']).size().unstack(fill_value=0)
+
+# Plotting
+normalized_social_media_counts.plot(kind='bar', stacked=True, figsize=(12, 8))
+plt.title('Normalized Social Media Presence by Location')
+plt.xlabel('Inputted City / Region')
+plt.ylabel('Counts')
 plt.xticks(rotation=45)
-#plt.savefig(plot_filename_location_vs_socialMedia)  # Save the plot
+plt.legend(title='Social Media')
+plt.tight_layout()
 plt.show()
 
 # keyword frequency
@@ -170,7 +210,7 @@ plt.figure(figsize=(12, 8))
 
 # Calculate keyword frequencies and keep the top N for a cleaner plot
 top_n = 20  # Adjust based on how many you wish to display
-keyword_counts = df[keywords_found_column].value_counts().head(top_n)
+keyword_counts = df_exploded_keywords['Keywords-found-list'].value_counts().head(20)  # Top 20 keywords
 
 # Create the bar plot
 keyword_counts.plot(kind='bar')
@@ -193,14 +233,39 @@ plt.show()
 
 # keyword vs location
 
+location_keyword_counts = df_exploded_keywords.groupby(['Inputted City / Region', 'Keywords-found-list']).size().unstack(fill_value=0)
+
+# You might want to focus on the top N keywords for clarity in the visualization
+top_keywords = df_exploded_keywords['Keywords-found-list'].value_counts().head(10).index
+filtered_location_keyword_counts = location_keyword_counts[top_keywords]
+
+plt.figure(figsize=(12, 8))
+sns.heatmap(filtered_location_keyword_counts, annot=True, cmap='viridis', fmt='g')
+plt.title('Keywords Frequency by Location')
+plt.xlabel('Keywords')
+plt.ylabel('Inputted City / Region')
+plt.xticks(rotation=45, ha='right')  # Rotate keywords for better visibility
+plt.tight_layout()
+plt.show()
+
 # keyword vs timeline
 
 #  # posts vs timeline
 
 #  # posts vs region
 
-#  # of keywords found vs region
+# Counting the number of posts per location
+posts_per_location = df.groupby('Inputted City / Region').size()
 
-#  # of keywords found vs timeline
+# Plotting the number of posts vs. location
+plt.figure(figsize=(12, 8))
+posts_per_location.sort_values(ascending=False).plot(kind='bar')  # Sort values for better visualization
+plt.title('Number of Posts by Location')
+plt.xlabel('Inputted City / Region')
+plt.ylabel('Number of Posts')
+plt.xticks(rotation=45, ha='right')  # Rotate location names for better visibility
+plt.tight_layout()
+plt.show()
+
 
 
