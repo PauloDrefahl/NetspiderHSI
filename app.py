@@ -9,6 +9,8 @@ from flask_socketio import SocketIO
 from flask_cors import CORS
 from Backend.Scraper import MegapersonalsScraper, SkipthegamesScraper, YesbackpageScraper, EscortalligatorScraper, \
     ErosScraper, RubratingsScraper
+from Backend.resultManager.appendResults import FileAppender
+from Backend.resultManager.resultManager import resultManager
 import subprocess
 import sys
 import os
@@ -174,8 +176,12 @@ def stop_scraper():
 # Result Manager Sockets
 @socketio.on('start_append')
 def start_append(data):
-    socketio.emit('result_manager_update', {'status': 'appending'})
     print(data)
+    socketio.emit('result_manager_update', {'status': 'appending'})
+    file_appender = FileAppender('C:\\Users\\kskos\\PycharmProjects\\HSI_Back_Test3\\result', data)
+    file_appender.create_new_folder()
+    file_appender.append_files()
+    file_appender.save_data()
     response = 0
     return {'Response': response}
     
