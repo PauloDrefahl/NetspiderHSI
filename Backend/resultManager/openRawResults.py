@@ -3,7 +3,7 @@ import sys
 import os
 
 # Path to your Excel file
-excel_file_path = "C:\\Users\\kskos\\PycharmProjects\\HSI_Back_Test3\\result\\yesbackpage-florida-2024-02-23_21-25-01\\RAW-yesbackpage-florida-2024-02-23_21-25-01.xlsx"
+excel_file_path = "/result/yesbackpage-florida-2024-02-23_21-25-01/RAW-yesbackpage-florida-2024-02-23_21-25-01.xlsx"
 
 # Making sure the path is absolute
 absolute_path = os.path.abspath(excel_file_path)

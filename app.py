@@ -4,8 +4,6 @@ gevent.monkey.patch_all()
 
 import threading
 import socket
-import time
-import os
 from flask import Flask
 from flask_socketio import SocketIO
 from flask_cors import CORS
@@ -139,141 +137,7 @@ scraper_manager = ScraperManager()
     Result Manager functions
     ---------------------------------
 '''
-
-def view_pdf(kwargs):
-    # Path to the directory you want to open
-    # Making sure the path is absolute
-    # Making sure the path is absolute
-    relative_path = kwargs['pdf_path']
-    print(relative_path)
-    full_path = "C:\\Users\\kskos\\PycharmProjects\\HSI_Back_Test3\\result\\" + relative_path
-
-    absolute_path = os.path.abspath(full_path)
-    try:
-        # Open the PDF file in the default application
-        webbrowser.open('file://' + absolute_path)
-        return 0
-    except Exception as e:
-        print(f"An error occurred: {e}")
-        return 1
-
-
-
-def view_ss_dir(kwargs):
-    # Making sure the path is absolute
-    relative_path = kwargs['ss_path']
-    print(relative_path)
-    full_path = "C:\\Users\\kskos\\PycharmProjects\\HSI_Back_Test3\\result\\" + relative_path
-
-    absolute_path = os.path.abspath(full_path)
-    print("open file path", absolute_path)
-
-    # Determine the platform and construct the command
-    if sys.platform.startswith('win32'):
-        # Windows: 'explorer' opens File Explorer
-        cmd = ['explorer', absolute_path]
-    elif sys.platform.startswith('darwin'):
-        # macOS: 'open' opens Finder
-        cmd = ['open', absolute_path]
-    elif sys.platform.startswith('linux'):
-        # Linux: 'xdg-open' opens the default file manager
-        cmd = ['xdg-open', absolute_path]
-    else:
-        raise OSError("Unsupported operating system")
-
-    # Execute the command to open the directory
-    subprocess.run(cmd, check=True, shell=sys.platform.startswith('win32'))
-
-def view_raw_data(kwargs):
-    # Making sure the path is absolute
-    # Making sure the path is absolute
-    relative_path = kwargs['raw_path']
-    print(relative_path)
-    full_path = "C:\\Users\\kskos\\PycharmProjects\\HSI_Back_Test3\\result\\" + relative_path
-
-    absolute_path = os.path.abspath(full_path)
-    print(absolute_path)
-
-    # Determine the platform and construct the command
-    if sys.platform.startswith('win32'):
-        # Windows
-        cmd = ['start', absolute_path]
-    elif sys.platform.startswith('darwin'):
-        # macOS
-        cmd = ['open', absolute_path]
-    elif sys.platform.startswith('linux'):
-        # Linux
-        cmd = ['xdg-open', absolute_path]
-    else:
-        raise OSError("Unsupported operating system")
-
-    # Execute the command to open the Excel file
-    try:
-        subprocess.run(cmd, check=True, shell=sys.platform.startswith('win32'))
-    except Exception as e:
-        print(f"An error occurred: {e}")
-
-
-def view_clean_data(kwargs):
-    # Making sure the path is absolute
-    # Making sure the path is absolute
-    relative_path = kwargs['clean_path']
-    full_path = "C:\\Users\\kskos\\PycharmProjects\\HSI_Back_Test3\\result\\" + relative_path
-
-    absolute_path = os.path.abspath(full_path)
-    print(absolute_path)
-
-    # Determine the platform and construct the command
-    if sys.platform.startswith('win32'):
-        # Windows
-        cmd = ['start', absolute_path]
-    elif sys.platform.startswith('darwin'):
-        # macOS
-        cmd = ['open', absolute_path]
-    elif sys.platform.startswith('linux'):
-        # Linux
-        cmd = ['xdg-open', absolute_path]
-    else:
-        raise OSError("Unsupported operating system")
-
-    # Execute the command to open the Excel file
-    try:
-        subprocess.run(cmd, check=True, shell=sys.platform.startswith('win32'))
-    except Exception as e:
-        print(f"An error occurred: {e}")
-
-def make_diagrams(kwargs):
-    print("")
-
-def view_diagram_dir(kwargs):
-    # Making sure the path is absolute
-    # Making sure the path is absolute
-    relative_path = kwargs['diagram_path']
-    print(relative_path)
-    full_path = "C:\\Users\\kskos\\PycharmProjects\\HSI_Back_Test3\\result\\" + relative_path
-
-    absolute_path = os.path.abspath(full_path)
-    print(absolute_path)
-
-    # Determine the platform and construct the command
-    if sys.platform.startswith('win32'):
-        # Windows: 'explorer' opens File Explorer
-        cmd = ['explorer', absolute_path]
-    elif sys.platform.startswith('darwin'):
-        # macOS: 'open' opens Finder
-        cmd = ['open', absolute_path]
-    elif sys.platform.startswith('linux'):
-        # Linux: 'xdg-open' opens the default file manager
-        cmd = ['xdg-open', absolute_path]
-    else:
-        raise OSError("Unsupported operating system")
-
-    # Execute the command to open the directory
-    try:
-        subprocess.run(cmd, check=True, shell=sys.platform.startswith('win32'))
-    except Exception as e:
-        print(f"An error occurred: {e}")
-
+resultManager = resultManager('C:\\Users\\kskos\\PycharmProjects\\HSI_Back_Test3\\result\\')
 
 '''
     ---------------------------------
@@ -319,28 +183,28 @@ def start_append(data):
 def open_PDF(data):
     socketio.emit('result_manager_update', {'status': 'view_pdf'})
     print(data)
-    response = view_pdf(data)
+    response = resultManager.view_pdf(data)
     return {'Response': response}
     
 @socketio.on('open_ss_dir')
 def open_ss_dir(data):
     socketio.emit('result_manager_update', {'status': 'view_SS_dir'})
     print(data)
-    response = view_ss_dir(data)
+    response = resultManager.view_ss_dir(data)
     return {'Response': response}
     
 @socketio.on('open_clean_data')
 def open_clean_data(data):
     socketio.emit('result_manager_update', {'status': 'view_clean_data'})
     print(data)
-    response = view_clean_data(data)
+    response = resultManager.view_clean_data(data)
     return {'Response': response}
     
 @socketio.on('open_raw_data')
 def open_raw_data(data):
     socketio.emit('result_manager_update', {'status': 'view_raw_data'})
     print(data)
-    response = view_raw_data(data)
+    response = resultManager.view_raw_data(data)
     print(response)
     return {'Response': response}
     
@@ -348,7 +212,7 @@ def open_raw_data(data):
 def open_diagram_dir(data):
     socketio.emit('result_manager_update', {'status': 'view_diagram_dir'})
     print(data)
-    response = view_diagram_dir(data)
+    response = resultManager.view_diagram_dir(data)
     return {'Response': response}  
 
 

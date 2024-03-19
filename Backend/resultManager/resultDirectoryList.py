@@ -16,7 +16,7 @@ def list_folders_in_directory_to_json(directory_path):
 
 
 # Specify the path to the directory you're interested in
-directory_path = "C:\\Users\\kskos\\PycharmProjects\\HSI_Back_Test3\\result"
+directory_path = "/result"
 
 # Get the folders in JSON format
 folders_json = list_folders_in_directory_to_json(directory_path)
