@@ -11,6 +11,10 @@ from flask_socketio import SocketIO
 from flask_cors import CORS
 from Backend.Scraper import MegapersonalsScraper, SkipthegamesScraper, YesbackpageScraper, EscortalligatorScraper, \
     ErosScraper, RubratingsScraper
+import subprocess
+import sys
+import os
+import webbrowser
 
 # pyinstaller app.py --onefile --name=NetSpiderServer --hidden-import gevent --hidden-import engineio.async_drivers.gevent --hidden-import pyimod02_importers
 
@@ -20,7 +24,7 @@ socketio = SocketIO(app, async_mode='gevent', cors_allowed_origins="*")
 
 '''
     ---------------------------------
-    Manage Scraper
+    Manage Scraper and threads
     ---------------------------------
 '''
 
@@ -129,18 +133,160 @@ class ScraperThread(threading.Thread):
 # Defining Scraper Manager Obj for managing scraper and its thread
 scraper_manager = ScraperManager()
 
+
+'''
+    ---------------------------------
+    Result Manager functions
+    ---------------------------------
+'''
+
+def view_pdf(kwargs):
+    # Path to the directory you want to open
+    # Making sure the path is absolute
+    # Making sure the path is absolute
+    relative_path = kwargs['pdf_path']
+    print(relative_path)
+    full_path = "C:\\Users\\kskos\\PycharmProjects\\HSI_Back_Test3\\result\\" + relative_path
+
+    absolute_path = os.path.abspath(full_path)
+    try:
+        # Open the PDF file in the default application
+        webbrowser.open('file://' + absolute_path)
+        return 0
+    except Exception as e:
+        print(f"An error occurred: {e}")
+        return 1
+
+
+
+def view_ss_dir(kwargs):
+    # Making sure the path is absolute
+    relative_path = kwargs['ss_path']
+    print(relative_path)
+    full_path = "C:\\Users\\kskos\\PycharmProjects\\HSI_Back_Test3\\result\\" + relative_path
+
+    absolute_path = os.path.abspath(full_path)
+    print("open file path", absolute_path)
+
+    # Determine the platform and construct the command
+    if sys.platform.startswith('win32'):
+        # Windows: 'explorer' opens File Explorer
+        cmd = ['explorer', absolute_path]
+    elif sys.platform.startswith('darwin'):
+        # macOS: 'open' opens Finder
+        cmd = ['open', absolute_path]
+    elif sys.platform.startswith('linux'):
+        # Linux: 'xdg-open' opens the default file manager
+        cmd = ['xdg-open', absolute_path]
+    else:
+        raise OSError("Unsupported operating system")
+
+    # Execute the command to open the directory
+    subprocess.run(cmd, check=True, shell=sys.platform.startswith('win32'))
+
+def view_raw_data(kwargs):
+    # Making sure the path is absolute
+    # Making sure the path is absolute
+    relative_path = kwargs['raw_path']
+    print(relative_path)
+    full_path = "C:\\Users\\kskos\\PycharmProjects\\HSI_Back_Test3\\result\\" + relative_path
+
+    absolute_path = os.path.abspath(full_path)
+    print(absolute_path)
+
+    # Determine the platform and construct the command
+    if sys.platform.startswith('win32'):
+        # Windows
+        cmd = ['start', absolute_path]
+    elif sys.platform.startswith('darwin'):
+        # macOS
+        cmd = ['open', absolute_path]
+    elif sys.platform.startswith('linux'):
+        # Linux
+        cmd = ['xdg-open', absolute_path]
+    else:
+        raise OSError("Unsupported operating system")
+
+    # Execute the command to open the Excel file
+    try:
+        subprocess.run(cmd, check=True, shell=sys.platform.startswith('win32'))
+    except Exception as e:
+        print(f"An error occurred: {e}")
+
+
+def view_clean_data(kwargs):
+    # Making sure the path is absolute
+    # Making sure the path is absolute
+    relative_path = kwargs['clean_path']
+    full_path = "C:\\Users\\kskos\\PycharmProjects\\HSI_Back_Test3\\result\\" + relative_path
+
+    absolute_path = os.path.abspath(full_path)
+    print(absolute_path)
+
+    # Determine the platform and construct the command
+    if sys.platform.startswith('win32'):
+        # Windows
+        cmd = ['start', absolute_path]
+    elif sys.platform.startswith('darwin'):
+        # macOS
+        cmd = ['open', absolute_path]
+    elif sys.platform.startswith('linux'):
+        # Linux
+        cmd = ['xdg-open', absolute_path]
+    else:
+        raise OSError("Unsupported operating system")
+
+    # Execute the command to open the Excel file
+    try:
+        subprocess.run(cmd, check=True, shell=sys.platform.startswith('win32'))
+    except Exception as e:
+        print(f"An error occurred: {e}")
+
+def make_diagrams(kwargs):
+    print("")
+
+def view_diagram_dir(kwargs):
+    # Making sure the path is absolute
+    # Making sure the path is absolute
+    relative_path = kwargs['diagram_path']
+    print(relative_path)
+    full_path = "C:\\Users\\kskos\\PycharmProjects\\HSI_Back_Test3\\result\\" + relative_path
+
+    absolute_path = os.path.abspath(full_path)
+    print(absolute_path)
+
+    # Determine the platform and construct the command
+    if sys.platform.startswith('win32'):
+        # Windows: 'explorer' opens File Explorer
+        cmd = ['explorer', absolute_path]
+    elif sys.platform.startswith('darwin'):
+        # macOS: 'open' opens Finder
+        cmd = ['open', absolute_path]
+    elif sys.platform.startswith('linux'):
+        # Linux: 'xdg-open' opens the default file manager
+        cmd = ['xdg-open', absolute_path]
+    else:
+        raise OSError("Unsupported operating system")
+
+    # Execute the command to open the directory
+    try:
+        subprocess.run(cmd, check=True, shell=sys.platform.startswith('win32'))
+    except Exception as e:
+        print(f"An error occurred: {e}")
+
+
 '''
     ---------------------------------
     Socket Routes
     ---------------------------------
 '''
 
-
+# Connection Manager Sockets
 @socketio.on('connection')
 def connected():
     print("connected")
 
-
+# Scraper Manager Sockets
 @socketio.on('scraper_status')
 def get_status():
     scraper_manager.get_scraper_status()
@@ -161,6 +307,52 @@ def stop_scraper():
     return {'Response': response}
 
 
+# Result Manager Sockets
+@socketio.on('start_append')
+def start_append(data):
+    socketio.emit('result_manager_update', {'status': 'appending'})
+    print(data)
+    response = 0
+    return {'Response': response}
+    
+@socketio.on('open_PDF')
+def open_PDF(data):
+    socketio.emit('result_manager_update', {'status': 'view_pdf'})
+    print(data)
+    response = view_pdf(data)
+    return {'Response': response}
+    
+@socketio.on('open_ss_dir')
+def open_ss_dir(data):
+    socketio.emit('result_manager_update', {'status': 'view_SS_dir'})
+    print(data)
+    response = view_ss_dir(data)
+    return {'Response': response}
+    
+@socketio.on('open_clean_data')
+def open_clean_data(data):
+    socketio.emit('result_manager_update', {'status': 'view_clean_data'})
+    print(data)
+    response = view_clean_data(data)
+    return {'Response': response}
+    
+@socketio.on('open_raw_data')
+def open_raw_data(data):
+    socketio.emit('result_manager_update', {'status': 'view_raw_data'})
+    print(data)
+    response = view_raw_data(data)
+    print(response)
+    return {'Response': response}
+    
+@socketio.on('open_diagram_dir')
+def open_diagram_dir(data):
+    socketio.emit('result_manager_update', {'status': 'view_diagram_dir'})
+    print(data)
+    response = view_diagram_dir(data)
+    return {'Response': response}  
+
+
+
 @socketio.on_error_default
 def handle_error(e):
     print(f"An error occurred: {str(e)}")
@@ -177,7 +369,7 @@ def handle_error(e):
 
 
 def write_open_ports(ports):
-    with open('C:\\Users\\Zach\\WebstormProjects\\NetspiderHSI\\open_ports.txt', 'w') as file:
+    with open('C:\\Users\\kskos\\PycharmProjects\\HSI_Back_Test3\\open_ports.txt', 'w') as file:
         for port in ports:
             file.write(str(port) + '\n')
 
@@ -211,5 +403,5 @@ if __name__ == "__main__":
 
     # Use the open ports as needed in the rest of your program
     # Note: You may want to handle the case where `open_ports` is an empty list.
-    socketio.run(app, host='127.0.0.1', port=open_ports[0],
+    socketio.run(app, host='127.0.0.1', port=3030,
                  allow_unsafe_werkzeug=True)

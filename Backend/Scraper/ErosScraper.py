@@ -120,12 +120,12 @@ class ErosScraper(ScraperPrototype):
         links = self.get_links()
 
         # Create directory for search data
-        self.scraper_directory = f'{self.path}/eros-{self.date_time}-{self.date_time}'
+        self.scraper_directory = f'{self.path}/eros-{self.city}-{self.date_time}'
         os.mkdir(self.scraper_directory)
 
         # Create directory for search screenshots
         self.screenshot_directory = f'{self.scraper_directory}/screenshots'
-        self.pdf_filename = f'{self.screenshot_directory}/eros-{self.date_time}-{self.date_time}.pdf'
+        self.pdf_filename = f'{self.screenshot_directory}/eros-{self.city}-{self.date_time}.pdf'
         os.mkdir(self.screenshot_directory)
 
         # Get data from posts
@@ -382,7 +382,7 @@ class ErosScraper(ScraperPrototype):
 
         data = pd.DataFrame(titled_columns)
         with pd.ExcelWriter(
-                f'{self.scraper_directory}/RAW-eros-{self.date_time}-{self.date_time}.xlsx',
+                f'{self.scraper_directory}/RAW-eros-{self.city}-{self.date_time}.xlsx',
                 engine='openpyxl') as writer:
             data.to_excel(writer, index=False)
             worksheet = writer.sheets['Sheet1']
@@ -446,7 +446,7 @@ class ErosScraper(ScraperPrototype):
         })
         data = pd.DataFrame(titled_columns)
         with pd.ExcelWriter(
-                f'{self.scraper_directory}/CLEAN-eros-{self.date_time}-{self.date_time}.xlsx',
+                f'{self.scraper_directory}/CLEAN-eros-{self.city}-{self.date_time}.xlsx',
                 engine='openpyxl') as writer:
             data.to_excel(writer, index=False)
             worksheet = writer.sheets['Sheet1']
