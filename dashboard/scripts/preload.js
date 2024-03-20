@@ -23,6 +23,32 @@ contextBridge.exposeInMainWorld('socket', {
     },
 });
 
+contextBridge.exposeInMainWorld('electronPath', {
+    join: (...args) => path.join(...args)
+});
+
+contextBridge.exposeInMainWorld('nodePaths', {
+    __dirname: __dirname,
+    // You can also expose other Node.js path functionalities as needed
+});
+
+contextBridge.exposeInMainWorld('electronAPI', {
+    readJson: (filePath) => new Promise((resolve, reject) => {
+        fs.readFile(filePath, 'utf8', (err, data) => {
+            if (err) {
+                reject(err);
+                return;
+            }
+            try {
+                const jsonData = JSON.parse(data);
+                resolve(jsonData);
+            } catch (parseErr) {
+                reject(parseErr);
+            }
+        });
+    })
+});
+
 contextBridge.exposeInMainWorld('editFile', {
     addKeywordToFile: (keywordsFile, keyword) => {
         fs.appendFile(keywordsFile, '\n' + keyword, (err) => {
@@ -173,5 +199,7 @@ contextBridge.exposeInMainWorld('editFile', {
                 console.error('Error opening folder:', error);
             });
     }
+
+
 
 });

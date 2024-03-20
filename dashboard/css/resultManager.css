@@ -1,0 +1,139 @@
+#listContainer {
+  width: 700px; /* Adjust the width as needed */
+  height: 500px; /* Adjust the height as needed */
+  overflow-y: auto; /* Enables vertical scrolling if content overflows */
+  border: 1px solid #ccc; /* Optional: adds a border around the container */
+  padding: 5px; /* Optional: adds some padding inside the container */
+}
+
+/* Control Buttons */
+#controlButtons {
+  display: flex;
+  justify-content: start;
+  gap: 10px; /* Adjust the gap between buttons */
+}
+
+#appendButtons {
+  display: flex;
+  justify-content: start;
+  gap: 10px; /* Adjust the gap between buttons */
+  margin-bottom: 1%; /* Optional: adds some space between the buttons and the list */
+
+}
+/* Optional: Additional styling for buttons to make them uniform in size */
+#appendButtons.button {
+  padding: 5px 10px; /* Reduced vertical padding */
+  font-size: 0.8rem; /* Adjust as needed */
+  line-height: 1; /* Reducing line-height can decrease button height */
+  border: 1px solid #ccc; /* Adjust border as needed, or remove it */
+  margin: 0; /* Ensures no additional space around the buttons */
+  box-sizing: border-box; /* Ensures padding and border are included in total height */
+}
+/* Layout for list and buttons */
+#contentContainer {
+  margin-top: 25px;
+  display: flex;
+  justify-content: space-between;
+}
+
+#listSection {
+  flex: 1; /* Allows the list section to fill available space */
+}
+
+
+#buttonArea {
+  margin-top: 20%; /* Adjust the value to lower the grid as needed */
+
+  height: fit-content; /* Adjust the height of the grid container to fit its content */
+  width: fit-content; /* Adjust the width of the grid container to fit its content */
+  padding-left: 20px; /* Adds some space between the list and the grid */
+}
+
+#listSection.selected {
+  background-color: #f0f0f0; /* Light grey background */
+  color: #000; /* Change text color if needed */
+  /* Add more styles as needed */
+}
+
+n.hidden {
+  display: none;
+}
+
+
+
+.result-list-col {
+  flex: 1;
+  margin: 30px; /* Increased margin */
+  margin-top: 0%;
+  padding: 30px; /* Increased padding */
+  padding-top: 0;
+  width: 99%;
+  height: 90%;
+  box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1); /* Improved box shadow */;
+  transition: transform 1.5s, box-shadow 1.5s;
+}
+
+.result-button-col {
+  flex: 1;
+  margin-left: 175px;
+  margin-top: 0%;
+  padding: 30px; /* Increased padding */
+  padding-top: 0;
+  width: 50%;
+  height: 90%;
+  box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1); /* Improved box shadow */;
+  transition: transform 1.5s, box-shadow 1.5s;
+}
+
+.result-list-col:hover {
+  box-shadow: 0 8px 16px rgba(0, 0, 0, 0.2);
+  transform: scale(1.05);
+}
+
+.result-button-col:hover {
+  box-shadow: 0 8px 16px rgba(0, 0, 0, 0.2);
+  transform: scale(1.05);
+}
+
+.button-result-ops {
+  display: block;
+  padding: 15px 30px; /* Increased padding for bigger buttons */
+  margin: 10px 0; /* Add space between buttons */
+  font-size: 20px; /* Increased font size */
+  color: #fff;
+  height: 13%;
+  width: 95%;
+  border: 2px solid #09558B;
+  border-radius: 8px;
+  background-color: #09558B;
+  transition: background-color 0.3s, color 0.3s, border-color 0.3s;
+  box-shadow: 0 6px 8px 0 rgba(0,0,0,0.24),0 8.5px 25px 0 rgba(0,0,0,0.19);
+  cursor: pointer;
+}
+
+.button-result-ops:hover {
+  transform: scale(1.05);
+  box-shadow: 0 8px 16px rgba(0, 0, 0, 0.2);
+}
+
+.button-app-sub {
+  display: block;
+  padding: 15px 30px; /* Increased padding for bigger buttons */
+  margin: 10px 0; /* Add space between buttons */
+  font-size: 20px; /* Increased font size */
+  height: 13%;
+  width: 50%;
+  border: 2px solid #09558B;
+  background-color: #09558B;
+  border-radius: 8px;
+  color: #fff;
+  transition: background-color 0.3s, color 0.3s, border-color 0.3s;
+  box-shadow: 0 6px 8px 0 rgba(0,0,0,0.24),0 8.5px 25px 0 rgba(0,0,0,0.19);
+  cursor: pointer;
+}
+
+.button-app-sub:hover {
+  transform: scale(1.05);
+  box-shadow: 0 8px 16px rgba(0, 0, 0, 0.2);
+}
+

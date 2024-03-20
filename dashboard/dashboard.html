@@ -14,6 +14,7 @@
     <link rel="stylesheet" href="css/website.css">
     <link rel="stylesheet" href="css/editKeywords.css">
     <link rel="stylesheet" href="css/selectKeywords.css">
+    <link rel="stylesheet" href="css/resultManager.css">
 
     
     <script src="scripts/files.js" defer></script>
@@ -181,6 +182,36 @@
                 <button onclick="location.href='NetSpider_user_manual_v1.1.pdf'" class="button-hp" target="_blank">Developers Guide</button>
                 <button onclick="location.href='https://mit-license.org/'" class="button-hp" target="_blank">Licensing Agreement</button>
         </div>
+
+        <div id="big-box-2">
+            <div id="box-header">
+                <h2><img src="./icons/box-archive-solid.svg" class="icon"/>Result Manager</h2>
+            </div>
+            <div class = "result-list-col">
+                <div id="contentContainer"> <!-- Container to hold both the list and the grid of buttons -->
+                    <div id="listSection"> <!-- Section for the list -->
+
+                        <div id="listContainer">
+                            <ol id="list"></ol>
+                        </div>
+                        <div id="appendButtons">
+                            <button id="appendButton" class="button-app-sub">Append</button> <!-- Removed space from ID for better practice -->
+                            <button id="submitButton" class="button-app-sub">Submit</button> <!-- Removed space from ID for better practice -->
+                        </div>
+                    </div>
+                </div>
+            </div>
+            <div class = "result-button-col">
+                <div id="buttonArea"> <!-- Grid for 6 buttons -->
+                    <button id="viewPdfButton" class="button-result-ops">View PDF</button>
+                    <button id="viewSsButton" class="button-result-ops">View Screenshot Directory</button>
+                    <button id="viewRawDataButton" class="button-result-ops">View RAW Data</button>
+                    <button id="viewCleanDataButton" class="button-result-ops">View CLEAN Data</button>
+                    <button id="viewDiagramButton" class="button-result-ops">View Diagram Directory</button>
+<!--                    <button id="generateKeywordsButton" class="button-hp">Generate New Keywords</button>-->
+                </div>
+            </div>
+        </div>
     </div>
 </div>
 
@@ -254,5 +285,8 @@
         document.getElementById("settings-link").focus();
     }
 </script>
+
+<script src="scripts/resultManager.js"></script>
+
 </body>
 </html>
