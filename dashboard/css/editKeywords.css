@@ -35,22 +35,6 @@
     height:  fit-content;
 }
 
-#header-keywords {
-    margin: 0;
-    border: 2px solid #ddd; /* Increased border width */
-    padding: 10px;
-    background-color: #fff;
-    text-align: center;
-    width: 80%;
-    border-radius: 7px;
-    box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
-    transition: transform 0.3s, box-shadow 0.3s;
-    grid-column: span 2;
-}
-
-#header-keywords h2 {
-    margin: 0;
-}
 
 .create-set-btn{
     width: 100%;

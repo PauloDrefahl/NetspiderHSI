@@ -79,7 +79,7 @@ body {
     margin-bottom: 20px;
 }
 
-/* Big box hover effect */
+/* Hover effects */
 .column:hover {
     box-shadow: 0 8px 16px rgba(0, 0, 0, 0.2);
     transform: scale(1.05);
@@ -93,6 +93,11 @@ body {
 
 /* Add this CSS for the big box hover effect */
 #big-box.hover-effect {
+    box-shadow: 0 8px 16px rgba(0, 0, 0, 0.2); /* Enhanced box shadow on hover */
+    transform: scale(1.05);
+}
+
+#big-box-2.hover-effect {
     box-shadow: 0 8px 16px rgba(0, 0, 0, 0.2); /* Enhanced box shadow on hover */
     transform: scale(1.05);
 }
