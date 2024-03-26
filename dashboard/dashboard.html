@@ -56,7 +56,7 @@
         <div class="box" id="folder-box">
             <h2><img src="./icons/folder-open-regular.svg" class="icon"/> Select Results Folder</h2>
             <input class="file-input" type="file" id="folderInput" webkitdirectory directory multiple style="display: none;">
-            <button class="selecet-folder" id="folder-input-btn" onclick="selectFolder()">Select Folder</button>
+            <button class="selecet-folder" id="folder-input-btn" >Select Folder</button>
         </div>
         <!-- Big box under the three existing boxes -->
         <div id="big-box">
@@ -221,23 +221,23 @@
 
 
 <script>
-    function selectFolder() {
-            document.getElementById('folderInput').click();
-        }
-
-        function handleFolderSelection(event) {
-            const files = event.target.files;
-            if (files.length > 0) {
-                const folderName = files[0].webkitRelativePath.split('/')[0];
-                let button = document.getElementById('folder-input-btn');
-                button.textContent = "Netspider/" + folderName;  
-            }
-        }
-
-        // Add event listener after the DOM has loaded
-        window.onload = function() {
-            document.getElementById('folderInput').addEventListener('change', handleFolderSelection);
-        };
+    // function selectFolder() {
+    //         document.getElementById('folderInput').click();
+    //     }
+    //
+    //     function handleFolderSelection(event) {
+    //         const files = event.target.files;
+    //         if (files.length > 0) {
+    //             const folderName = files[0].webkitRelativePath.split('/')[0];
+    //             let button = document.getElementById('folder-input-btn');
+    //             button.textContent = "Netspider/" + folderName;
+    //         }
+    //     }
+    //
+    //     // Add event listener after the DOM has loaded
+    //     window.onload = function() {
+    //         document.getElementById('folderInput').addEventListener('change', handleFolderSelection);
+    //     };
     // $(document).ready(function() {
     //     $('#itemList').on('mousedown', 'option', function(e) {
     //         e.preventDefault();

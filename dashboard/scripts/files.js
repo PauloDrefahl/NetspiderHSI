@@ -135,7 +135,17 @@ function addOptionKeyset(keysets) {
 
 document.addEventListener("DOMContentLoaded", function (){
     const openResultsFolderButton = document.getElementById('open-results-folder-btn');
+    const resultsFolderButton = document.getElementById('folder-input-btn');
     openResultsFolderButton.addEventListener('click', function () {
-       window.editFile.openResults('C:\\Users\\Zach\\PycharmProjects\\NetSpiderHSI\\result')
+       window.editFile.openResults(resultFolder);
     });
+
+    resultsFolderButton.addEventListener('click', function () {
+       window.socket.emit('set_result_dir');
+    });
+
+    window.socket.on('result_folder_selected', (result_folder) => {
+        console.log("Result Folder selected:", result_folder);
+        resultFolder = result_folder;
+    })
 })
