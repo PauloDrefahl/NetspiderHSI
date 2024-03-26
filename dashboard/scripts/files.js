@@ -1,6 +1,7 @@
 let keywordsFile = ''
 let keywordsSetFile = ''
 let resultFolder = ''
+window.resultManager = undefined;
 
 document.addEventListener("DOMContentLoaded", function () {
     const fileInputs = document.querySelectorAll('.file-input');
@@ -147,5 +148,6 @@ document.addEventListener("DOMContentLoaded", function (){
     window.socket.on('result_folder_selected', (result_folder) => {
         console.log("Result Folder selected:", result_folder);
         resultFolder = result_folder;
+        window.resultManager.updateFoldersJSON(resultFolder).then(r => r);
     })
 })

@@ -1,6 +1,3 @@
-const fs = require('fs').promises;
-const chokidar = require('chokidar');
-const util = require('util');
 const { app, BrowserWindow} = require('electron');
 const path = require('path');
 const { execFile, exec } = require('child_process');
@@ -50,7 +47,7 @@ const createWindow = () => {
     });
 
     // and load the index.html of the app.
-    mainWindow.loadFile(path.join(__dirname, 'index.html'));
+    mainWindow.loadFile(path.join(__dirname, 'index.html')).then(r => r);
 };
 
 
@@ -73,7 +70,7 @@ app.on('window-all-closed', () => {
     }
 });
 
-const directoryPath = 'C:\\Users\\kskos\\PycharmProjects\\HSI_Back_Test3\\result';
+// const directoryPath = 'C:\\Users\\kskos\\PycharmProjects\\HSI_Back_Test3\\result';
 // Read directory and filter out files, keeping only directories
 /*fs.readdir(directoryPath, { withFileTypes: true }, (err, files) => {
     if (err) {
@@ -98,52 +95,6 @@ const directoryPath = 'C:\\Users\\kskos\\PycharmProjects\\HSI_Back_Test3\\result
         console.log('Folders list saved to folders.json');
     });
 });*/
-
-// Function to read directory and write folders.json
-async function updateFoldersJson() {
-    try {
-        const files = await fs.readdir(directoryPath, { withFileTypes: true });
-        const folders = files.filter(file => file.isDirectory()).map(folder => folder.name);
-
-        // sort the folders into alphanumerical order
-        folders.sort((a, b) => a.localeCompare(b, undefined, { numeric: true, sensitivity: 'base' }));
-
-        const jsonFolders = JSON.stringify(folders, null, 2);
-        console.log(jsonFolders);
-        await fs.writeFile('folders.json', jsonFolders);
-        console.log('Folders list updated in folders.json');
-    } catch (err) {
-        console.error('Error accessing the directory or writing to file', err);
-    }
-}
-
-// Initial update
-updateFoldersJson();
-
-// Watch the directory for changes using chokidar
-const watcher = chokidar.watch(directoryPath, {
-    ignored: /^\./, // ignore dotfiles
-    persistent: true,
-    ignoreInitial: false, // Do not fire add events when starting
-});
-
-// Add event listeners for add, change, and unlink
-watcher
-    .on('addDir', path => {
-        console.log(`Directory ${path} has been added`);
-        updateFoldersJson();
-        // Trigger a reload of the current page
-
-    })
-    .on('unlinkDir', path => {
-        console.log(`Directory ${path} has been removed`);
-        updateFoldersJson();
-        // Trigger a reload of the current page
-
-    })
-    .on('error', error => console.error(`Watcher error: ${error}`))
-    .on('ready', () => console.log('Initial scan complete. Ready for changes'));
-
 
 //kill all NetSpiderServer processes
 // app.on('before-quit', async () => {
