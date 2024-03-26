@@ -11,6 +11,7 @@ from Backend.Scraper import MegapersonalsScraper, SkipthegamesScraper, Yesbackpa
     ErosScraper, RubratingsScraper
 from Backend.resultManager.appendResults import FileAppender
 from Backend.resultManager.resultManager import resultManager
+from PyQt5.QtWidgets import QFileDialog, QApplication
 import subprocess
 import sys
 import os
@@ -19,6 +20,7 @@ import webbrowser
 # pyinstaller app.py --onefile --name=NetSpiderServer --hidden-import gevent --hidden-import engineio.async_drivers.gevent --hidden-import pyimod02_importers
 
 app = Flask(__name__)
+qt_app = QApplication([])
 CORS(app)
 socketio = SocketIO(app, async_mode='gevent', cors_allowed_origins="*")
 
@@ -133,7 +135,6 @@ class ScraperThread(threading.Thread):
 # Defining Scraper Manager Obj for managing scraper and its thread
 scraper_manager = ScraperManager()
 
-
 '''
     ---------------------------------
     Result Manager functions
@@ -147,10 +148,12 @@ resultManager = resultManager('C:\\Users\\kskos\\PycharmProjects\\HSI_Back_Test3
     ---------------------------------
 '''
 
+
 # Connection Manager Sockets
 @socketio.on('connection')
 def connected():
     print("connected")
+
 
 # Scraper Manager Sockets
 @socketio.on('scraper_status')
@@ -184,28 +187,32 @@ def start_append(data):
     file_appender.save_data()
     response = 0
     return {'Response': response}
-    
+
+
 @socketio.on('open_PDF')
 def open_PDF(data):
     socketio.emit('result_manager_update', {'status': 'view_pdf'})
     print(data)
     response = resultManager.view_pdf(data)
     return {'Response': response}
-    
+
+
 @socketio.on('open_ss_dir')
 def open_ss_dir(data):
     socketio.emit('result_manager_update', {'status': 'view_SS_dir'})
     print(data)
     response = resultManager.view_ss_dir(data)
     return {'Response': response}
-    
+
+
 @socketio.on('open_clean_data')
 def open_clean_data(data):
     socketio.emit('result_manager_update', {'status': 'view_clean_data'})
     print(data)
     response = resultManager.view_clean_data(data)
     return {'Response': response}
-    
+
+
 @socketio.on('open_raw_data')
 def open_raw_data(data):
     socketio.emit('result_manager_update', {'status': 'view_raw_data'})
@@ -213,14 +220,24 @@ def open_raw_data(data):
     response = resultManager.view_raw_data(data)
     print(response)
     return {'Response': response}
-    
+
+
 @socketio.on('open_diagram_dir')
 def open_diagram_dir(data):
     socketio.emit('result_manager_update', {'status': 'view_diagram_dir'})
     print(data)
     response = resultManager.view_diagram_dir(data)
-    return {'Response': response}  
+    return {'Response': response}
 
+
+@socketio.on('set_result_dir')
+def set_result_dir():
+    print("Selecting result directory")
+    directory = QFileDialog.getExistingDirectory(None, "Select Directory", os.getcwd())
+    if directory:
+        print("Selected Directory: ", directory)
+        result_dir = os.path.join(os.getcwd(), directory)
+        socketio.emit('result_folder_selected', result_dir)
 
 
 @socketio.on_error_default
@@ -239,7 +256,7 @@ def handle_error(e):
 
 
 def write_open_ports(ports):
-    with open('C:\\Users\\kskos\\PycharmProjects\\HSI_Back_Test3\\open_ports.txt', 'w') as file:
+    with open('C:\\Users\\Zach\\WebstormProjects\\NetspiderHSI\\open_ports.txt', 'w') as file:
         for port in ports:
             file.write(str(port) + '\n')
 
@@ -273,5 +290,5 @@ if __name__ == "__main__":
 
     # Use the open ports as needed in the rest of your program
     # Note: You may want to handle the case where `open_ports` is an empty list.
-    socketio.run(app, host='127.0.0.1', port=3030,
+    socketio.run(app, host='127.0.0.1', port=open_ports[0],
                  allow_unsafe_werkzeug=True)
