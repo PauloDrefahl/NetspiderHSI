@@ -77,7 +77,7 @@ function StartScraper() {
         search_text: searchText.innerText,
         payment_methods_only: paymentSearch.checked,
         inclusive_search: inclusiveSearch.checked,
-        path: 'C:\\Users\\Zach\\PycharmProjects\\NetSpiderHSI\\result'
+        path: resultFolder
     };
     window.socket.emit('start_scraper', data);
     console.log("emitted data", data);

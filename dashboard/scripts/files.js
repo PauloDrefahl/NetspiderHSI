@@ -2,6 +2,7 @@ let keywordsFile = ''
 let keywordsSetFile = ''
 let resultFolder = ''
 window.resultManager = undefined;
+window.electronAPI = undefined;
 
 document.addEventListener("DOMContentLoaded", function () {
     const fileInputs = document.querySelectorAll('.file-input');
@@ -134,20 +135,58 @@ function addOptionKeyset(keysets) {
     document.querySelector('.dropdown-content-keyset').appendChild(option2);
 }
 
-document.addEventListener("DOMContentLoaded", function (){
+document.addEventListener("DOMContentLoaded", function () {
     const openResultsFolderButton = document.getElementById('open-results-folder-btn');
     const resultsFolderButton = document.getElementById('folder-input-btn');
     openResultsFolderButton.addEventListener('click', function () {
-       window.editFile.openResults(resultFolder);
+        window.editFile.openResults(resultFolder);
     });
 
     resultsFolderButton.addEventListener('click', function () {
-       window.socket.emit('set_result_dir');
+        window.socket.emit('set_result_dir');
     });
 
-    window.socket.on('result_folder_selected', (result_folder) => {
+    window.socket.on('result_folder_selected', async (result_folder) => {
         console.log("Result Folder selected:", result_folder);
         resultFolder = result_folder;
-        window.resultManager.updateFoldersJSON(resultFolder).then(r => r);
-    })
-})
+        try {
+            await window.resultManager.updateFoldersJSON(resultFolder);
+            let dataPath = "folders.json";
+            console.log(dataPath);
+            const jsonData = await window.electronAPI.readJson(dataPath);
+            if (Array.isArray(jsonData) && jsonData.length > 0) {
+                console.log('JSON data:', jsonData);
+                let selectedItemContent = '';
+
+                const listElement = document.getElementById('list'); // Assuming you have an element with id 'list' for the list
+
+                jsonData.forEach(item => {
+                    const listItem = document.createElement('li');
+                    listItem.textContent = item;
+                    listElement.appendChild(listItem);
+
+                    // Add click event listener to this list item
+                    listItem.addEventListener('click', function () {
+
+                        // Update the selectedItemContent variable with this item's content
+                        selectedItemContent = this.textContent;
+
+                        // Optionally, highlight the selected item
+                        // First, remove highlight from all items
+                        document.querySelectorAll('#list li').forEach(li => {
+                            li.classList.remove('selected'); // Assuming 'selected' is a class that styles the selected item
+                        });
+
+                        // Then, add the highlight class to the clicked item
+                        this.classList.add('selected');
+                        console.log(selectedItemContent); // For demonstration: log the selected item content
+                    });
+                });
+            } else {
+                console.error('Error: JSON data is empty or not in expected format');
+            }
+        } catch (error) {
+            console.error('Error processing result folder:', error);
+        }
+    });
+});

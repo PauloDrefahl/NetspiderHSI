@@ -1,42 +1,7 @@
 // Assuming data.json is in the same directory as your main script
 //const dataPath = window.electronPath.join(window.nodePaths.__dirname, 'folders.json');
-dataPath = "folders.json"
-console.log(dataPath);
+
 //const jsonData = JSON.parse(fs.readFileSync(dataPath, 'utf8'));
-
-// List element is global, so it can be accessed from anywhere in the script
-const listElement = document.getElementById('list');
-
-// Function to read the JSON file and populate the list //
-window.electronAPI.readJson(dataPath).then((jsonData) => {
-    console.log('JSON data:', jsonData);
-    let selectedItemContent = '';
-
-    jsonData.forEach(item => {
-        const listItem = document.createElement('li');
-        listItem.textContent = item;
-        listElement.appendChild(listItem);
-
-        // Add click event listener to this list item
-        listItem.addEventListener('click', function () {
-
-            // Update the selectedItemContent variable with this item's content
-            selectedItemContent = this.textContent;
-
-            // Optionally, highlight the selected item
-            // First, remove highlight from all items
-            document.querySelectorAll('#list li').forEach(li => {
-                li.classList.remove('selected'); // Assuming 'selected' is a class that styles the selected item
-            });
-
-            // Then, add the highlight class to the clicked item
-            this.classList.add('selected');
-            console.log(selectedItemContent); // For demonstration: log the selected item content
-        });
-    });
-}).catch((error) => {
-    console.error('Error reading JSON file:', error);
-});
 
 document.addEventListener('DOMContentLoaded', () => {
     // toggle multiple selection mode //
