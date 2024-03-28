@@ -4,16 +4,83 @@
 //const jsonData = JSON.parse(fs.readFileSync(dataPath, 'utf8'));
 
 document.addEventListener('DOMContentLoaded', () => {
+
+    const open_PDF = async (path) => {
+        console.log("emitting open_PDF event");
+
+        const data = {
+            pdf_path: path
+        };
+
+        window.socket.emit('open_PDF', data);
+        console.log("emitted data");
+    };
+
+    const open_ss_dir = async (path) => {
+        console.log("emitting view ss dir event");
+
+        const data = {
+            ss_path: path
+        };
+
+        window.socket.emit('open_ss_dir', data);
+        console.log("emitted data");
+    };
+
+    const open_raw_data = async (path) => {
+        console.log("emitting view ss dir event");
+        const data = {
+            raw_path: path
+        };
+
+        window.socket.emit('open_raw_data', data);
+        console.log("emitted data");
+    };
+
+    const open_clean_data = async (path) => {
+        console.log("emitting view clean data event");
+        const data = {
+            clean_path: path
+        };
+
+        window.socket.emit('open_clean_data', data);
+        console.log("emitted data");
+    };
+
+    const open_diagram_dir = async (path) => {
+        console.log("emitting view diagram event");
+        const data = {
+            diagram_path: path
+        };
+
+        window.socket.emit('open_diagram_dir', data);
+        console.log("emitted data");
+    };
+
+    const generate_keywords = async (path) => {
+        console.log("emitting view generate keywords event");
+        path = selectedItems[0].textContent + "\\keywords\\Keywords.txt";
+        const data = {
+            gen_key_path: path
+        };
+
+        window.socket.emit('', data);
+        console.log("emitted data");
+    };
+
+    const append_results = async (paths) => {
+        console.log("emitting view generate keywords event");
+
+        window.socket.emit('start_append', paths);
+        console.log("emitted data");
+    };
+
     // toggle multiple selection mode //
     let multipleSelectionEnabled = false; // Flag to track selection mode
     const selectedItems = []; // Store selected items
 
-    const submitButton = document.getElementById('submitButton');
-    if (multipleSelectionEnabled) {
-        submitButton.classList.remove('hidden');
-    } else {
-        submitButton.classList.add('hidden');
-    }
+    // update button visasbility
+    updateSubmitButtonVisibility();
 
     document.getElementById('submitButton').addEventListener('click', function () {
         // Check if multiple selection mode is enabled
@@ -50,12 +117,7 @@ document.addEventListener('DOMContentLoaded', () => {
         updateButtonGridState();
 
         // Hide the Submit button
-        const submitButton = document.getElementById('submitButton');
-        if (multipleSelectionEnabled) {
-            submitButton.classList.remove('hidden');
-        } else {
-            submitButton.classList.add('hidden');
-        }
+        updateSubmitButtonVisibility();
 
     });
 
@@ -73,24 +135,18 @@ document.addEventListener('DOMContentLoaded', () => {
 
     // Handle the Append button click //
     document.getElementById('appendButton').addEventListener('click', function () {
+
         multipleSelectionEnabled = !multipleSelectionEnabled; // Toggle selection mode
-        // Optionally, update the UI to indicate the current mode
+
+        // update the UI to indicate the current mode
         this.textContent = multipleSelectionEnabled ? "Cancel" : "Append";
         console.log("Mode:", multipleSelectionEnabled ? "Multiple Selection" : "Single Selection");
 
-        // Toggle the disabled state of the button grid buttons based on the mode
-        const buttonGridButtons = document.querySelectorAll('#buttonGrid button');
-        buttonGridButtons.forEach(button => {
-            button.disabled = multipleSelectionEnabled; // Disable buttons in multiple selection mode
-        });
+        // Update submit button visibility
+        updateSubmitButtonVisibility();
 
-        // Show the Submit button in multiple selection mode, hide it in single selection mode
-        const submitButton = document.getElementById('submitButton');
-        if (multipleSelectionEnabled) {
-            submitButton.classList.remove('hidden');
-        } else {
-            submitButton.classList.add('hidden');
-        }
+        // Update the button grid state to ensure it's disabled if no items are selected
+        updateButtonGridState();
 
         // If switching to single selection mode, clear all but the last selected item
         if (!multipleSelectionEnabled && selectedItems.length > 1) {
@@ -194,6 +250,15 @@ document.addEventListener('DOMContentLoaded', () => {
         updateButtonGridState();
     }
 
+    function updateSubmitButtonVisibility() {
+        const submitButton = document.getElementById('submitButton');
+        if (multipleSelectionEnabled) {
+            submitButton.classList.remove('hidden');
+        } else {
+            submitButton.classList.add('hidden');
+        }
+    }
+
     /*
       function logSelectedItems(actionMessage, pathExtension = "\\") {
         if (multipleSelectionEnabled && selectedItems.length > 0) {
@@ -212,87 +277,16 @@ document.addEventListener('DOMContentLoaded', () => {
       }
     */
     function updateButtonGridState() {
-        const buttonGridButtons = document.querySelectorAll('#buttonGrid button');
+        const buttonGridButtons = document.querySelectorAll('.button-result-ops');
         const hasSelectedItem = selectedItems.length > 0 && !multipleSelectionEnabled;
         buttonGridButtons.forEach(button => {
-            button.disabled = !hasSelectedItem; // Enable buttons if there are selected items, otherwise disable
+            button.disabled = !hasSelectedItem || multipleSelectionEnabled; // Enable buttons if there are selected items, otherwise disable
         });
     }
-
-    const open_PDF = async (path) => {
-        console.log("emitting open_PDF event");
-
-        const data = {
-            pdf_path: path
-        };
-
-        window.socket.emit('open_PDF', data);
-        console.log("emitted data");
-    };
-
-    const open_ss_dir = async (path) => {
-        console.log("emitting view ss dir event");
-
-        const data = {
-            ss_path: path
-        };
-
-        window.socket.emit('open_ss_dir', data);
-        console.log("emitted data");
-    };
-
-    const open_raw_data = async (path) => {
-        console.log("emitting view ss dir event");
-        const data = {
-            raw_path: path
-        };
-
-        window.socket.emit('open_raw_data', data);
-        console.log("emitted data");
-    };
-
-    const open_clean_data = async (path) => {
-        console.log("emitting view clean data event");
-        const data = {
-            clean_path: path
-        };
-
-        window.socket.emit('open_clean_data', data);
-        console.log("emitted data");
-    };
-
-    const open_diagram_dir = async (path) => {
-        console.log("emitting view diagram event");
-        const data = {
-            diagram_path: path
-        };
-
-        window.socket.emit('open_diagram_dir', data);
-        console.log("emitted data");
-    };
-
-    const generate_keywords = async (path) => {
-        console.log("emitting view generate keywords event");
-        path = selectedItems[0].textContent + "\\keywords\\Keywords.txt";
-        const data = {
-            gen_key_path: path
-        };
-
-        window.socket.emit('', data);
-        console.log("emitted data");
-    };
 
     window.socket.on('result_manager_update', (data) => {
         console.log("Recieved result_manager_update event", data);
     });
-
-    const append_results = async (paths) => {
-        console.log("emitting view generate keywords event");
-
-        window.socket.emit('start_append', paths);
-        console.log("emitted data");
-    };
-
 
 });
 

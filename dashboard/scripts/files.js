@@ -190,3 +190,46 @@ document.addEventListener("DOMContentLoaded", function () {
         }
     });
 });
+
+// zack function to populate result manager list without selecting result folder
+document.addEventListener("DOMContentLoaded", function () {
+    let dataPath = "folders.json";
+    console.log(dataPath);
+
+    // Use then() to handle the promise returned by readJson
+    window.electronAPI.readJson(dataPath)
+        .then(jsonData => {
+            console.log(jsonData);
+            if (Array.isArray(jsonData) && jsonData.length > 0) {
+                console.log('JSON data:', jsonData);
+                let selectedItemContent = '';
+                const listElement = document.getElementById('list'); // Assuming you have an element with id 'list' for the list
+                jsonData.forEach(item => {
+                    const listItem = document.createElement('li');
+                    listItem.textContent = item;
+                    listElement.appendChild(listItem);
+                    // Add click event listener to this list item
+                    listItem.addEventListener('click', function () {
+
+                        // Update the selectedItemContent variable with this item's content
+                        selectedItemContent = this.textContent;
+
+                        // Optionally, highlight the selected item
+                        // First, remove highlight from all items
+                        document.querySelectorAll('#list li').forEach(li => {
+                            li.classList.remove('selected'); // Assuming 'selected' is a class that styles the selected item
+                        });
+
+                        // Then, add the highlight class to the clicked item
+                        this.classList.add('selected');
+                        console.log(selectedItemContent); // For demonstration: log the selected item content
+                    });
+                });
+            } else {
+                console.error('Error: JSON data is empty or not in expected format');
+            }
+        })
+        .catch(error => {
+            console.error('Error reading JSON:', error);
+        });
+});

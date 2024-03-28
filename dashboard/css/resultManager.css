@@ -1,4 +1,5 @@
 #listContainer {
+  margin-left: 7.25%;
   width: 700px; /* Adjust the width as needed */
   height: 500px; /* Adjust the height as needed */
   overflow-y: auto; /* Enables vertical scrolling if content overflows */
@@ -18,7 +19,6 @@
   justify-content: start;
   gap: 10px; /* Adjust the gap between buttons */
   margin-bottom: 1%; /* Optional: adds some space between the buttons and the list */
-
 }
 /* Optional: Additional styling for buttons to make them uniform in size */
 #appendButtons.button {
@@ -42,8 +42,8 @@
 
 
 #buttonArea {
-  margin-top: 20%; /* Adjust the value to lower the grid as needed */
-
+  margin-top: 14%; /* Adjust the value to lower the grid as needed */
+  margin-right: 5%;
   height: fit-content; /* Adjust the height of the grid container to fit its content */
   width: fit-content; /* Adjust the width of the grid container to fit its content */
   padding-left: 20px; /* Adds some space between the list and the grid */
@@ -55,11 +55,9 @@
   /* Add more styles as needed */
 }
 
-n.hidden {
-  display: none;
+.hidden {
+  display: none !important;
 }
-
-
 
 .result-list-col {
   flex: 1;
@@ -74,6 +72,7 @@ n.hidden {
 }
 
 .result-button-col {
+  margin-top: 10%;
   flex: 1;
   margin-left: 175px;
   margin-top: 0%;
@@ -137,3 +136,9 @@ n.hidden {
   box-shadow: 0 8px 16px rgba(0, 0, 0, 0.2);
 }
 
+.button-result-ops:disabled {
+  background-color: #cccccc; /* Grey background */
+  color: #666666; /* Darker text color for contrast */
+  cursor: not-allowed; /* Shows a 'not allowed' cursor on hover */
+  border: 2px solid #bbbbbb; /* Optional: Grey border */
+}
