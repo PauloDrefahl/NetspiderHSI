@@ -59,7 +59,7 @@
     background-color: #09558B;
     height: 13%;
     width: 100%;
-    border: 2px solid #09558B;
+    border: 2px solid #000000;
     border-radius: 8px;
     transition: background-color 0.3s, color 0.3s, border-color 0.3s;
     box-shadow: 0 6px 8px 0 rgba(0,0,0,0.24),0 8.5px 25px 0 rgba(0,0,0,0.19);
