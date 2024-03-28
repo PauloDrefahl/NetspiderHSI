@@ -74,19 +74,20 @@
     }
 }
 
-/* Active, focus, and hover styles for navigation links */
 #navbar a.active,
 #navbar a:focus,
-#navbar a.focus:hover {
+#navbar a.focus:hover{
     background-color: #09558B;
     color: white;
-    box-shadow: 0 8px 16px rgba(9, 85, 139, 0.9); /* Enhanced box shadow */
     transform: translateY(4px);
     border-image: none;
     box-shadow: 0 12px 16px 0 rgba(0,0,0,0.24),0 17px 50px 0 rgba(0,0,0,0.19);
 }
 
-#navbar a:hover:not(.active):not(.focus) {
+#navbar a:hover:not(.active):not(.focus),
+#keyword-link:hover:not(.active):not(.focus),
+#help-link:hover:not(.active):not(.focus),
+#results-link:hover:not(.active):not(.focus) {
     background-color: #accaf34d;
     color: #09558B;
     border-color: white;

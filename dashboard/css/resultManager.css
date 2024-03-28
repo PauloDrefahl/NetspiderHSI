@@ -3,8 +3,9 @@
   width: 700px; /* Adjust the width as needed */
   height: 500px; /* Adjust the height as needed */
   overflow-y: auto; /* Enables vertical scrolling if content overflows */
-  border: 1px solid #ccc; /* Optional: adds a border around the container */
+  border: 10px solid #09558B; /* Border with the color #09558B */
   padding: 5px; /* Optional: adds some padding inside the container */
+  border-radius: 12px;
 }
 
 /* Control Buttons */
@@ -22,13 +23,20 @@
 }
 /* Optional: Additional styling for buttons to make them uniform in size */
 #appendButtons.button {
-  padding: 5px 10px; /* Reduced vertical padding */
+  padding: 15px; /* Reduced vertical padding */
   font-size: 0.8rem; /* Adjust as needed */
+  margin-left: 10px;
   line-height: 1; /* Reducing line-height can decrease button height */
-  border: 1px solid #ccc; /* Adjust border as needed, or remove it */
-  margin: 0; /* Ensures no additional space around the buttons */
   box-sizing: border-box; /* Ensures padding and border are included in total height */
+  border: 2px solid #000000; /* Adjust border as needed, or remove it */
 }
+
+#appendButtons.button:hover {
+  transform: scale(1.05);
+  box-shadow: 0 8px 16px rgba(0, 0, 0, 0.2);
+  transition: background-color 0.3s, color 0.3s, border-color 0.3s;
+}
+
 /* Layout for list and buttons */
 #contentContainer {
   margin-top: 25px;
@@ -62,7 +70,6 @@
 .result-list-col {
   flex: 1;
   margin: 30px; /* Increased margin */
-  margin-top: 0%;
   padding: 30px; /* Increased padding */
   padding-top: 0;
   width: 99%;
@@ -75,11 +82,10 @@
   margin-top: 10%;
   flex: 1;
   margin-left: 175px;
-  margin-top: 0%;
-  padding: 30px; /* Increased padding */
+  padding: 5%; /* Increased padding */
   padding-top: 0;
   width: 50%;
-  height: 90%;
+  height: 60%;
   box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1); /* Improved box shadow */;
   transition: transform 1.5s, box-shadow 1.5s;
 }
@@ -95,38 +101,37 @@
 }
 
 .button-result-ops {
-  display: block;
-  padding: 15px 30px; /* Increased padding for bigger buttons */
-  margin: 10px 0; /* Add space between buttons */
+  padding: 15px 10px; /* Increased padding for bigger buttons */
+  margin: 20px 0; /* Add space between buttons */
   font-size: 20px; /* Increased font size */
   color: #fff;
   height: 13%;
-  width: 95%;
-  border: 2px solid #09558B;
+  width: 100%;
   border-radius: 8px;
   background-color: #09558B;
-  transition: background-color 0.3s, color 0.3s, border-color 0.3s;
   box-shadow: 0 6px 8px 0 rgba(0,0,0,0.24),0 8.5px 25px 0 rgba(0,0,0,0.19);
+  border: 2px solid #000000; /* Adjust border as needed, or remove it */
   cursor: pointer;
+  display: block;
 }
 
 .button-result-ops:hover {
   transform: scale(1.05);
   box-shadow: 0 8px 16px rgba(0, 0, 0, 0.2);
+  transition: background-color 0.3s, color 0.3s, border-color 0.3s;
 }
 
 .button-app-sub {
   display: block;
-  padding: 15px 30px; /* Increased padding for bigger buttons */
+  padding: 15px 10px; /* Increased padding for bigger buttons */
   margin: 10px 0; /* Add space between buttons */
   font-size: 20px; /* Increased font size */
   height: 13%;
-  width: 50%;
-  border: 2px solid #09558B;
+  width: 100%;
+  border: 2px solid #000000; /* Adjust border as needed, or remove it */
   background-color: #09558B;
   border-radius: 8px;
   color: #fff;
-  transition: background-color 0.3s, color 0.3s, border-color 0.3s;
   box-shadow: 0 6px 8px 0 rgba(0,0,0,0.24),0 8.5px 25px 0 rgba(0,0,0,0.19);
   cursor: pointer;
 }
@@ -134,6 +139,7 @@
 .button-app-sub:hover {
   transform: scale(1.05);
   box-shadow: 0 8px 16px rgba(0, 0, 0, 0.2);
+  transition: background-color 0.3s, color 0.3s, border-color 0.3s;
 }
 
 .button-result-ops:disabled {
