@@ -1,10 +1,11 @@
 #listContainer {
-  margin-left: 7.25%;
-  width: 700px; /* Adjust the width as needed */
-  height: 500px; /* Adjust the height as needed */
-  overflow-y: auto; /* Enables vertical scrolling if content overflows */
-  border: 10px solid #09558B; /* Border with the color #09558B */
-  padding: 5px; /* Optional: adds some padding inside the container */
+  flex-grow: 2; /* Allows #listContainer to grow twice as fast as its siblings */
+  width: auto; /* Adjust based on flex-grow */
+  max-width: 2000px; /* Or higher, based on your requirement */
+  height: 500px;
+  overflow-y: auto;
+  border: 10px solid #09558B;
+  padding: 5px;
   border-radius: 12px;
 }
 
@@ -68,11 +69,12 @@
 }
 
 .result-list-col {
-  flex: 1;
+  flex-grow: 1;
   margin: 30px; /* Increased margin */
   padding: 30px; /* Increased padding */
   padding-top: 0;
-  width: 99%;
+  padding-bottom: 2%;
+  width: 121%;
   height: 90%;
   box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1); /* Improved box shadow */;
   transition: transform 1.5s, box-shadow 1.5s;
@@ -81,10 +83,12 @@
 .result-button-col {
   margin-top: 10%;
   flex: 1;
-  margin-left: 175px;
+  margin-left: 40%;
   padding: 5%; /* Increased padding */
   padding-top: 0;
-  width: 50%;
+  padding-bottom: 7.5%;
+  width: 40%;
+  max-width: 40%;
   height: 60%;
   box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1); /* Improved box shadow */;
   transition: transform 1.5s, box-shadow 1.5s;
@@ -122,17 +126,18 @@
 }
 
 .button-app-sub {
-  display: block;
-  padding: 15px 10px; /* Increased padding for bigger buttons */
-  margin: 10px 0; /* Add space between buttons */
-  font-size: 20px; /* Increased font size */
-  height: 13%;
-  width: 100%;
-  border: 2px solid #000000; /* Adjust border as needed, or remove it */
+  padding: 10px 15px; /* Reduced from 15px 10px for a slimmer look */
+  font-size: 16px; /* Reduced font size for smaller appearance */
+  width: 50%; /* Adjust based on content, or set a specific width */
+  height: auto; /* Allows button height to fit the content, or set a specific height */
+  /* Other styles remain unchanged */
+  margin-top: 1%;
+  margin-left: 25%;
+  border: 2px solid #000000;
   background-color: #09558B;
   border-radius: 8px;
   color: #fff;
-  box-shadow: 0 6px 8px 0 rgba(0,0,0,0.24),0 8.5px 25px 0 rgba(0,0,0,0.19);
+  box-shadow: 0 6px 8px 0 rgba(0,0,0,0.24), 0 8.5px 25px 0 rgba(0,0,0,0.19);
   cursor: pointer;
 }
 
