@@ -50,7 +50,7 @@
 					</div>
 
 					<div class="container-login100-form-btn">
-						<button class="login100-form-btn" type="button" onclick="attemptLogin()">
+						<button id="submitForm" class="login100-form-btn" type="button" onclick="attemptLogin()">
 							Login
 						</button>
 					</div>
@@ -83,7 +83,18 @@
         console.log('Login failed. Invalid credentials.');
     }
         }
-		
+		var submitOnEnter = document.getElementById("submitForm");
+
+		function clickButtonOnEnter(event) {
+
+			if (event.keyCode === 13) {
+				console.log("user hit enter");
+				submitOnEnter.click();
+			}
+		}
+
+
+		document.addEventListener("keypress", clickButtonOnEnter);
     </script>	
 <!--===============================================================================================-->
 	<script src="vendor/jquery/jquery-3.2.1.min.js"></script>
