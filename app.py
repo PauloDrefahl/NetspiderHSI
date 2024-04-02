@@ -138,9 +138,19 @@ scraper_manager = ScraperManager()
 '''
     ---------------------------------
     Result Manager functions
-    ---------------------------------
+    ---------------------------------   
 '''
-resultManager = resultManager('C:\\Users\\kskos\\PycharmProjects\\HSI_Back_Test3\\result\\')
+
+
+def initialize_result_manager(result_dir):
+    # Access the stored result directory from Flask app configuration
+    # result_dir = app.config.get('RESULT_DIR', 'default_directory_if_not_set')
+    #print("stored result directory", result_dir)
+    global resultManager
+    resultManager = resultManager(result_dir)
+    resultManager.debug_print()
+
+
 
 '''
     ---------------------------------
@@ -237,7 +247,11 @@ def set_result_dir():
     if directory:
         print("Selected Directory: ", directory)
         result_dir = os.path.join(os.getcwd(), directory)
+        app.config['RESULT_DIR'] = result_dir
         socketio.emit('result_folder_selected', result_dir)
+        initialize_result_manager(result_dir)
+    else:
+        socketio.emit('result_folder_selected', "file_explorer_opened")
 
 
 @socketio.on_error_default
@@ -284,11 +298,11 @@ if __name__ == "__main__":
     num_ports = 1  # Change this to the desired number of open ports
     open_ports = find_open_ports(num_ports)
 
-    write_open_ports(open_ports)
+    # write_open_ports(open_ports)
 
     print("Open Ports:", open_ports)
 
     # Use the open ports as needed in the rest of your program
     # Note: You may want to handle the case where `open_ports` is an empty list.
-    socketio.run(app, host='127.0.0.1', port=open_ports[0],
+    socketio.run(app, host='127.0.0.1', port=3030,
                  allow_unsafe_werkzeug=True)

@@ -60,6 +60,7 @@ except Exception as e:
 # When saving a plot, specify the full path
 
 plot_filename_keywords_vs_location = os.path.join(new_diagram_folder_path, 'keywords-vs-location.png')
+plot_filename_postNumber_vs_location = os.path.join(new_diagram_folder_path, 'posts-vs-location.png')
 plot_filename_location_vs_payment = os.path.join(new_diagram_folder_path, 'location-vs-payment.png')  # Corrected filename
 plot_filename_location_vs_socialMedia = os.path.join(new_diagram_folder_path, 'location-vs-socialMedia.png')
 plot_filename_keyword_frequency = os.path.join(new_diagram_folder_path, 'keyword-frequency.png')
@@ -98,7 +99,7 @@ socialMedia_found_column = 'Social-media-found'
 keywords_found_column = 'Keywords-found'
 number_of_keywords_found_column = 'Number-of-keywords-found'
 
-#df[# Splitting the keywords into lists
+# Splitting the keywords into lists
 # Splitting the 'Keywords-found' into lists and removing rows with 'service' as the only keyword
 df['Keywords-found-list'] = df['Keywords-found'].apply(lambda x: x.split(',') if pd.notnull(x) and x.strip().lower() != 'service' else [])
 
@@ -154,28 +155,81 @@ print(df[payment_methods_column])
     ---------------------------------
 '''
 
-# location vs timeline
-plt.figure(figsize=(10, 8))  # Increase figure size
-sns.lineplot(x=timeline_column, y=city_column, hue=city_column, data=df)
-plt.title('Location vs. Timeline')
-plt.xticks(rotation=45, ha='right')  # Rotate x-axis labels
-plt.tight_layout()  # Adjust layout to fit the figure and labels
+'''keyword vs location'''
 
-# Optional: Change the size of the legend or relocate it
-plt.legend(title='City', bbox_to_anchor=(1.05, 1), loc='upper left')
+location_keyword_counts = df_exploded_keywords.groupby(['Inputted City / Region', 'Keywords-found-list']).size().unstack(fill_value=0)
 
-# Saving the plot with a higher resolution
-#plt.savefig(plot_filename_keywords_vs_location, dpi=300)  # Save the plot with higher DPI for better quality
+# You might want to focus on the top N keywords for clarity in the visualization
+top_keywords = df_exploded_keywords['Keywords-found-list'].value_counts().head(10).index
+filtered_location_keyword_counts = location_keyword_counts[top_keywords]
+
+plt.figure(figsize=(12, 8))
+sns.heatmap(filtered_location_keyword_counts, annot=True, cmap='viridis', fmt='g')
+plt.title('Keywords Frequency by Location')
+plt.xlabel('Keywords')
+plt.ylabel('Inputted City / Region')
+plt.xticks(rotation=45, ha='right')  # Rotate keywords for better visibility
+plt.tight_layout()
 plt.show()
 
-# location vs payment
+
+'''posts vs region'''
+
+# Counting the number of posts per location
+posts_per_location = df.groupby('Inputted City / Region').size()
+
+# Plotting the number of posts vs. location
+plt.figure(figsize=(12, 8))
+posts_per_location.sort_values(ascending=False).plot(kind='bar')  # Sort values for better visualization
+plt.title('Number of Posts by Location')
+plt.xlabel('Inputted City / Region')
+plt.ylabel('Number of Posts')
+plt.xticks(rotation=45, ha='right')  # Rotate location names for better visibility
+plt.tight_layout()
+plt.show()
+
+
+'''keyword frequency'''
+
+# Set the figure size to make it larger
+plt.figure(figsize=(12, 8))
+
+# Calculate keyword frequencies and keep the top N for a cleaner plot
+top_n = 20  # Adjust based on how many you wish to display
+keyword_counts = df_exploded_keywords['Keywords-found-list'].value_counts().head(20)  # Top 20 keywords
+
+# Create the bar plot
+keyword_counts.plot(kind='bar')
+
+
+plt.title('Top 20 Keyword Frequencies')
+plt.xticks(rotation=45, ha='right')  # Rotate labels for better readability
+plt.xlabel('Keywords')  # Optional: label the x-axis
+plt.ylabel('Frequency')  # Optional: label the y-axis
+
+# Adjust font size for x and y ticks if necessary
+plt.xticks(fontsize=10)
+plt.yticks(fontsize=10)
+
+plt.tight_layout()  # Adjust layout to make room for the rotated x-axis labels
+
+# Optionally, save the plot with a higher resolution
+#plt.savefig(plot_filename_keyword_frequency, dpi=300)
+
+plt.show()
+
+
+'''location vs payment'''
+
 sns.barplot(x=city_column, y=payment_methods_column, data=df)
 plt.title('Location vs. Payment')
 plt.xticks(rotation=45)  # Rotate labels if they overlap
 #plt.savefig(plot_filename_location_vs_payment)  # Save the plot
 plt.show()
 
-# location vs social media
+
+'''location vs social media'''
+
 # Filter out empty strings which might have come from the split operation
 df_exploded_social_media = df_exploded_social_media[df_exploded_social_media['Social-media-found-list'].str.strip() != '']
 
@@ -203,69 +257,5 @@ plt.xticks(rotation=45)
 plt.legend(title='Social Media')
 plt.tight_layout()
 plt.show()
-
-# keyword frequency
-# Set the figure size to make it larger
-plt.figure(figsize=(12, 8))
-
-# Calculate keyword frequencies and keep the top N for a cleaner plot
-top_n = 20  # Adjust based on how many you wish to display
-keyword_counts = df_exploded_keywords['Keywords-found-list'].value_counts().head(20)  # Top 20 keywords
-
-# Create the bar plot
-keyword_counts.plot(kind='bar')
-
-plt.title('Top 20 Keyword Frequencies')
-plt.xticks(rotation=45, ha='right')  # Rotate labels for better readability
-plt.xlabel('Keywords')  # Optional: label the x-axis
-plt.ylabel('Frequency')  # Optional: label the y-axis
-
-# Adjust font size for x and y ticks if necessary
-plt.xticks(fontsize=10)
-plt.yticks(fontsize=10)
-
-plt.tight_layout()  # Adjust layout to make room for the rotated x-axis labels
-
-# Optionally, save the plot with a higher resolution
-#plt.savefig(plot_filename_keyword_frequency, dpi=300)
-
-plt.show()
-
-# keyword vs location
-
-location_keyword_counts = df_exploded_keywords.groupby(['Inputted City / Region', 'Keywords-found-list']).size().unstack(fill_value=0)
-
-# You might want to focus on the top N keywords for clarity in the visualization
-top_keywords = df_exploded_keywords['Keywords-found-list'].value_counts().head(10).index
-filtered_location_keyword_counts = location_keyword_counts[top_keywords]
-
-plt.figure(figsize=(12, 8))
-sns.heatmap(filtered_location_keyword_counts, annot=True, cmap='viridis', fmt='g')
-plt.title('Keywords Frequency by Location')
-plt.xlabel('Keywords')
-plt.ylabel('Inputted City / Region')
-plt.xticks(rotation=45, ha='right')  # Rotate keywords for better visibility
-plt.tight_layout()
-plt.show()
-
-# keyword vs timeline
-
-#  # posts vs timeline
-
-#  # posts vs region
-
-# Counting the number of posts per location
-posts_per_location = df.groupby('Inputted City / Region').size()
-
-# Plotting the number of posts vs. location
-plt.figure(figsize=(12, 8))
-posts_per_location.sort_values(ascending=False).plot(kind='bar')  # Sort values for better visualization
-plt.title('Number of Posts by Location')
-plt.xlabel('Inputted City / Region')
-plt.ylabel('Number of Posts')
-plt.xticks(rotation=45, ha='right')  # Rotate location names for better visibility
-plt.tight_layout()
-plt.show()
-
 
 

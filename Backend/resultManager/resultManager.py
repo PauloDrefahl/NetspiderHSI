@@ -22,11 +22,14 @@ class resultManager:
         # Path to the directory you want to open
         # Making sure the path is absolute
         relative_path = kwargs['pdf_path']
-        print(relative_path)
-        full_path = self.results_directory + relative_path
+        print("relative path", relative_path)
+
+        print("result dir", self.results_directory)
+
+        full_path = self.results_directory + "\\" + relative_path
 
         absolute_path = os.path.abspath(full_path)
-        print()
+        print("absolute path", absolute_path)
         try:
             # Open the PDF file in the default application
             webbrowser.open('file://' + absolute_path)
@@ -39,7 +42,7 @@ class resultManager:
         # Making sure the path is absolute
         relative_path = kwargs['ss_path']
         print(relative_path)
-        full_path = self.results_directory + relative_path
+        full_path = self.results_directory + "\\" + relative_path
 
         absolute_path = os.path.abspath(full_path)
         print("open file path", absolute_path)
@@ -65,7 +68,7 @@ class resultManager:
         # Making sure the path is absolute
         relative_path = kwargs['raw_path']
         print(relative_path)
-        full_path = self.results_directory + relative_path
+        full_path = self.results_directory + "\\" + relative_path
 
         absolute_path = os.path.abspath(full_path)
         print(absolute_path)
@@ -93,7 +96,7 @@ class resultManager:
         # Making sure the path is absolute
         # Making sure the path is absolute
         relative_path = kwargs['clean_path']
-        full_path = self.results_directory + relative_path
+        full_path = self.results_directory + "\\" + relative_path
 
         absolute_path = os.path.abspath(full_path)
         print(absolute_path)
@@ -125,7 +128,7 @@ class resultManager:
         # Making sure the path is absolute
         relative_path = kwargs['diagram_path']
         print(relative_path)
-        full_path = self.results_directory + relative_path
+        full_path = self.results_directory + "\\" + relative_path
 
         absolute_path = os.path.abspath(full_path)
         print(absolute_path)
@@ -149,3 +152,5 @@ class resultManager:
         except Exception as e:
             print(f"An error occurred: {e}")
 
+    def debug_print(self):
+        print("stored result directory",self.results_directory)
