@@ -5,6 +5,7 @@
 
 document.addEventListener('DOMContentLoaded', () => {
 
+    // operations for result manager
     const open_PDF = async (path) => {
         console.log("emitting open_PDF event");
 
@@ -74,6 +75,9 @@ document.addEventListener('DOMContentLoaded', () => {
         window.socket.emit('start_append', paths);
         console.log("emitted data");
     };
+
+
+
 
     // toggle multiple selection mode //
     let multipleSelectionEnabled = false; // Flag to track selection mode
@@ -282,6 +286,13 @@ document.addEventListener('DOMContentLoaded', () => {
         buttonGridButtons.forEach(button => {
             button.disabled = !hasSelectedItem || multipleSelectionEnabled; // Enable buttons if there are selected items, otherwise disable
         });
+        updateAppendButtonState();
+    }
+
+    function updateAppendButtonState() {
+        const appendButton = document.getElementById('appendButton');
+        const hasSelectedItems = selectedItems.length > 0;
+        appendButton.disabled = !hasSelectedItems; // Disable if no items are selected, enable if at least one is selected
     }
 
     window.socket.on('result_manager_update', (data) => {
