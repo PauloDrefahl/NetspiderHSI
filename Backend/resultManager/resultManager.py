@@ -1,10 +1,13 @@
+import json
 import webbrowser
 import os
 import sys
 import subprocess
 
+from flask import jsonify
 
-class resultManager:
+
+class ResultManager:
     """
         Result Manager Class for seeing results.
 
@@ -17,6 +20,40 @@ class resultManager:
     """
     def __init__(self, results_directory):
         self.results_directory = results_directory
+
+        self.update_folders_json()
+
+    def get_folders(self):
+        print("Sending folder json to list component")
+        try:
+            with open('folders.json', 'r') as f:
+                folders = json.load(f)
+            return folders
+        except FileNotFoundError:
+            return {"error": "folders.json not found"}, 404
+        except Exception as e:
+            return {"error": str(e)}, 500
+
+    def update_folders_json(self):
+        print("Updating File list")
+        try:
+            print("Reading Directory")
+            all_folders = []
+            # Use os.walk to iterate through each directory and subdirectory
+            # List everything in the directory
+            all_entries = os.listdir(self.results_directory)
+            # Filter to include only directories
+            all_folders = [entry for entry in all_entries if os.path.isdir(os.path.join(self.results_directory, entry))]
+
+            # Optionally, sort files alphabetically; adjust as needed
+            all_folders.sort()
+
+            print("Writing Directory into file")
+            with open('folders.json', 'w') as f:
+                json.dump(all_folders, f, indent=2)
+            print("Folders list updated in folders.json")
+        except Exception as e:
+            print(f"Error updating the folders list: {e}")
 
     def view_pdf(self, kwargs):
         # Path to the directory you want to open

@@ -1,21 +1,25 @@
 import gevent.monkey
 
+import json
+
 gevent.monkey.patch_all()
 
 import threading
 import socket
-from flask import Flask
+from flask import Flask, jsonify
 from flask_socketio import SocketIO
 from flask_cors import CORS
 from Backend.Scraper import MegapersonalsScraper, SkipthegamesScraper, YesbackpageScraper, EscortalligatorScraper, \
     ErosScraper, RubratingsScraper
 from Backend.resultManager.appendResults import FileAppender
-from Backend.resultManager.resultManager import resultManager
+from Backend.resultManager.resultManager import ResultManager
 from PyQt5.QtWidgets import QFileDialog, QApplication
 import subprocess
 import sys
 import os
 import webbrowser
+from watchdog.observers import Observer
+from watchdog.events import FileSystemEventHandler
 
 # pyinstaller app.py --onefile --name=NetSpiderServer --hidden-import gevent --hidden-import engineio.async_drivers.gevent --hidden-import pyimod02_importers
 
@@ -29,6 +33,23 @@ socketio = SocketIO(app, async_mode='gevent', cors_allowed_origins="*")
     Manage Scraper and threads
     ---------------------------------
 '''
+
+
+class DirectoryWatchHandler(FileSystemEventHandler):
+    def on_any_event(self, event):
+        print(f"Event triggered: {event}")  # Debugging line
+        print("Updating files list...")  # Debugging line
+        resultManager.update_folders_json()
+        # resultList = resultManager.get_folders()
+        #
+        # # Check if resultList is not empty and send the list
+        # if resultList:
+        #     socketio.emit('result_folder_selected', {'folders': resultList})
+        # else:
+        #     # Notify if the directory is empty or there are no folders
+        #     socketio.emit('result_folder_selected', {'error': 'No folders found in the selected directory'})
+
+
 
 
 class ScraperManager:
@@ -147,8 +168,9 @@ def initialize_result_manager(result_dir):
     # result_dir = app.config.get('RESULT_DIR', 'default_directory_if_not_set')
     #print("stored result directory", result_dir)
     global resultManager
-    resultManager = resultManager(result_dir)
+    resultManager = ResultManager(result_dir)
     resultManager.debug_print()
+
 
 
 
@@ -244,15 +266,40 @@ def open_diagram_dir(data):
 def set_result_dir():
     print("Selecting result directory")
     directory = QFileDialog.getExistingDirectory(None, "Select Directory", os.getcwd())
-    if directory:
-        print("Selected Directory: ", directory)
-        result_dir = os.path.join(os.getcwd(), directory)
-        app.config['RESULT_DIR'] = result_dir
-        socketio.emit('result_folder_selected', result_dir)
-        initialize_result_manager(result_dir)
-    else:
-        socketio.emit('result_folder_selected', "file_explorer_opened")
+    print("Selected Directory: ", directory)
 
+    print("Selected Directory: ", directory)
+    result_dir = os.path.join(os.getcwd(), directory)
+
+    initialize_result_manager(result_dir)
+    resultList = resultManager.get_folders()
+    print(resultList)
+
+    # Check if resultList is not empty and send the list
+    if resultList:
+        print("sending Result list")
+        socketio.emit('result_folder_selected', {'folders': resultList, 'result_dir': result_dir})
+    else:
+        # Notify if the directory is empty or there are no folders
+        socketio.emit('result_folder_selected', {'error': 'No folders found in the selected directory'})
+    # else:
+    #     # Notify the client that no directory was selected
+    #     socketio.emit('result_folder_selected', {'file_explorer_opened'})
+
+
+@socketio.on('refresh_result_list')
+def refresh_result_list():
+
+    resultManager.update_folders_json()
+
+    resultList = resultManager.get_folders()
+
+    # Check if resultList is not empty and send the list
+    if resultList:
+        socketio.emit('result_list_refreshed', {'folders': resultList})
+    else:
+        # Notify if the directory is empty or there are no folders
+        socketio.emit('result_list_refreshed', {'error': 'No folders found in the selected directory'})
 
 @socketio.on_error_default
 def handle_error(e):
@@ -270,7 +317,7 @@ def handle_error(e):
 
 
 def write_open_ports(ports):
-    with open('C:\\Users\\Zach\\WebstormProjects\\NetspiderHSI\\open_ports.txt', 'w') as file:
+    with open('C:\\Users\\kskos\\WebstormProjects\\HSI_Back_Test3\\open_ports.txt', 'w') as file:
         for port in ports:
             file.write(str(port) + '\n')
 
