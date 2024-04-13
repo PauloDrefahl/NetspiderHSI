@@ -51,7 +51,6 @@ const createWindow = () => {
 };
 
 
-
 // This method will be called when Electron has finished
 // initialization and is ready to create browser windows.
 app.on('ready', () => {
@@ -69,32 +68,6 @@ app.on('window-all-closed', () => {
         app.quit();
     }
 });
-
-// const directoryPath = 'C:\\Users\\kskos\\PycharmProjects\\HSI_Back_Test3\\result';
-// Read directory and filter out files, keeping only directories
-/*fs.readdir(directoryPath, { withFileTypes: true }, (err, files) => {
-    if (err) {
-        console.error('Error reading the directory', err);
-        return;
-    }
-
-    const folders = files.filter(file => file.isDirectory()).map(folder => folder.name);
-
-    // Convert array of folders to JSON format
-    const jsonFolders = JSON.stringify(folders, null, 2);
-
-    // Output the JSON string
-    console.log(jsonFolders);
-
-    // Optionally, write the JSON to a file
-    fs.writeFile('folders.json', jsonFolders, (err) => {
-        if (err) {
-            console.error('Error writing to file', err);
-            return;
-        }
-        console.log('Folders list saved to folders.json');
-    });
-});*/
 
 //kill all NetSpiderServer processes
 // app.on('before-quit', async () => {

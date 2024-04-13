@@ -1,11 +1,18 @@
 // Assuming data.json is in the same directory as your main script
-//const dataPath = window.electronPath.join(window.nodePaths.__dirname, 'folders.json');
-
-//const jsonData = JSON.parse(fs.readFileSync(dataPath, 'utf8'));
+// const dataPath = window.electronPath.join(window.nodePaths.__dirname, 'folders.json');
+//
+// let jsonData = JSON.parse(fs.readFileSync(dataPath, 'utf8'));
 
 document.addEventListener('DOMContentLoaded', () => {
 
     // operations for result manager
+    const refresh_result_list = async () => {
+        console.log("emitting refresh result list event");
+
+        window.socket.emit('refresh_result_list');
+        console.log("emitted data");
+    };
+
     const open_PDF = async (path) => {
         console.log("emitting open_PDF event");
 
@@ -75,8 +82,6 @@ document.addEventListener('DOMContentLoaded', () => {
         window.socket.emit('start_append', paths);
         console.log("emitted data");
     };
-
-
 
 
     // toggle multiple selection mode //
@@ -162,6 +167,15 @@ document.addEventListener('DOMContentLoaded', () => {
     });
 
     // event listeners to buttons in the button grid
+
+    document.getElementById('refreshListButton').addEventListener('click', function () {
+        console.log("clicked refresh list button");
+
+        // logSelectedItems("Diagram Directory View Requested: ", "\\diagrams");
+
+        refresh_result_list().then(r => r);
+    });
+
     document.getElementById('viewPdfButton').addEventListener('click', function () {
         console.log("clicked view pdf button");
 
@@ -224,8 +238,6 @@ document.addEventListener('DOMContentLoaded', () => {
         let genKeyPath = "\\keywords\\Keywords.txt";
         let path = selectedItems[0].textContent + genKeyPath;
         //logSelectedItems("Generate Keywords Requested: ", "\\keywords\\Keywords.txt");
-
-
     });
 
     // Function to toggle selection //
@@ -299,8 +311,4 @@ document.addEventListener('DOMContentLoaded', () => {
         console.log("Recieved result_manager_update event", data);
     });
 
-});
-
-document.addEventListener('DOMContentLoaded', function () {
-    window.resultManager.setupWatcher(resultFolder);
 });

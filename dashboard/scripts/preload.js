@@ -4,8 +4,7 @@
 const { ipcRenderer, contextBridge, shell } = require('electron');
 const io = require('socket.io-client');
 const fs = require('fs');
-const chokidar = require("chokidar");
-const result_fs = require('fs').promises;
+
 
 // Read the port from a text file;
 const portFilePath = 'open_ports.txt';
@@ -203,44 +202,3 @@ contextBridge.exposeInMainWorld('editFile', {
     }
 });
 
-contextBridge.exposeInMainWorld('resultManager', {
-    // Function to read directory and write folders.json
-    updateFoldersJSON :  async (directory) => {
-        try {
-            const files = await result_fs.readdir(directory, { withFileTypes: true });
-            const folders = files.filter(file => file.isDirectory()).map(folder => folder.name);
-
-            // sort the folders into alphanumerical order
-            folders.sort((a, b) => a.localeCompare(b, undefined, { numeric: true, sensitivity: 'base' }));
-
-            const jsonFolders = JSON.stringify(folders, null, 2);
-            console.log(jsonFolders);
-            await result_fs.writeFile('folders.json', jsonFolders);
-            console.log('Folders list updated in folders.json');
-        } catch (err) {
-            console.error('Error accessing the directory or writing to file', err);
-        }
-    },
-    // Watch the directory for changes using chokidar
-    setupWatcher: (directory) => {
-        const watcher = chokidar.watch(directory, {
-            ignored: /^\./, // ignore dotfiles
-            persistent: true,
-            ignoreInitial: false // Do not fire add events when starting
-        });
-
-        watcher
-            .on('addDir', path => {
-                console.log(`Directory ${path} has been added`);
-                resultManager.updateFoldersJSON(directory).then(r => r);
-                // Trigger a reload of the current page
-            })
-            .on('unlinkDir', path => {
-                console.log(`Directory ${path} has been removed`);
-                resultManager.updateFoldersJSON(directory).then(r => r);
-                // Trigger a reload of the current page
-            })
-            .on('error', error => console.error(`Watcher error: ${error}`))
-            .on('ready', () => console.log('Initial scan complete. Ready for changes'));
-    }
-});

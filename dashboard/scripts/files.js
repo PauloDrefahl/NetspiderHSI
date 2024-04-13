@@ -1,6 +1,8 @@
 let keywordsFile = ''
 let keywordsSetFile = ''
 let resultFolder = ''
+let folderList = ''
+
 window.resultManager = undefined;
 window.electronAPI = undefined;
 
@@ -138,6 +140,8 @@ function addOptionKeyset(keysets) {
 document.addEventListener("DOMContentLoaded", function () {
     const openResultsFolderButton = document.getElementById('open-results-folder-btn');
     const resultsFolderButton = document.getElementById('folder-input-btn');
+    const listElement = document.getElementById('list'); // Ensure this element exists in your HTML
+
     openResultsFolderButton.addEventListener('click', function () {
         window.editFile.openResults(resultFolder);
     });
@@ -146,90 +150,86 @@ document.addEventListener("DOMContentLoaded", function () {
         window.socket.emit('set_result_dir');
     });
 
-    window.socket.on('result_folder_selected', async (result_folder) => {
-        console.log("Result Folder selected:", result_folder);
-        resultFolder = result_folder;
-        try {
-            await window.resultManager.updateFoldersJSON(resultFolder);
-            let dataPath = "folders.json";
-            console.log(dataPath);
-            const jsonData = await window.electronAPI.readJson(dataPath);
-            if (Array.isArray(jsonData) && jsonData.length > 0) {
-                console.log('JSON data:', jsonData);
-                let selectedItemContent = '';
+    window.socket.on('result_folder_selected', (data) => {
 
-                const listElement = document.getElementById('list'); // Assuming you have an element with id 'list' for the list
+        if (data.error) {
+            console.error('Error received:', data.error);
+            listElement.innerHTML = `<li>Error: ${data.error}</li>`; // Display error in the list
+            return;
+        }
 
-                jsonData.forEach(item => {
-                    const listItem = document.createElement('li');
-                    listItem.textContent = item;
-                    listElement.appendChild(listItem);
+        if (data.file_explorer_opened) {
+            console.log("File explorer opened but no directory was selected.");
+            listElement.innerHTML = '<li>No directory selected.</li>';
+            return;
+        }
 
-                    // Add click event listener to this list item
-                    listItem.addEventListener('click', function () {
+        if (data.result_dir) {
+            console.log("Result Folder selected:", data.result_dir);
+            resultFolder = data.result_dir; // Store the result directory globally if needed
+        }
 
-                        // Update the selectedItemContent variable with this item's content
-                        selectedItemContent = this.textContent;
+        folderList = data.folders; // This should match the key used in backend 'folders'
+        console.log("Result list:", folderList);
 
-                        // Optionally, highlight the selected item
-                        // First, remove highlight from all items
-                        document.querySelectorAll('#list li').forEach(li => {
-                            li.classList.remove('selected'); // Assuming 'selected' is a class that styles the selected item
-                        });
+        console.log("Result list:", folderList);
+        if (Array.isArray(folderList) && folderList.length > 0) {
+            console.log('Folders:', folderList);
+            listElement.innerHTML = ''; // Clear previous entries
 
-                        // Then, add the highlight class to the clicked item
-                        this.classList.add('selected');
-                        console.log(selectedItemContent); // For demonstration: log the selected item content
-                    });
+            folderList.forEach(item => {
+                const listItem = document.createElement('li');
+                listItem.textContent = item;
+                listElement.appendChild(listItem);
+
+                listItem.addEventListener('click', function () {
+                    const previouslySelected = document.querySelector('#list li.selected');
+                    if (previouslySelected) {
+                        previouslySelected.classList.remove('selected');
+                    }
+                    this.classList.add('selected');
+                    console.log("Selected Folder:", this.textContent); // For demonstration
                 });
-            } else {
-                console.error('Error: JSON data is empty or not in expected format');
-            }
-        } catch (error) {
-            console.error('Error processing result folder:', error);
+            });
+        } else {
+            console.error('Error: Folder list is empty or not in expected format');
+            listElement.innerHTML = '<li>No folders found.</li>';
+        }
+    });
+
+    window.socket.on('result_list_refreshed', (data) => {
+
+        if (data.error) {
+            console.error('Error received:', data.error);
+            listElement.innerHTML = `<li>Error: ${data.error}</li>`; // Display error in the list
+            return;
+        }
+
+        folderList = data.folders; // This should match the key used in backend 'folders'
+        console.log("Result list:", folderList);
+
+        console.log("Result list:", folderList);
+        if (Array.isArray(folderList) && folderList.length > 0) {
+            console.log('Folders:', folderList);
+            listElement.innerHTML = ''; // Clear previous entries
+
+            folderList.forEach(item => {
+                const listItem = document.createElement('li');
+                listItem.textContent = item;
+                listElement.appendChild(listItem);
+
+                listItem.addEventListener('click', function () {
+                    const previouslySelected = document.querySelector('#list li.selected');
+                    if (previouslySelected) {
+                        previouslySelected.classList.remove('selected');
+                    }
+                    this.classList.add('selected');
+                    console.log("Selected Folder:", this.textContent); // For demonstration
+                });
+            });
+        } else {
+            console.error('Error: Folder list is empty or not in expected format');
+            listElement.innerHTML = '<li>No folders found.</li>';
         }
     });
 });
-
-// zack function to populate result manager list without selecting result folder
-// document.addEventListener("DOMContentLoaded", function () {
-//     let dataPath = "folders.json";
-//     console.log(dataPath);
-//
-//     // Use then() to handle the promise returned by readJson
-//     window.electronAPI.readJson(dataPath)
-//         .then(jsonData => {
-//             console.log(jsonData);
-//             if (Array.isArray(jsonData) && jsonData.length > 0) {
-//                 console.log('JSON data:', jsonData);
-//                 let selectedItemContent = '';
-//                 const listElement = document.getElementById('list'); // Assuming you have an element with id 'list' for the list
-//                 jsonData.forEach(item => {
-//                     const listItem = document.createElement('li');
-//                     listItem.textContent = item;
-//                     listElement.appendChild(listItem);
-//                     // Add click event listener to this list item
-//                     listItem.addEventListener('click', function () {
-//
-//                         // Update the selectedItemContent variable with this item's content
-//                         selectedItemContent = this.textContent;
-//
-//                         // Optionally, highlight the selected item
-//                         // First, remove highlight from all items
-//                         document.querySelectorAll('#list li').forEach(li => {
-//                             li.classList.remove('selected'); // Assuming 'selected' is a class that styles the selected item
-//                         });
-//
-//                         // Then, add the highlight class to the clicked item
-//                         this.classList.add('selected');
-//                         console.log(selectedItemContent); // For demonstration: log the selected item content
-//                     });
-//                 });
-//             } else {
-//                 console.error('Error: JSON data is empty or not in expected format');
-//             }
-//         })
-//         .catch(error => {
-//             console.error('Error reading JSON:', error);
-//         });
-// });
