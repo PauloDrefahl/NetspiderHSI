@@ -12,9 +12,15 @@ class DataAnalyzer:
         self.results_directory = results_directory
         self.selected_folder = selected_folder
 
+        print(self.results_directory + "\n")
+        print(self.selected_folder + "\n")
+
         # the new diagram dir
         self.selected_result_folder_path = os.path.join(self.results_directory, self.selected_folder)
-        self.new_diagram_folder_path = os.path.join(self.selected_result_folder_path, 'diagrams')
+        self.new_diagram_folder_path = self.selected_result_folder_path + "\\diagrams"
+        print(self.selected_result_folder_path + "\n")
+        print(self.new_diagram_folder_path + "\n")
+
 
         # creates the directory
         self.create_diagrams_directory()
@@ -47,7 +53,7 @@ class DataAnalyzer:
 
     def read_data(self):
         spreadsheet_name = 'CLEAN-' + self.selected_folder + '.xlsx'
-        file_path = os.path.join(self.selected_result_folder_path, spreadsheet_name)
+        file_path = self.selected_result_folder_path + "\\" + spreadsheet_name
         print("selected file path", file_path)
         if os.path.exists(file_path):
             self.df = pd.read_excel(file_path)
@@ -67,6 +73,7 @@ class DataAnalyzer:
 
     def plot_keywords_vs_location(self):
         if self.df_exploded_keywords is not None:
+            print("Plotting keywords vs location.")
             location_keyword_counts = self.df_exploded_keywords.groupby(
                 [self.city_column, 'Keywords-found-list']).size().unstack(fill_value=0)
 
@@ -80,11 +87,12 @@ class DataAnalyzer:
             plt.ylabel('Inputted City / Region')
             plt.xticks(rotation=45, ha='right')
             plt.tight_layout()
-            plt.savefig(os.path.join(self.new_diagram_folder_path, 'keywords-vs-location.png'))
+            plt.savefig(self.new_diagram_folder_path + '\\keywords-vs-location.png')
             plt.close()
 
     def plot_posts_vs_region(self):
         if self.df is not None:
+            print("plotting posts vs region\n")
             posts_per_location = self.df.groupby(self.city_column).size()
 
             plt.figure(figsize=(12, 8))
@@ -95,7 +103,7 @@ class DataAnalyzer:
             plt.xticks(rotation=45, ha='right')
             plt.tight_layout()
 
-            plt.savefig(os.path.join(self.new_diagram_folder_path, 'posts-vs-location.png'))
+            plt.savefig(self.new_diagram_folder_path + '\\posts-vs-location.png')
             plt.close()
 
     def plot_keyword_frequency(self):
@@ -122,7 +130,7 @@ class DataAnalyzer:
 
             plt.tight_layout()  # Adjust layout to make room for the rotated x-axis labels
 
-            plt.savefig(os.path.join(self.new_diagram_folder_path, 'keyword-frequency.png'), dpi=300)
+            plt.savefig(self.new_diagram_folder_path + '\\keyword-frequency.png', dpi=300)
             plt.show()
 
     def plot_location_vs_payment(self):
@@ -168,20 +176,20 @@ class DataAnalyzer:
 
 
 # Usage
-results_directory = 'C:\\Users\\kskos\\PycharmProjects\\HSI_Back_Test3\\result'
-selected_folder = 'yesbackpage-florida-2024-02-24_04-51-07'
-
-analyzer = DataAnalyzer(results_directory, selected_folder)
-
-analyzer.read_data()
-
-analyzer.preprocess_data()
-
-analyzer.plot_keywords_vs_location()
-
-analyzer.plot_posts_vs_region()
-
-analyzer.plot_keyword_frequency()
+# results_directory = 'C:\\Users\\kskos\\PycharmProjects\\HSI_Back_Test3\\result'
+# selected_folder = 'yesbackpage-florida-2024-02-24_04-51-07'
+#
+# analyzer = DataAnalyzer(results_directory, selected_folder)
+#
+# analyzer.read_data()
+#
+# analyzer.preprocess_data()
+#
+# analyzer.plot_keywords_vs_location()
+#
+# analyzer.plot_posts_vs_region()
+#
+# analyzer.plot_keyword_frequency()
 
 #analyzer.plot_location_vs_social_media()
 #analyzer.plot_location_vs_payment()

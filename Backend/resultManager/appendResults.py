@@ -7,17 +7,20 @@ import openpyxl
 from openpyxl.utils import get_column_letter
 
 
-class FileAppender:
-    def __init__(self, results_directory, selected_folders):
+class FolderAppender:
+    def __init__(self, results_directory):
         self.new_folder_name = None
         self.new_file_path = None
         self.new_file_name = None
         self.new_screenshot_folder_path = None
         self.new_folder_path = None
         self.results_directory = results_directory
-        self.selected_folders = selected_folders
+        self.selected_folders = None
         self.pdf_merger = PdfMerger()
         self.dataframes = []
+
+    def setSelectedFolders(self, selected_folders):
+        self.selected_folders = selected_folders
 
     def create_new_folder(self):
         self.new_folder_name = '-'.join(folder.split('-')[0] for folder in self.selected_folders)

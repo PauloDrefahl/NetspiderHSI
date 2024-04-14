@@ -11,7 +11,7 @@ from flask_socketio import SocketIO
 from flask_cors import CORS
 from Backend.Scraper import MegapersonalsScraper, SkipthegamesScraper, YesbackpageScraper, EscortalligatorScraper, \
     ErosScraper, RubratingsScraper
-from Backend.resultManager.appendResults import FileAppender
+from Backend.resultManager.appendResults import FolderAppender, FolderAppender
 from Backend.resultManager.resultManager import ResultManager
 from PyQt5.QtWidgets import QFileDialog, QApplication
 import subprocess
@@ -171,6 +171,14 @@ def initialize_result_manager(result_dir):
     resultManager = ResultManager(result_dir)
     resultManager.debug_print()
 
+def initialize_folder_appender(result_dir):
+    # Access the stored result directory from Flask app configuration
+    # result_dir = app.config.get('RESULT_DIR', 'default_directory_if_not_set')
+    #print("stored result directory", result_dir)
+    global folderAppend
+    folderAppend = FolderAppender(result_dir)
+
+
 
 
 
@@ -213,10 +221,10 @@ def stop_scraper():
 def start_append(data):
     print(data)
     socketio.emit('result_manager_update', {'status': 'appending'})
-    file_appender = FileAppender('C:\\Users\\kskos\\PycharmProjects\\HSI_Back_Test3\\result', data)
-    file_appender.create_new_folder()
-    file_appender.append_files()
-    file_appender.save_data()
+    folderAppend.setSelectedFolders(data)
+    folderAppend.create_new_folder()
+    folderAppend.append_files()
+    folderAppend.save_data()
     response = 0
     return {'Response': response}
 
@@ -271,20 +279,25 @@ def set_result_dir():
     print("Selected Directory: ", directory)
     result_dir = os.path.join(os.getcwd(), directory)
 
+    # initialize the folder appender and result manager
     initialize_result_manager(result_dir)
+    initialize_folder_appender(result_dir)
+
+    # get the result list from result manager
     resultList = resultManager.get_folders()
+
     print(resultList)
 
     # Check if resultList is not empty and send the list
     if resultList:
         print("sending Result list")
         socketio.emit('result_folder_selected', {'folders': resultList, 'result_dir': result_dir})
-    else:
-        # Notify if the directory is empty or there are no folders
-        socketio.emit('result_folder_selected', {'error': 'No folders found in the selected directory'})
     # else:
-    #     # Notify the client that no directory was selected
-    #     socketio.emit('result_folder_selected', {'file_explorer_opened'})
+    #     # Notify if the directory is empty or there are no folders
+    #     socketio.emit('result_folder_selected', {'error': 'No folders found in the selected directory'})
+    else:
+        # Notify the client that no directory was selected
+        socketio.emit('result_folder_selected', {'file_explorer_opened'})
 
 
 @socketio.on('refresh_result_list')

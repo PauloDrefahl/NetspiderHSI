@@ -3,6 +3,7 @@ import webbrowser
 import os
 import sys
 import subprocess
+from Backend.resultManager.makeDiagramsBetter import DataAnalyzer
 
 from flask import jsonify
 
@@ -157,20 +158,43 @@ class ResultManager:
         except Exception as e:
             print(f"An error occurred: {e}")
 
-    def make_diagrams(self, kwargs):
-        print("")
+    def make_diagrams(self, relative_path):
+        print("Making Diagrams")
+        diagramMaker = DataAnalyzer(self.results_directory, relative_path)
+
+        diagramMaker.read_data()
+        print("Read data from clean file\n")
+        diagramMaker.preprocess_data()
+        print("Preprocessed data\n")
+
+        diagramMaker.plot_keyword_frequency()
+        print("Plotted Keyword Frequency\n")
+        diagramMaker.plot_keywords_vs_location()
+        print("Plotted Keyword Frequency vs Location\n")
+        diagramMaker.plot_posts_vs_region()
+        print("Plotted Posts vs Region\n")
+        print("Diagrams made\n")
 
     def view_diagram_dir(self, kwargs):
-        # Making sure the path is absolute
-        # Making sure the path is absolute
-        relative_path = kwargs['diagram_path']
-        print(relative_path)
-        full_path = self.results_directory + "\\" + relative_path
+        # Extract the relative path from the kwargs dictionary
+        relative_path = kwargs.get('diagram_path')
+        if not relative_path:
+            print("Error: No diagram path provided.")
+            return  # Exit the function if no path is provided
 
+        # Construct the full path by combining the results directory with the relative path
+        full_path = os.path.join(self.results_directory, relative_path)
+
+        # Convert to absolute path to ensure compatibility across different operations
         absolute_path = os.path.abspath(full_path)
-        print(absolute_path)
+        absolute_path = absolute_path + "\\diagrams"
+        print("Attempting to open:", absolute_path)
 
-        # Determine the platform and construct the command
+        # Check if the path exists
+        if not os.path.exists(absolute_path):
+            self.make_diagrams(relative_path)
+
+        # Determine the platform and construct the command to open the directory
         if sys.platform.startswith('win32'):
             # Windows: 'explorer' opens File Explorer
             cmd = ['explorer', absolute_path]
@@ -187,7 +211,7 @@ class ResultManager:
         try:
             subprocess.run(cmd, check=True, shell=sys.platform.startswith('win32'))
         except Exception as e:
-            print(f"An error occurred: {e}")
+            print(f"An error occurred while trying to open the directory: {e}")
 
     def debug_print(self):
         print("stored result directory",self.results_directory)
