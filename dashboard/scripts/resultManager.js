@@ -224,8 +224,8 @@ document.addEventListener('DOMContentLoaded', () => {
 
     document.getElementById('viewDiagramButton').addEventListener('click', function () {
         console.log("clicked view diagram dir button");
-        let diagramPath = "\\diagrams";
-        let path = selectedItems[0].textContent + diagramPath;
+        // let diagramPath = "\\diagrams";
+        let path = selectedItems[0].textContent ;
         console.log(path);
 
         // logSelectedItems("Diagram Directory View Requested: ", "\\diagrams");
