@@ -65,16 +65,16 @@ document.addEventListener('DOMContentLoaded', () => {
         console.log("emitted data");
     };
 
-    const generate_keywords = async (path) => {
-        console.log("emitting view generate keywords event");
-        path = selectedItems[0].textContent + "\\keywords\\Keywords.txt";
-        const data = {
-            gen_key_path: path
-        };
-
-        window.socket.emit('', data);
-        console.log("emitted data");
-    };
+    // const generate_keywords = async (path) => {
+    //     console.log("emitting view generate keywords event");
+    //     path = selectedItems[0].textContent + "\\keywords\\Keywords.txt";
+    //     const data = {
+    //         gen_key_path: path
+    //     };
+    //
+    //     window.socket.emit('', data);
+    //     console.log("emitted data");
+    // };
 
     const append_results = async (paths) => {
         console.log("emitting view generate keywords event");
@@ -148,10 +148,24 @@ document.addEventListener('DOMContentLoaded', () => {
         multipleSelectionEnabled = !multipleSelectionEnabled; // Toggle selection mode
 
         // update the UI to indicate the current mode
-        this.textContent = multipleSelectionEnabled ? "Cancel" : "Append";
         console.log("Mode:", multipleSelectionEnabled ? "Multiple Selection" : "Single Selection");
 
-        // Update submit button visibility
+        // Update submit & cancel button visibility
+        updateSubmitButtonVisibility();
+
+        // Update the button grid state to ensure it's disabled if no items are selected
+        updateButtonGridState();
+
+    });
+
+    document.getElementById('cancelButton').addEventListener('click', function () {
+
+        multipleSelectionEnabled = !multipleSelectionEnabled; // Toggle selection mode
+
+        // update the UI to indicate the current mode
+        console.log("Mode:", multipleSelectionEnabled ? "Multiple Selection" : "Single Selection");
+
+        // Update submit & cancel button visibility
         updateSubmitButtonVisibility();
 
         // Update the button grid state to ensure it's disabled if no items are selected
@@ -268,12 +282,21 @@ document.addEventListener('DOMContentLoaded', () => {
 
     function updateSubmitButtonVisibility() {
         const submitButton = document.getElementById('submitButton');
+        const cancelButton = document.getElementById('cancelButton');
+        const appendButton = document.getElementById('appendButton');
         if (multipleSelectionEnabled) {
             submitButton.classList.remove('hidden');
-        } else {
+            cancelButton.classList.remove('hidden');
+            appendButton.classList.add('hidden');
+
+        }
+        else {
             submitButton.classList.add('hidden');
+            cancelButton.classList.add('hidden');
+            appendButton.classList.remove('hidden');
         }
     }
+
 
     /*
       function logSelectedItems(actionMessage, pathExtension = "\\") {
