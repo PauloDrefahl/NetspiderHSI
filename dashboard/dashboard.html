@@ -55,7 +55,7 @@
         <div class="box" id="folder-box">
             <h2><img src="./icons/folder-open-regular.svg" class="icon"/> Select Results Folder</h2>
             <input class="file-input" type="file" id="folderInput" webkitdirectory directory multiple style="display: none;">
-            <button class="selecet-folder" id="folder-input-btn" >Select Folder</button>
+            <button class="select-folder" id="folder-input-btn" >Select Folder</button>
         </div>
         <!-- Big box under the three existing boxes -->
         <div id="big-box">
@@ -195,8 +195,9 @@
                             <ol id="list"></ol>
                         </div>
                         <div id="appendButtons">
-                            <button id="appendButton" class="button-app-sub">Append</button> <!-- Removed space from ID for better practice -->
-                            <button id="submitButton" class="button-app-sub">Submit</button> <!-- Removed space from ID for better practice -->
+                            <button id="appendButton" class="button-app-append">Append</button> <!-- Removed space from ID for better practice -->
+                            <button id="cancelButton" class="button-app-cancel">Cancel</button>
+                            <button id="submitButton" class="button-app-submit">Submit</button>
                         </div>
                     </div>
                 </div>
