@@ -110,6 +110,10 @@ window.socket.on('scraper_update', (data) => {
         console.log('Scraper completed');
     } else if (data.status === 'error') {
         console.log('Error occurred: ' + data.error);
+    } else if (data.status === 'completed') {
+        console.log('Scraper completed');
+        stopClock();
+        statusText.textContent = 'Status: Off';
     }
 
 });
