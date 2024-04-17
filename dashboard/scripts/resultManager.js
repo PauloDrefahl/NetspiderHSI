@@ -4,7 +4,7 @@
 // let jsonData = JSON.parse(fs.readFileSync(dataPath, 'utf8'));
 
 document.addEventListener('DOMContentLoaded', () => {
-
+    
     // operations for result manager
     const refresh_result_list = async () => {
         console.log("emitting refresh result list event");
@@ -249,7 +249,7 @@ document.addEventListener('DOMContentLoaded', () => {
                 item.style.backgroundColor = ""; // Remove highlight
             } else {
                 selectedItems.push(item); // Add item to selectedItems
-                item.style.backgroundColor = "lightblue"; // Highlight selected item
+                item.style.backgroundColor = "#50b8ff"; // Highlight selected item
             }
         } else {
             // Clear previous selection if multiple selection is not enabled
@@ -259,7 +259,7 @@ document.addEventListener('DOMContentLoaded', () => {
 
             selectedItems.length = 0; // Clear the array
             selectedItems.push(item); // Add the newly selected item
-            item.style.backgroundColor = "lightblue"; // Highlight selected item
+            item.style.backgroundColor = "#50b8ff"; // Highlight selected item
         }
 
         // Update button grid state based on current selection

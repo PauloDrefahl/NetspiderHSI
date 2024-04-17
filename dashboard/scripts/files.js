@@ -215,7 +215,8 @@ document.addEventListener("DOMContentLoaded", function () {
 
             folderList.forEach(item => {
                 const listItem = document.createElement('li');
-                listItem.textContent = item;
+                listItem.textContent = item;  // adding text conte
+                item.style.fontSize = "20px";
                 listElement.appendChild(listItem);
 
                 listItem.addEventListener('click', function () {
