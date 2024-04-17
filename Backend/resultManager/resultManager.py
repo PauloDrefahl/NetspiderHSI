@@ -27,18 +27,19 @@ class ResultManager:
     def get_folders(self):
         print("Sending folder json to list component")
 
-        # Check if folders.json exists, if not, create it
-        if not os.path.exists('C:\\Users\\Zach\\WebstormProjects\\NetspiderHSI\\folders.json'):
-            with open('folders.json', 'w') as f:
-                json.dump({}, f)
-
         try:
-            with open('C:\\Users\\Zach\\WebstormProjects\\NetspiderHSI\\folders.json', 'r') as f:
+            if not os.path.exists('folders.json'):
+                self.update_folders_json()
+
+            with open('folders.json', 'r') as f:
                 folders = json.load(f)
             return folders
         except FileNotFoundError:
-            return {"error": "folders.json not found"}, 404
+            print("folders.json not found, creating a new one.")
+            self.update_folders_json()
+            return self.get_folders()
         except Exception as e:
+            print(f"Error getting folders: {str(e)}")
             return {"error": str(e)}, 500
 
     def update_folders_json(self):

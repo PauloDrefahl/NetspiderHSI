@@ -180,9 +180,6 @@ def initialize_folder_appender(result_dir):
     folderAppend = FolderAppender(result_dir)
 
 
-
-
-
 '''
     ---------------------------------
     Socket Routes
@@ -289,16 +286,8 @@ def set_result_dir():
 
     print(resultList)
 
-    # Check if resultList is not empty and send the list
-    if resultList:
-        print("sending Result list")
-        socketio.emit('result_folder_selected', {'folders': resultList, 'result_dir': result_dir})
-    # else:
-    #     # Notify if the directory is empty or there are no folders
-    #     socketio.emit('result_folder_selected', {'error': 'No folders found in the selected directory'})
-    else:
-        # Notify the client that no directory was selected
-        socketio.emit('result_folder_selected', {'file_explorer_opened'})
+    print("sending Result list")
+    socketio.emit('result_folder_selected', {'folders': resultList, 'result_dir': result_dir})
 
 
 @socketio.on('refresh_result_list')
@@ -331,7 +320,7 @@ def handle_error(e):
 
 
 def write_open_ports(ports):
-    with open('C:\\Users\\Zach\\WebstormProjects\\NetspiderHSI\\open_ports.txt', 'w') as file:
+    with open('open_ports.txt', 'w') as file:
         for port in ports:
             file.write(str(port) + '\n')
 
