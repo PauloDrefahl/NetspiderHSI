@@ -20,6 +20,7 @@ import os
 import webbrowser
 from watchdog.observers import Observer
 from watchdog.events import FileSystemEventHandler
+import chromedriver_autoinstaller
 
 # pyinstaller app.py --onefile --name=NetSpiderServer --hidden-import gevent --hidden-import engineio.async_drivers.gevent --hidden-import pyimod02_importers
 
@@ -330,7 +331,7 @@ def handle_error(e):
 
 
 def write_open_ports(ports):
-    with open('C:\\Users\\kskos\\WebstormProjects\\HSI_Back_Test3\\open_ports.txt', 'w') as file:
+    with open('C:\\Users\\Zach\\WebstormProjects\\NetspiderHSI\\open_ports.txt', 'w') as file:
         for port in ports:
             file.write(str(port) + '\n')
 
@@ -353,16 +354,17 @@ def find_open_ports(num):
 
 
 if __name__ == "__main__":
+    chromedriver_autoinstaller.install()
     print("active threads: ", threading.active_count())
 
     num_ports = 1  # Change this to the desired number of open ports
     open_ports = find_open_ports(num_ports)
 
-    # write_open_ports(open_ports)
+    write_open_ports(open_ports)
 
     print("Open Ports:", open_ports)
 
     # Use the open ports as needed in the rest of your program
     # Note: You may want to handle the case where `open_ports` is an empty list.
-    socketio.run(app, host='127.0.0.1', port=3030,
+    socketio.run(app, host='127.0.0.1', port=open_ports[0],
                  allow_unsafe_werkzeug=True)
