@@ -122,6 +122,7 @@
   border: 2px solid #000000; /* Adjust border as needed, or remove it */
   cursor: pointer;
   display: block;
+  flex: auto;
 }
 
 .button-result-ops:hover {
@@ -136,6 +137,7 @@
   width: 50%; /* Adjust based on content, or set a specific width */
   height: auto; /* Allows button height to fit the content, or set a specific height */
   /* Other styles remain unchanged */
+  margin-bottom: 8px;
   margin-top: 1%;
   margin-left: 25%;
   border: 2px solid #000000;
@@ -144,9 +146,75 @@
   color: #fff;
   box-shadow: 0 6px 8px 0 rgba(0,0,0,0.24), 0 8.5px 25px 0 rgba(0,0,0,0.19);
   cursor: pointer;
+  flex: auto;
 }
 
-.button-app-sub:hover {
+.button-app-append {
+  padding: 10px 15px; /* Reduced from 15px 10px for a slimmer look */
+  font-size: 16px; /* Reduced font size for smaller appearance */
+  width: 50%; /* Adjust based on content, or set a specific width */
+  height: auto; /* Allows button height to fit the content, or set a specific height */
+  /* Other styles remain unchanged */
+  margin-bottom: 8px;
+  margin-top: 1%;
+  margin-left: 35%;
+  margin-right: 35%;
+  border: 2px solid #000000;
+  background-color: #09558B;
+  border-radius: 8px;
+  color: #fff;
+  box-shadow: 0 6px 8px 0 rgba(0,0,0,0.24), 0 8.5px 25px 0 rgba(0,0,0,0.19);
+  cursor: pointer;
+  flex: auto;
+}
+
+.button-app-cancel {
+  padding: 10px 15px; /* Reduced from 15px 10px for a slimmer look */
+  font-size: 16px; /* Reduced font size for smaller appearance */
+  width: 40%; /* Adjust based on content, or set a specific width */
+  height: auto; /* Allows button height to fit the content, or set a specific height */
+  /* Other styles remain unchanged */
+  margin-bottom: 8px;
+  margin-top: 1%;
+  border: 2px solid #000000;
+  background-color: #09558B;
+  border-radius: 8px;
+  color: #fff;
+  box-shadow: 0 6px 8px 0 rgba(0,0,0,0.24), 0 8.5px 25px 0 rgba(0,0,0,0.19);
+  cursor: pointer;
+}
+
+.button-app-submit {
+  padding: 10px 15px; /* Reduced from 15px 10px for a slimmer look */
+  font-size: 16px; /* Reduced font size for smaller appearance */
+  width: 40%; /* Adjust based on content, or set a specific width */
+  height: auto; /* Allows button height to fit the content, or set a specific height */
+  /* Other styles remain unchanged */
+  margin-bottom: 8px;
+  margin-top: 1%;
+  margin-left: 35%;
+  border: 2px solid #000000;
+  background-color: #09558B;
+  border-radius: 8px;
+  color: #fff;
+  box-shadow: 0 6px 8px 0 rgba(0,0,0,0.24), 0 8.5px 25px 0 rgba(0,0,0,0.19);
+  cursor: pointer;
+}
+
+.button-app-append:hover {
+  transform: scale(1.05);
+  box-shadow: 0 8px 16px rgba(0, 0, 0, 0.2);
+  transition: background-color 0.3s, color 0.3s, border-color 0.3s;
+}
+
+.button-app-cancel:hover {
+  transform: scale(1.05);
+  box-shadow: 0 8px 16px rgba(0, 0, 0, 0.2);
+  transition: background-color 0.3s, color 0.3s, border-color 0.3s;
+}
+
+
+.button-app-submit:hover {
   transform: scale(1.05);
   box-shadow: 0 8px 16px rgba(0, 0, 0, 0.2);
   transition: background-color 0.3s, color 0.3s, border-color 0.3s;
