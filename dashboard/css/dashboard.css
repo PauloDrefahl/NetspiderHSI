@@ -224,5 +224,11 @@ body {
     margin: 0;
 }
 
-
+/* Screen movement / Relativity */
+#wrapper {
+    margin-left:auto;
+    margin-right:auto;
+    min-width: 1920px;
+    width: 100%;
+}
 
