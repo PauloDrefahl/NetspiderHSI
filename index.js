@@ -70,7 +70,11 @@ const createWindow = () => {
             label: 'View',
             submenu: [
                 { role: 'reload' },
-                { role: 'forcereload' }
+                { role: 'forcereload' },
+                { role: 'separator'},
+                { role: 'resetZoom'},
+                { role: 'zoomIn'},
+                { role: 'zoomOut'}
             ]
         }
     ];
