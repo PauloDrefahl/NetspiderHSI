@@ -145,4 +145,4 @@ This project is licensed under the MIT License. See the [LICENSE](LICENSE) file 
 
 ## Disclaimer
 
-Netspider is intended for use by authorized cybercrime investigators only. Users are responsible for ensuring their use of this tool complies with all applicable laws and regulations. The developers of Netspider are not responsible for any misuse or illegal application of this tool.
+The complete version of Netspider is intended for use by authorized cybercrime investigators only, this open source version does not include any sensitive data or exclusive features. Users are responsible for ensuring their use of this tool complies with all applicable laws and regulations. The developers of Netspider are not responsible for any misuse or illegal application of this tool.
