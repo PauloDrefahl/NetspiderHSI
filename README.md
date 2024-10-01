@@ -63,7 +63,7 @@ Netspider allows users to navigate through complex web structures, extract data 
 
 1. Clone the repository to your local machine:
    ```bash
-   git clone https://github.com/paulodrefahl/netspider.git
+   git clone https://github.com/PauloDrefahl/NetspiderHSI.git
    ```
 
 2. Navigate to the project directory:
