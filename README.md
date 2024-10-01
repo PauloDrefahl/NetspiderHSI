@@ -96,14 +96,14 @@ Netspider allows users to navigate through complex web structures, extract data 
 ## Usage
 
 Start the Client without the main Executable script:
-* In the Client Directory, in the terminal enter:
+1. In the Client Directory, in the terminal enter:
     ```bash
     npm start
     ```
 
-* Then run app.py in server directory to start the backend.
-* Input the port shown in consol into both open_ports.txt files.
-* rerun app.py
+2. Then run app.py in server directory to start the backend.
+3. Input the port shown in consol into both open_ports.txt files.
+4. rerun app.py
 
 Start the scraper by running the main script:
 
