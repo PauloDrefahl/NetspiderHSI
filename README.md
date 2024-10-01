@@ -83,23 +83,23 @@ Netspider allows users to navigate through complex web structures, extract data 
    ```
 
 5. In Client Directory, enter:
- ```bash
-npm init
-```
+   ```bash
+    npm init
+    ```
 
 6. install electron in client:
- ```bash
-npm install --save-dev electron
-```
+    ```bash
+    npm install --save-dev electron
+    ```
 
 
 ## Usage
 
 Start the Client without the main Executable script:
 * In the Client Directory, in the terminal enter:
- ```bash
-npm start
-```
+    ```bash
+    npm start
+    ```
 
 * Then run app.py in server directory to start the backend.
 * Input the port shown in consol into both open_ports.txt files.
@@ -107,9 +107,9 @@ npm start
 
 Start the scraper by running the main script:
 
-```bash
-python netspider.py
-```
+    ```bash
+    python netspider.py
+    ```
 
 Follow the prompts in the UI to configure your keyword sets and begin scraping.
 
