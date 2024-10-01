@@ -105,6 +105,8 @@ Start the Client without the main Executable script:
 3. Input the port shown in consol into both open_ports.txt files.
 4. rerun app.py
 
+
+
 Start the scraper by running the main script:
 
   ```bash
