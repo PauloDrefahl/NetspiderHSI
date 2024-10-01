@@ -1,0 +1,121 @@
+/* SELECT WEBSITES BOX */
+
+/* Add this CSS for radio buttons */
+/* Updated CSS for radio buttons */
+/* Updated CSS for radio buttons */
+.column .radio-buttons {
+    display: flex;
+    flex-direction: column;
+    text-align: center;
+    gap: 12px;
+    
+}
+
+.column input[type="radio"] {
+    opacity: 0; /* Hide default radio button */
+    position: absolute;
+    cursor: pointer;
+    text-align: center;
+}
+
+.column label {
+    text-align: center;
+    cursor: pointer;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    margin: 0;
+    padding: 8px;
+    background-color: #09558B;
+    color: #fff;
+    border: 2px solid #000000;
+    border-radius: 8px;
+    transition: background-color 0.3s, color 0.3s, transform 0.3s;
+    box-sizing: border-box;
+    
+}
+
+.column label:hover {
+    color: white;
+    background-color: #0a6fc1;
+    transform: scale(1.05);
+    box-shadow: 0 8px 16px rgba(0, 0, 0, 0.2);
+}
+
+.column input[type="radio"]:checked + label {
+    background-color: #0a6fc1;
+    color: white;
+    transform: scale(1.1);
+    box-shadow: 0 12px 16px 0 rgba(0,0,0,0.24),0 17px 50px 0 rgba(0,0,0,0.19);
+}
+
+/* Styles for the dropdown menu */
+.dropdown {
+    position: relative;
+    display: inline-block;
+    width: 100%;
+    margin-top: 5px;
+    border: 2px solid #09558B;
+    box-shadow: 0 12px 16px 0 rgba(0,0,0,0.24),0 17px 50px 0 rgba(0,0,0,0.19);
+}
+
+.dropdown-content {
+    display: none;
+    position: absolute;
+    background-color: #fff;
+    box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+    border-radius: 0px;
+    overflow-y: auto;
+    z-index: 1;
+    max-height: 100px;
+}
+
+.dropdown:hover .dropdown-content {
+    display: block;
+    width: 100%;
+}
+
+.dropdown-content-keyset {
+    display: none;
+    position: absolute;
+    background-color: #fff;
+    box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+    border-radius: 0px;
+    overflow-y: auto;
+    overflow-x: hidden;
+    max-height: 100px;
+}
+
+.dropdown:hover .dropdown-content-keyset {
+    display: block;
+    width: 100%;
+}
+
+.dropdown-item {
+    text-align: center;
+    padding: 10px 10px 10px 10px;
+    color: #09558B;
+    width: 95%;
+    text-decoration: none;
+    display: inline-block;
+}
+
+.dropdown-item:hover {
+    background-color: #09558B;
+    color: white;
+}
+
+.dropdown-item-keyset {
+    text-align: center;
+    padding: 10px 10px 10px 10px;
+    color: #09558B;
+    width: 95%;
+    text-decoration: none;
+    display: inline-block;
+    transition: background-color 0.3s, color 0.3s;
+}
+
+.dropdown-item-keyset:hover {
+    background-color: #09558B;
+    color: white;
+}

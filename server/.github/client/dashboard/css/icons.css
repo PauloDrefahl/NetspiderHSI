@@ -1,0 +1,72 @@
+/* ICON CHARACTERISTICS */
+
+#navbar .icon {
+    max-width: 15px; 
+    margin-right: 3px; 
+    max-height: 15px; 
+    margin: 0;
+    margin-right: 8px;
+}
+
+/* Styles for the icon inside the <a> in the navbar */
+#navbar a:focus .icon,
+#navbar a.focus .icon {
+    filter: invert(1); /* Invert the color to change it */
+}
+
+
+#navbar a:focus .icon{
+    /* Styles for the icon when focused */
+    filter: brightness(0) invert(1);
+
+}
+
+#navbar a:focus:hover .icon{
+    /* Styles for the icon when focused and then hovered after */
+    filter: none;
+  }
+
+
+#content-wrapper .icon {
+    max-height: 20px;
+    filter: invert(29%) sepia(39%) saturate(1238%) hue-rotate(163deg) brightness(95%) contrast(101%);
+    margin: 0;
+    margin-right: 8px;
+}
+
+/* Styles for the icon inside the <a> in the navbar */
+#content-wrapper a:focus .icon,
+#content-wrapper a.focus .icon {
+    filter: invert(1); /* Invert the color to change it */
+}
+
+#content-wrapper #blueIcon{
+    filter: none;
+}
+
+#content-wrapper #blueIcon2{
+    filter: none;
+}
+
+
+/* Style for buttons */
+.button-hp {
+    display: block;
+    padding: 15px 30px; /* Increased padding for bigger buttons */
+    margin: 10px 0; /* Add space between buttons */
+    font-size: 20px; /* Increased font size */
+    color: #fff;
+    background-color: #09558B;
+    height: 13%;
+    width: 100%;
+    border: 2px solid #000000;
+    border-radius: 8px;
+    transition: background-color 0.3s, color 0.3s, border-color 0.3s;
+    box-shadow: 0 6px 8px 0 rgba(0,0,0,0.24),0 8.5px 25px 0 rgba(0,0,0,0.19);
+    cursor: pointer;
+}
+
+.button-hp:hover {
+    transform: scale(1.05);
+    box-shadow: 0 8px 16px rgba(0, 0, 0, 0.2);
+}

@@ -1,0 +1,234 @@
+/* DEFAULT DASHBOARD CHARACTERISTICS */
+
+/* Resetting default styles and setting font */
+body {
+    font-family: "Plus Jakarta Sans", sans-serif;
+    margin: 0;
+    padding: 0;
+    background-color: #f4f4f4;
+    background-image: url('../documents/white-triangle-pattern-seamless-background-2.jpg'); /* Specify the URL of your background image */
+    background-size: contain; /* Fit the background image within the container */
+    background-repeat: repeat; /* Prevent the background image from repeating */
+}
+
+* {
+    scroll-behavior: smooth;
+  }
+
+
+.input-container, .button-container {
+    display: flex;
+    align-items: center; /* Center items horizontally */
+    justify-content: center; /* Center items vertically */
+    padding: 10px;  
+}
+
+/* Big box under the three existing boxes */
+#big-box {
+    width: 100%;
+    margin-left: 15px;
+    margin-top: 40px;
+    padding: 30px; /* Increased padding */
+    background-color: #fff;
+    border-left: 2px solid #ddd; /* Left border */
+    border-right: 2px solid #ddd; /* Right border */
+    border-radius: 12px; /* Rounded corners */
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    height: 620px;
+    transition: box-shadow 0.3s, transform 0.3s;
+    box-shadow: 0 8px 16px rgba(0, 0, 0, 0.1); /* Improved box shadow */
+}
+
+.medium-column {
+    flex: 1;
+    margin: 5px; /* Decreased margin */
+    padding: 20px; /* Decreased padding */
+    box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1); /* Improved box shadow */
+    transition: transform 1.5s, box-shadow 1.5s;
+    max-width: calc(50% - 20px); /* Adjusted max-width */
+    display: flex; /* Added */
+    flex-direction: column; /* Added */
+}
+
+/* Three columns within the big box */
+.column {
+    flex: 1;
+    margin: 30px; /* Increased margin */
+    margin-top: 0%;
+    padding: 30px; /* Increased padding */
+    padding-top: 0;
+    height: 90%;
+    box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1); /* Improved box shadow */;
+    transition: transform 1.5s, box-shadow 1.5s;
+}
+
+.column h2{
+    margin-top: 20px;
+    margin-bottom: 17px;
+    color: #09558B;
+    text-align: center;
+}
+
+
+/* Title styles for the big box */
+#big-box h2 {
+    color: #09558B;
+    text-align: center;
+    margin-bottom: 20px;
+}
+
+/* Hover effects */
+.column:hover {
+    box-shadow: 0 8px 16px rgba(0, 0, 0, 0.2);
+    transform: scale(1.05);
+}
+
+.medium-column:hover {
+    box-shadow: 0 8px 16px rgba(0, 0, 0, 0.2);
+    transform: scale(1.05);
+}
+
+
+/* Add this CSS for the big box hover effect */
+#big-box.hover-effect {
+    box-shadow: 0 8px 16px rgba(0, 0, 0, 0.2); /* Enhanced box shadow on hover */
+    transform: scale(1.05);
+}
+
+#big-box-2.hover-effect {
+    box-shadow: 0 8px 16px rgba(0, 0, 0, 0.2); /* Enhanced box shadow on hover */
+    transform: scale(1.05);
+}
+
+
+/* Medium box under the Big box w/ 3 sections */
+#med-box {
+    display: grid;
+    grid-template-columns: repeat(2, 1fr); /* Two equal-width columns */
+    grid-gap: 20px; /* Gap between columns */
+    width: 60%;
+    margin-left: 15px;
+    margin-top: 40px;
+    padding: 30px; /* Increased padding */
+    background-color: #fff;
+    border-left: 2px solid #ddd; /* Left border */
+    border-right: 2px solid #ddd; /* Right border */
+    border-radius: 12px; /* Rounded corners */
+    position: relative; /* Ensure positioning context for absolute positioning */
+    min-height: 500px;
+    transition: box-shadow 0.3s, transform 0.3s;
+    box-shadow: 0 8px 16px rgba(255, 255, 255, 0.1); /* Improved box shadow */
+}
+
+.setname-input{
+    width: 100%;
+    padding: 10px;
+    border: 2px solid #09558B;
+    border-radius: 8px;
+    background-color: #fff;
+    transition: background-color 0.3s, color 0.3s, border-color 0.3s;
+    box-shadow: 0 6px 8px 0 rgba(0,0,0,0.24),0 8.5px 25px 0 rgba(0,0,0,0.19);
+    cursor: pointer;
+}
+
+#med-box h2 {
+    margin-top: 0; /* Removed top margin */
+    margin-bottom: 20px; /* Adjusted bottom margin */
+    color: #09558B;
+    text-align: center;
+}
+
+#med-box-2 h2 {
+    margin-top: 0; /* Removed top margin */
+    margin-bottom: 20px; /* Adjusted bottom margin */
+    color: #09558B;
+    text-align: center;
+}
+
+/* Specifically for bottom warning in medium box*/
+#med-box .column h3 {
+    color: #09558B;
+    text-align: center;
+    padding: 5px;
+    border: 2px solid #000000;
+    padding: 2%;
+    border-radius: 12px; /* Rounded corners */
+    background-color: #09558B;
+    color: #fff;
+    transition: background-color 0.3s, color 0.3s, border-color 0.3s;
+    box-shadow: 0 6px 8px 0 rgba(0,0,0,0.24),0 8.5px 25px 0 rgba(0,0,0,0.19);
+    cursor: pointer;
+}
+
+/* Text within the medium box */
+#med-box p {
+    margin-left: 5px;
+    margin-right: 5px;
+    color: #09558B;
+    text-align: center;
+    font-size: 17px;
+    margin-bottom: 20px;
+}
+
+#med-box-2 p {
+    margin-left: 5px;
+    margin-right: 5px;
+    color: #09558B;
+    text-align: center;
+    font-size: 17px;
+    margin-bottom: 20px;
+}
+
+#big-box-2 {
+    display: grid;
+    grid-template-columns: repeat(2, 1fr); /* Two equal-width columns */
+    grid-gap: 20px; /* Gap between columns */
+    width: 100%;
+    margin-left: 15px;
+    margin-top: 40px;
+    padding: 30px; /* Increased padding */
+    background-color: #fff;
+    border-left: 2px solid #ddd; /* Left border */
+    border-right: 2px solid #ddd; /* Right border */
+    border-radius: 12px; /* Rounded corners */
+    position: relative; /* Ensure positioning context for absolute positioning */
+    min-height: 500px;
+    transition: box-shadow 0.3s, transform 0.3s;
+    box-shadow: 0 8px 16px rgba(255, 255, 255, 0.1); /* Improved box shadow */
+}
+
+#big-box-2 h2 {
+    margin-bottom: 20px; /* Adjusted bottom margin */
+    color: #09558B;
+    text-align: center;
+}
+
+#box-header {
+    justify-content: center; /* Center horizontally */
+    align-items: center; /* Center vertically */
+    margin: 0;
+    border: 2px solid #ddd; /* Increased border width */
+    padding: 10px;
+    background-color: #fff;
+    text-align: center;
+    width: 96%;
+    border-radius: 7px;
+    box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+    transition: transform 0.3s, box-shadow 0.3s;
+    grid-column: span 2;
+}
+
+#box-header h2 {
+    margin: 0;
+}
+
+/* Screen movement / Relativity */
+#wrapper {
+    margin-left:auto;
+    margin-right:auto;
+    min-width: 1920px;
+    width: 100%;
+}
+

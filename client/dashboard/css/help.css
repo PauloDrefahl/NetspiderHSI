@@ -1,0 +1,27 @@
+/* RESOURCES AND SUPPORT BOX */
+
+#small-box{
+    margin-left: 15px;
+    max-width: 370px;
+    margin-top: 40px;
+    padding: 30px; /* Increased padding */
+    background-color: #fff;
+    border-left: 2px solid #ddd; /* Left border */
+    border-right: 2px solid #ddd; /* Right border */
+    border-radius: 12px; /* Rounded corners */
+    position: relative; /* Ensure positioning context for absolute positioning */
+    min-height: 500px;
+    transition: box-shadow 0.3s, transform 0.3s;
+    box-shadow: 0 8px 16px rgba(255, 255, 255, 0.1); /* Improved box shadow */
+}
+
+#small-box:hover {
+    box-shadow: 0 8px 16px rgba(0, 0, 0, 0.2); /* Enhanced box shadow on hover */
+    transform: scale(1.05);
+}
+
+/* Add this CSS for the big box hover effect */
+.small-box.hover-effect {
+    box-shadow: 0 8px 16px rgba(0, 0, 0, 0.2); /* Enhanced box shadow on hover */
+    transform: scale(1.05);
+}

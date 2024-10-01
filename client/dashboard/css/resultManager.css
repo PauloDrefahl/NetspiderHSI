@@ -1,0 +1,235 @@
+#listContainer {
+  flex-grow: 2; /* Allows #listContainer to grow twice as fast as its siblings */
+  width: auto; /* Adjust based on flex-grow */
+  max-width: 2000px; /* Or higher, based on your requirement */
+  height: 500px;
+  overflow-y: auto;
+  border: 10px solid #09558B;
+  padding: 5px;
+  border-radius: 12px;
+}
+
+#list {
+  width: 100%;
+  height: 320px;
+  padding: 10px;
+  text-align: left;
+  transition: transform 0.3s, box-shadow 0.3s;
+  font-size: 24px;
+  display: block;
+  margin-left: 2%;
+}
+
+/* Control Buttons */
+#controlButtons {
+  display: flex;
+  justify-content: start;
+  gap: 10px; /* Adjust the gap between buttons */
+}
+
+#appendButtons {
+  display: flex;
+  justify-content: start;
+  gap: 10px; /* Adjust the gap between buttons */
+  margin-bottom: 1%; /* Optional: adds some space between the buttons and the list */
+}
+/* Optional: Additional styling for buttons to make them uniform in size */
+#appendButtons.button {
+  padding: 15px; /* Reduced vertical padding */
+  font-size: 0.8rem; /* Adjust as needed */
+  margin-left: 10px;
+  line-height: 1; /* Reducing line-height can decrease button height */
+  box-sizing: border-box; /* Ensures padding and border are included in total height */
+  border: 2px solid #000000; /* Adjust border as needed, or remove it */
+}
+
+#appendButtons.button:hover {
+  transform: scale(1.05);
+  box-shadow: 0 8px 16px rgba(0, 0, 0, 0.2);
+  transition: background-color 0.3s, color 0.3s, border-color 0.3s;
+}
+
+/* Layout for list and buttons */
+#contentContainer {
+  margin-top: 25px;
+  display: flex;
+  justify-content: space-between;
+}
+
+#listSection {
+  flex: 1; /* Allows the list section to fill available space */
+}
+
+
+
+#buttonArea {
+  margin-top: 14%; /* Adjust the value to lower the grid as needed */
+  margin-right: 5%;
+  height: fit-content; /* Adjust the height of the grid container to fit its content */
+  width: fit-content; /* Adjust the width of the grid container to fit its content */
+  padding-left: 20px; /* Adds some space between the list and the grid */
+}
+
+#listSection.selected {
+  background-color: #50b8ff; /* Light grey background */
+  color: #000; /* Change text color if needed */
+  /* Add more styles as needed */
+}
+
+.hidden {
+  display: none !important;
+}
+
+.result-list-col {
+  flex-grow: 1;
+  margin: 30px; /* Increased margin */
+  padding: 30px; /* Increased padding */
+  padding-top: 0;
+  padding-bottom: 2%;
+  width: 121%;
+  height: 90%;
+  box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1); /* Improved box shadow */;
+  transition: transform 1.5s, box-shadow 1.5s;
+}
+
+.result-button-col {
+  margin-top: 10%;
+  flex: 1;
+  margin-left: 40%;
+  padding: 5%; /* Increased padding */
+  padding-top: 0;
+  padding-bottom: 7.5%;
+  width: 40%;
+  max-width: 40%;
+  height: 60%;
+  box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1); /* Improved box shadow */;
+  transition: transform 1.5s, box-shadow 1.5s;
+}
+
+.result-list-col:hover {
+  box-shadow: 0 8px 16px rgba(0, 0, 0, 0.2);
+  transform: scale(1.05);
+}
+
+.result-button-col:hover {
+  box-shadow: 0 8px 16px rgba(0, 0, 0, 0.2);
+  transform: scale(1.05);
+}
+
+.button-result-ops {
+  padding: 15px 10px; /* Increased padding for bigger buttons */
+  margin: 20px 0; /* Add space between buttons */
+  font-size: 20px; /* Increased font size */
+  color: #fff;
+  height: 13%;
+  width: 100%;
+  border-radius: 8px;
+  background-color: #09558B;
+  box-shadow: 0 6px 8px 0 rgba(0,0,0,0.24),0 8.5px 25px 0 rgba(0,0,0,0.19);
+  border: 2px solid #000000; /* Adjust border as needed, or remove it */
+  cursor: pointer;
+  display: block;
+  flex: auto;
+}
+
+.button-result-ops:hover {
+  transform: scale(1.05);
+  box-shadow: 0 8px 16px rgba(0, 0, 0, 0.2);
+  transition: background-color 0.3s, color 0.3s, border-color 0.3s;
+}
+
+.button-app-sub {
+  padding: 10px 15px; /* Reduced from 15px 10px for a slimmer look */
+  font-size: 16px; /* Reduced font size for smaller appearance */
+  width: 50%; /* Adjust based on content, or set a specific width */
+  height: auto; /* Allows button height to fit the content, or set a specific height */
+  /* Other styles remain unchanged */
+  margin-bottom: 8px;
+  margin-top: 1%;
+  margin-left: 25%;
+  border: 2px solid #000000;
+  background-color: #09558B;
+  border-radius: 8px;
+  color: #fff;
+  box-shadow: 0 6px 8px 0 rgba(0,0,0,0.24), 0 8.5px 25px 0 rgba(0,0,0,0.19);
+  cursor: pointer;
+  flex: auto;
+}
+
+.button-app-append {
+  padding: 10px 15px; /* Reduced from 15px 10px for a slimmer look */
+  font-size: 16px; /* Reduced font size for smaller appearance */
+  width: 50%; /* Adjust based on content, or set a specific width */
+  height: auto; /* Allows button height to fit the content, or set a specific height */
+  /* Other styles remain unchanged */
+  margin-bottom: 8px;
+  margin-top: 1%;
+  margin-left: 35%;
+  margin-right: 35%;
+  border: 2px solid #000000;
+  background-color: #09558B;
+  border-radius: 8px;
+  color: #fff;
+  box-shadow: 0 6px 8px 0 rgba(0,0,0,0.24), 0 8.5px 25px 0 rgba(0,0,0,0.19);
+  cursor: pointer;
+  flex: auto;
+}
+
+.button-app-cancel {
+  padding: 10px 15px; /* Reduced from 15px 10px for a slimmer look */
+  font-size: 16px; /* Reduced font size for smaller appearance */
+  width: 40%; /* Adjust based on content, or set a specific width */
+  height: auto; /* Allows button height to fit the content, or set a specific height */
+  /* Other styles remain unchanged */
+  margin-bottom: 8px;
+  margin-top: 1%;
+  border: 2px solid #000000;
+  background-color: #09558B;
+  border-radius: 8px;
+  color: #fff;
+  box-shadow: 0 6px 8px 0 rgba(0,0,0,0.24), 0 8.5px 25px 0 rgba(0,0,0,0.19);
+  cursor: pointer;
+}
+
+.button-app-submit {
+  padding: 10px 15px; /* Reduced from 15px 10px for a slimmer look */
+  font-size: 16px; /* Reduced font size for smaller appearance */
+  width: 40%; /* Adjust based on content, or set a specific width */
+  height: auto; /* Allows button height to fit the content, or set a specific height */
+  /* Other styles remain unchanged */
+  margin-bottom: 8px;
+  margin-top: 1%;
+  margin-left: 35%;
+  border: 2px solid #000000;
+  background-color: #09558B;
+  border-radius: 8px;
+  color: #fff;
+  box-shadow: 0 6px 8px 0 rgba(0,0,0,0.24), 0 8.5px 25px 0 rgba(0,0,0,0.19);
+  cursor: pointer;
+}
+
+.button-app-append:hover {
+  transform: scale(1.05);
+  box-shadow: 0 8px 16px rgba(0, 0, 0, 0.2);
+  transition: background-color 0.3s, color 0.3s, border-color 0.3s;
+}
+
+.button-app-cancel:hover {
+  transform: scale(1.05);
+  box-shadow: 0 8px 16px rgba(0, 0, 0, 0.2);
+  transition: background-color 0.3s, color 0.3s, border-color 0.3s;
+}
+
+
+.button-app-submit:hover {
+  transform: scale(1.05);
+  box-shadow: 0 8px 16px rgba(0, 0, 0, 0.2);
+  transition: background-color 0.3s, color 0.3s, border-color 0.3s;
+}
+
+.button-result-ops:disabled {
+  background-color: #cccccc; /* Grey background */
+  color: #666666; /* Darker text color for contrast */
+  cursor: not-allowed; /* Shows a 'not allowed' cursor on hover */
+  border: 2px solid #bbbbbb; /* Optional: Grey border */
+}

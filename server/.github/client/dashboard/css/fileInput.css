@@ -1,0 +1,135 @@
+/* 3 SMALL FILE BOXES AT TOP */
+
+/* Styles for the main content area */
+#content {
+    padding: 20px;
+    display: flex;
+    flex-wrap: wrap;
+    min-width: 963px;
+}
+ 
+/* New wrapper with margin on the left */
+#content-wrapper {
+    margin-top: 20px;
+    margin-left: 300px;
+    margin-right: 40px;
+    display: flex;
+    flex-wrap: wrap;
+}
+
+/* Styles for individual boxes in the content area */
+.box {
+    width: calc(29.33% - 20px);
+    margin: 0 auto;
+    padding: 20px; /* Increased padding */
+    border: 1px solid #ddd;
+    background-color: #fff;
+    text-align: center;
+    border-radius: 12px; /* Rounded corners */
+    transition: box-shadow 0.3s, transform 0.3s;
+    box-sizing: border-box;
+    box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1); /* Improved box shadow */
+}
+
+/* Heading styles within the boxes */
+.box h2 {
+    margin: 0 auto;
+    text-align: center;
+    color: #09558B;
+}
+
+/* Box hover effect */
+.box:hover {
+    box-shadow: 0 8px 16px rgba(0, 0, 0, 0.2); /* Enhanced box shadow on hover */
+    transform: scale(1.05);
+}
+
+/* Add this CSS for the hover effect */
+.box.hover-effect {
+    box-shadow: 0 8px 16px rgba(0, 0, 0, 0.2); /* Enhanced box shadow on hover */
+    transform: scale(1.05);
+}
+
+
+
+/* Styles for file input */
+input[type="file"] {
+    width: 100%;
+    box-sizing: border-box;
+    margin-top: 20px; /* Increased margin */
+    text-align: center;
+    padding: 15px; /* Increased padding */
+    border: 2px dashed #09558B; /* Thicker border */
+    border-radius: 8px;
+    background-color: #fff;
+    transition: background-color 0.3s, border-color 0.3s;
+}
+
+/* Hover effect for file input */
+input[type="file"]:hover {
+    background-color: #f9f9f9;
+    border-color: #0852c9;
+    transition: background-color 1.5s;
+}
+
+input[type="file"].file-selected {
+    background:
+   linear-gradient(#fff 0 0) padding-box,
+   linear-gradient(to bottom, #09558B, green 49%, green) border-box; 
+   border: 2px dashed #fff;
+}
+
+/* Styles for the folder box */
+#folder-box {
+    width: calc(29.33% - 20px); /* Same width as other boxes */
+    margin: 0 auto; /* Centered */
+    padding: 20px; /* Same padding as other boxes */
+    border: 1px solid #ddd; /* Same border as other boxes */
+    background-color: #fff; /* Same background color as other boxes */
+    text-align: center; /* Same text alignment as other boxes */
+    border-radius: 12px; /* Same border radius as other boxes */
+    transition: box-shadow 0.3s, transform 0.3s; /* Same transition effect as other boxes */
+    box-sizing: border-box; /* Same box-sizing as other boxes */
+    box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1); /* Same box shadow as other boxes */
+}
+
+#folder-box h2 {
+    margin: 0 auto; /* Centered */
+    text-align: center; /* Same text alignment as other boxes */
+    color: #09558B; /* Same color as other boxes */
+}
+
+#folder-box:hover {
+    box-shadow: 0 8px 16px rgba(0, 0, 0, 0.2); /* Same hover effect as other boxes */
+    transform: scale(1.05); /* Same hover effect as other boxes */
+}
+
+#folder-box .icon {
+    vertical-align: middle; /* Align icon vertically */
+    margin-right: 10px; /* Add some space between icon and text */
+}
+
+#folder-box input[type="file"] {
+    display: none; /* Hide the file input */
+}
+
+#folder-box .select-folder-button {
+    width: 100%;
+    box-sizing: border-box;
+    margin-top: 20px;
+    text-align: center;
+    padding: 18px;
+    border: 2px dashed #09558B;
+    border-radius: 8px;
+    background-color: #fff;
+    transition: background-color 0.3s, border-color 0.3s;
+}
+
+#folder-box .select-folder-button:hover {
+    border-color: #000000;
+    border-style: solid;
+    background-color: #09558B;
+    color: #fff;
+    cursor: pointer;
+    transition: background-color 0.3s, transform 0.3s, box-shadow 0.3s;
+}
