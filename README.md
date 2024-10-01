@@ -13,14 +13,14 @@ Software Overview Document: <a href="Netspider Final Report.pdf">Final Report 20
 </p>
 
 
-[![AltText](photos/readmeImages/Screenshot%202024-09-20%20113707.png)](https://docs.google.com/presentation/d/1tBXKREY9hA72LFQHfF9SY9RlOABc-vO6arp6WOSfq2M/edit?usp=sharing)
+[![AltText](Images/Screenshot%202024-09-20%20113707.png)](https://docs.google.com/presentation/d/1tBXKREY9hA72LFQHfF9SY9RlOABc-vO6arp6WOSfq2M/edit?usp=sharing)
 
 # Censored Demo
 <p align="center">
    <a href="https://drive.google.com/file/d/1DItKe31nMTbkqE_HVSeL2_9LD99FNy4W/view?resourcekey">Censored DEMO 3.1v</a></h2>
 </p>
 
-[![AltText](photos/readmeImages/Screenshot%202024-09-20%20114023.png)](https://drive.google.com/file/d/1DItKe31nMTbkqE_HVSeL2_9LD99FNy4W/view?resourcekey)
+[![AltText](Images/Screenshot%202024-09-20%20114023.png)](https://drive.google.com/file/d/1DItKe31nMTbkqE_HVSeL2_9LD99FNy4W/view?resourcekey)
 
 
 ## Table of Contents
