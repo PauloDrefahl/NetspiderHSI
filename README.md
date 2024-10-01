@@ -107,9 +107,9 @@ Start the Client without the main Executable script:
 
 Start the scraper by running the main script:
 
-    ```bash
-    python netspider.py
-    ```
+  ```bash
+  python netspider.py
+  ```
 
 Follow the prompts in the UI to configure your keyword sets and begin scraping.
 
