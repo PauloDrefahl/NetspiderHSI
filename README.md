@@ -63,7 +63,7 @@ Netspider allows users to navigate through complex web structures, extract data 
 
 1. Clone the repository to your local machine:
    ```bash
-   git clone https://github.com/paulodrefahl/netspider.git
+   git clone https://github.com/PauloDrefahl/NetspiderHSI.git
    ```
 
 2. Navigate to the project directory:
@@ -160,7 +160,7 @@ Contributions to the project are welcome! If you would like to suggest a feature
 
 Please read our [Contributing Guidelines](link-to-contributing-guidelines) for more information.
 
-## Team
+## Netspider 23-24 Team
 
 * **Paulo Drefahl** - Full Stack Developer
 * **Zach Sutton** - Full Stack Developer
@@ -169,6 +169,10 @@ Please read our [Contributing Guidelines](link-to-contributing-guidelines) for m
 * **Greg Bateham** - Frontend Developer
 * **Corey Record** - Backend Developer
 * **Dylan Garcia** - Frontend Developer
+
+## Netspider 24-25 Team
+
+* **Caleb Newman** - Full Stack Developer
 
 ## Sponsors and Mentors
 
