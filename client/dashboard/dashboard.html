@@ -58,6 +58,7 @@
             <input class="file-input" type="file" id="folderInput" webkitdirectory directory multiple style="display: none;">
             <button class="select-folder" id="folder-input-btn" >Select Folder</button>
         </div>
+
         <!-- Big box under the three existing boxes -->
         <div id="big-box">
             <div class="column">
@@ -135,6 +136,22 @@
                         <h2><div id="clock"></div></h2>
                         <h2><div id="clock"></div></h2>
                     </div>
+                </div>
+            </div>
+        </div>
+
+        <div id="big-box">
+            <h2><img src="./icons/pager-solid.svg" class="icon"/>Automatic Scraping Setup:</h2>
+            <div class="column">
+                <h2>Select Date to Start Scraping</h2>
+                <input type="date">
+                <h2>Select Date to Stop Scraping</h2>
+                <input type="date">
+            </div>
+            <div class="column">
+                <h2>Select Frequency to Scrape</h2>
+                <div>
+                    <label onclick="StartScraper(selectedWebsite, selectedLocation)" id="startButton">Schedule</label>
                 </div>
             </div>
         </div>
