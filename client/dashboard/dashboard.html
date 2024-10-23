@@ -28,18 +28,28 @@
 
 <body>
 
-<div id="navbar">
-    <img src="photos/logo-hsi.png">
-    <h1>Homeland Security Netspider</h1>
-    
-    <a href="#" id="settings-link"  ><img src="./icons/gear-solid.svg" class="icon"/>Settings</a>
-    <a href="#" id="netspider-link"><img src="./icons/spider-solid.svg" class="icon"/>Netspider</a>
-    <a href="#med-box" id="keyword-link"><img src="./icons/key-solid.svg" class="icon"/>Keyword</a>
-    <a href="#small-box" id="help-link"><img src="./icons/circle-question-solid.svg" class="icon"/>Help</a>
-    <a href="#big-box-2" id="results-link"><img src="./icons/box-archive-solid.svg" class="icon"/>Results</a>
-    <a href="../index.html" id="logout-link" class="last-child-divider"><img src="./icons/right-from-bracket-solid.svg" class="icon"/>Logout</a>
-    <img src="photos/fgcu-logo.png" class="fgcu-logo">
-    <div class="divider"></div>
+<div id="navbar"> <!-- Added hamburger menu into navbar and reorganized navbar into classes -->
+    <div class="hamburger" onclick="toggleMenu()">
+        &#9776;
+    </div>
+
+    <div class="nav-logo">
+        <img src="photos/logo-hsi.png">
+        <h1>Homeland Security Netspider</h1>
+    </div>
+
+    <div class="nav-links">
+        <a href="#" id="settings-link"  ><img src="./icons/gear-solid.svg" class="icon"/><span>Settings</span></a>
+        <a href="#" id="netspider-link"><img src="./icons/spider-solid.svg" class="icon"/><span>Netspider</span></a>
+        <a href="#med-box" id="keyword-link"><img src="./icons/key-solid.svg" class="icon"/><span>Keyword</span></a>
+        <a href="#small-box" id="help-link"><img src="./icons/circle-question-solid.svg" class="icon"/><span>Help</span></a>
+        <a href="#big-box-2" id="results-link"><img src="./icons/box-archive-solid.svg" class="icon"/><span>Results</span></a>
+        <a href="../index.html" id="logout-link" class="last-child-divider"><img src="./icons/right-from-bracket-solid.svg" class="icon"/><span>Logout</span></a>
+    </div>
+    <div class="nav-logo">
+        <img src="photos/fgcu-logo.png" class="fgcu-logo">
+        <div class="divider"></div>
+    </div>
 </div>
 
 <div id="wrapper">

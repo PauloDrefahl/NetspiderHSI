@@ -228,7 +228,50 @@ body {
 #wrapper {
     margin-left:auto;
     margin-right:auto;
-    min-width: 1920px;
+    min-width: auto;
     width: 100%;
 }
 
+/* Small screen movement */
+@media (max-width: 1400px) {
+    .input-container, .button-container {
+        flex-direction: column; /* Stack items vertically */
+        align-items: center; /* Centers items w/o stretching */
+    }
+
+    #big-box {
+        flex-direction: column;
+        height: auto; /* Let height adjust automatically */
+    }
+
+    .medium-column {
+        max-width: 100%;
+    }
+
+    .column {
+        margin: 15px 0;
+        padding: 20px;
+        width: 100%;
+    }
+
+    #med-box {
+        width: 100%;
+        grid-template-columns: repeat(auto-fill, minmax(300px, 1fr)); /* Responsive columns */
+    }
+
+    #big-box-2 {
+        grid-template-columns: repeat(auto-fill, minmax(300px, 1fr)); /* Responsive columns */
+    }
+
+    #box-header {
+        width: 100%;
+    }
+
+    #buttonArea {
+        height: auto;
+    }
+
+    #wrapper {
+        width: 100%;
+    }
+}

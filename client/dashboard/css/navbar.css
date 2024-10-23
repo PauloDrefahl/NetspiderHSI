@@ -53,13 +53,14 @@
 
 /* Styles for navigation links */
 #navbar a {
-    display: block;
+    display: flex;
     font-size: 18px;
     padding: 15px;
     text-decoration: none;
     color: #09558B;
     background-color: #ffffff;
     text-align: center;
+    align-items: center;
     transition: background-color 0.3s, color 0.3s, box-shadow 0.3s, transform 0.3s;
     margin-top: 17px;
     border: none; /* Remove solid border */
@@ -110,4 +111,43 @@
     height: 1px;
     background-color: #ddd;
     margin-top: 20px;
+}
+
+.nav-links {
+    display: block;
+}
+
+.hamburger {
+    display: none; /* Hidden by default */
+    font-size: 27px;
+    cursor: pointer;
+}
+
+/* Media query for hamburger below 1400px */
+/* test */
+@media (max-width: 1400px) {
+    .nav-links {
+        display: none;
+        position: absolute;
+        top: 40px;
+        left: 0;
+        width: 100%;
+        z-index: 1;
+    }
+
+    .nav-links a span, .nav-logo {
+        display: none;
+    }
+
+    .nav-links.active, .hamburger {
+        display: block;
+    }
+
+    #navbar {
+        padding: 10px;
+        width: 30px;
+        height: 35px;
+        min-height: 30px;
+    }
+
 }
