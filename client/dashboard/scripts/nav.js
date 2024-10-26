@@ -45,5 +45,11 @@ document.addEventListener("DOMContentLoaded", function () {
         addHoverEffect(bigBox2); // Assuming there's a big box 2, adjust accordingly
     });
 
+    /* Toggle Hamburger Menu */
+    window.toggleMenu = function() {
+        const navLinks = document.querySelector('.nav-links');
+        navLinks.classList.toggle('active');
+    };
+
 });
 

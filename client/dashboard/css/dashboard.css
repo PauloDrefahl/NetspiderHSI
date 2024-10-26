@@ -236,12 +236,12 @@ body {
 @media (max-width: 1400px) {
     .input-container, .button-container {
         flex-direction: column; /* Stack items vertically */
-        align-items: center; /* Centers items w/o stretching */
+        align-items: flex-start;
     }
 
     #big-box {
         flex-direction: column;
-        height: auto; /* Let height adjust automatically */
+        height: auto;
     }
 
     .medium-column {
@@ -249,7 +249,7 @@ body {
     }
 
     .column {
-        margin: 15px 0;
+        margin: 30px 0;
         padding: 20px;
         width: 100%;
     }
@@ -273,5 +273,7 @@ body {
 
     #wrapper {
         width: 100%;
+        margin-left: 0;
+        margin-right: auto;
     }
 }
