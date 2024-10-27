@@ -253,18 +253,13 @@ body {
         padding: 20px;
         width: 100%;
     }
-
     #med-box {
-        width: 100%;
+        width: auto;
         grid-template-columns: repeat(auto-fill, minmax(300px, 1fr)); /* Responsive columns */
     }
-
+    
     #big-box-2 {
         grid-template-columns: repeat(auto-fill, minmax(300px, 1fr)); /* Responsive columns */
-    }
-
-    #box-header {
-        width: 100%;
     }
 
     #buttonArea {
@@ -272,8 +267,8 @@ body {
     }
 
     #wrapper {
-        width: 100%;
-        margin-left: 0;
+        width: fit-content;
+        margin-left: -230px;
         margin-right: auto;
     }
 }
