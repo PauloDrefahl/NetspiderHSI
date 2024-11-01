@@ -22,7 +22,6 @@ from watchdog.observers import Observer
 from watchdog.events import FileSystemEventHandler
 import chromedriver_autoinstaller
 
-# pyinstaller app.py --onefile --name=NetSpiderServer --hidden-import gevent --hidden-import engineio.async_drivers.gevent --hidden-import pyimod02_importers
 
 app = Flask(__name__)
 qt_app = QApplication([])

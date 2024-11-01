@@ -1,3 +1,8 @@
+# Only put project-specific paths in here.
+# If you have OS-specific or editor-specific paths to ignore, such as '*.swp',
+# '[Dd]esktop.ini', '.DS_Store', or '.vscode', put those in your global
+# .gitignore file or in /path/to/repository/.git/info/exclude. Thanks!
+
 # Cached bytecode and DLLs
 __pycache__/
 *.py[cd]
@@ -10,3 +15,12 @@ venv/
 ENV/
 env.bak/
 venv.bak/
+
+# General Python packaging
+build/
+build-*/
+dist/
+
+# PyInstaller
+*.manifest
+*.spec
