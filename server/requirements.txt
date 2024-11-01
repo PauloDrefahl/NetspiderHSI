@@ -14,7 +14,6 @@ Deprecated
 dnspython
 et-xmlfile
 eventlet
-exceptiongroup
 Flask
 Flask-Cors
 Flask-SocketIO
@@ -45,6 +44,9 @@ pyinstaller
 pyinstaller-hooks-contrib
 pyparsing
 PyPDF2
+PyQt5
+PyQt5-Qt5
+PyQt5-sip
 PySocks
 python-dateutil
 python-engineio
@@ -54,6 +56,7 @@ pywin32-ctypes
 requests
 seaborn
 selenium
+setuptools
 simple-websocket
 six
 sniffio
@@ -64,12 +67,11 @@ typing_extensions
 tzdata
 undetected-chromedriver
 urllib3
-waitress
 watchdog
+websocket-client
 websockets
 Werkzeug
 wrapt
 wsproto
 zope.event
 zope.interface
-PyQt5
