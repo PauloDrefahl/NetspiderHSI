@@ -24,3 +24,6 @@ dist/
 # PyInstaller
 *.manifest
 *.spec
+
+# Node.js dependencies
+node_modules/
