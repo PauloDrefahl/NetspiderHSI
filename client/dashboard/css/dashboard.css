@@ -8,7 +8,7 @@ body {
     background-color: #f4f4f4;
     background-image: url('../documents/white-triangle-pattern-seamless-background-2.jpg'); /* Specify the URL of your background image */
     background-size: contain; /* Fit the background image within the container */
-    background-repeat: repeat; /* Prevent the background image from repeating */
+    background-repeat: repeat; /* Allow the background image to repeat */
 }
 
 * {
@@ -16,11 +16,12 @@ body {
   }
 
 
+
 .input-container, .button-container {
     display: flex;
     align-items: center; /* Center items horizontally */
     justify-content: center; /* Center items vertically */
-    padding: 10px;  
+    padding: 10px;
 }
 
 /* Big box under the three existing boxes */
@@ -41,12 +42,17 @@ body {
     box-shadow: 0 8px 16px rgba(0, 0, 0, 0.1); /* Improved box shadow */
 }
 
+/* Added Transition CSS */
+.column, .medium-column {
+    transition: transform 0.3s ease, box-shadow 0.3s ease;
+}
+
+
 .medium-column {
     flex: 1;
     margin: 5px; /* Decreased margin */
     padding: 20px; /* Decreased padding */
     box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1); /* Improved box shadow */
-    transition: transform 1.5s, box-shadow 1.5s;
     max-width: calc(50% - 20px); /* Adjusted max-width */
     display: flex; /* Added */
     flex-direction: column; /* Added */
@@ -61,7 +67,6 @@ body {
     padding-top: 0;
     height: 90%;
     box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1); /* Improved box shadow */;
-    transition: transform 1.5s, box-shadow 1.5s;
 }
 
 .column h2{
@@ -80,26 +85,14 @@ body {
 }
 
 /* Hover effects */
-.column:hover {
+.hover-effect {
     box-shadow: 0 8px 16px rgba(0, 0, 0, 0.2);
     transform: scale(1.05);
 }
 
-.medium-column:hover {
-    box-shadow: 0 8px 16px rgba(0, 0, 0, 0.2);
-    transform: scale(1.05);
-}
-
-
-/* Add this CSS for the big box hover effect */
-#big-box.hover-effect {
-    box-shadow: 0 8px 16px rgba(0, 0, 0, 0.2); /* Enhanced box shadow on hover */
-    transform: scale(1.05);
-}
-
-#big-box-2.hover-effect {
-    box-shadow: 0 8px 16px rgba(0, 0, 0, 0.2); /* Enhanced box shadow on hover */
-    transform: scale(1.05);
+/* Improved CSS for hover */
+.column:hover,.medium-column:hover,#big-box.hover-effect,#big-box-2.hover-effect {
+    composes: hover-effect;
 }
 
 
