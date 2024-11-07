@@ -188,13 +188,6 @@ class SkipthegamesScraper(ScraperPrototype):
         for link in links:
             self.driver.get(link)
             assert "Page not found" not in self.driver.page_source
-            '''
-            try:
-                timestamp = self.driver.find_element(
-                    By.CLASS_NAME, 'viewpostbody').text
-            except NoSuchElementException:
-                timestamp = 'N/A'
-            '''
             try:
                 about_info = self.driver.find_element(
                     By.XPATH, '/html/body/div[7]/div/div[2]/div/table/tbody').text
