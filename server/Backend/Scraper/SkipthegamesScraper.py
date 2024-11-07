@@ -3,7 +3,7 @@ from datetime import datetime
 import pandas as pd
 import time
 from seleniumbase import Driver
-from selenium.common import NoSuchElementException
+from seleniumbase.common.exceptions import NoSuchElementException
 from selenium.webdriver.common.by import By
 from Backend.ScraperPrototype import ScraperPrototype
 import img2pdf
@@ -189,20 +189,21 @@ class SkipthegamesScraper(ScraperPrototype):
             self.driver.get(link)
             assert "Page not found" not in self.driver.page_source
             try:
-                about_info = self.driver.find_element(
-                    By.XPATH, '/html/body/div[7]/div/div[2]/div/table/tbody').text
+                about_info = self.driver.wait_for_element(
+                    By.CSS_SELECTOR, '#post-body tbody').text
             except NoSuchElementException:
                 about_info = 'N/A'
 
             try:
-                services = self.driver.find_element(
+                services = self.driver.wait_for_element(
                     By.XPATH, '//*[@id="post-services"]').text
             except NoSuchElementException:
                 services = 'N/A'
 
             try:
-                description = self.driver.find_element(
-                    By.XPATH, '/html/body/div[7]/div/div[2]/div/div[1]/div').text
+                # NOTE: It's possible for two elements to have the same ID.
+                description = self.driver.wait_for_element(
+                    By.CSS_SELECTOR, '#post-body #post-body').text
             except NoSuchElementException:
                 description = 'N/A'
 

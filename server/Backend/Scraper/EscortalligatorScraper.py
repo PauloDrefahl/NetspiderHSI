@@ -539,6 +539,7 @@ class EscortalligatorScraper(ScraperPrototype):
         self.location_and_age = []
         self.links = []
         self.post_identifier = []
+        self.timestamps = []
         self.payment_methods_found = []
         self.number_of_keywords_found = []
         self.keywords_found = []
