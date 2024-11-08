@@ -122,7 +122,8 @@ class RubratingsScraper(ScraperPrototype):
             headless=self.search_mode,
             # Override the default mode (headless mode) on Linux.
             headed=not self.search_mode,
-            window_size="1920,1080",
+            # Use a fixed window size in headless mode.
+            window_size="1920,1080" if self.search_mode else None,
         )
 
         # Open Webpage with URL
@@ -171,7 +172,11 @@ class RubratingsScraper(ScraperPrototype):
 
                 # Switch back to the new tab
                 self.driver.switch_to.window(self.driver.window_handles[-1])
-        self.driver.maximize_window()
+
+        # NOTE: Maximizing the window in headless mode makes it too big:
+        # https://chromium.googlesource.com/chromium/src.git/+/f2bdeab65/ui/views/win/hwnd_message_handler_headless.cc#264
+        if not self.search_mode:
+            self.driver.maximize_window()
         self.driver.find_element(By.XPATH, '/html/body/div[4]/div[2]/div/div[3]/button').click()
         assert "Page not found" not in self.driver.page_source
 

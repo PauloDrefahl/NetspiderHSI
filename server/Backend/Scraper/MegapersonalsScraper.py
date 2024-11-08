@@ -127,7 +127,8 @@ class MegapersonalsScraper(ScraperPrototype):
             headless=self.search_mode,
             # Override the default mode (headless mode) on Linux.
             headed=not self.search_mode,
-            window_size="1920,1080",
+            # Use a fixed window size in headless mode.
+            window_size="1920,1080" if self.search_mode else None,
         )
 
         # Open Webpage with URL
@@ -162,7 +163,10 @@ class MegapersonalsScraper(ScraperPrototype):
     def open_webpage(self) -> None:
         self.driver.implicitly_wait(10)
         self.driver.get(self.url)
-        self.driver.maximize_window()
+        # NOTE: Maximizing the window in headless mode makes it too big:
+        # https://chromium.googlesource.com/chromium/src.git/+/f2bdeab65/ui/views/win/hwnd_message_handler_headless.cc#264
+        if not self.search_mode:
+            self.driver.maximize_window()
         assert "Page not found" not in self.driver.page_source
         self.driver.find_element(By.XPATH, '//*[@id="checkbox-agree"]').click()
         # There is a quick fade-in during which we cannot click the button.
