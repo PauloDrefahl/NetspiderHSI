@@ -1,5 +1,4 @@
 from Backend.ScraperPrototype import ScraperPrototype
-import time
 from datetime import datetime
 from seleniumbase import Driver
 from selenium.common import NoSuchElementException
@@ -119,7 +118,6 @@ class ErosScraper(ScraperPrototype):
 
         # Open Webpage with URL
         self.open_webpage()
-        time.sleep(10)
 
         # Find links of posts
         links = self.get_links()

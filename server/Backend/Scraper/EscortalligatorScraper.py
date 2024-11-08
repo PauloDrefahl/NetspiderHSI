@@ -1,5 +1,4 @@
 import os
-import time
 from datetime import datetime
 import pandas as pd
 from seleniumbase import Driver
@@ -177,16 +176,11 @@ class EscortalligatorScraper(ScraperPrototype):
     ---------------------------------------
     '''
     def get_links(self) -> list:
-        # click on terms btn
-        btn = self.driver.find_element(
-            By.CLASS_NAME, 'button')
-        btn.click()
+        # Click on the "terms of use" button.
+        self.driver.click(By.CLASS_NAME, "button")
 
-        time.sleep(2)
-        # click on 2nd terms btn
-        btn = self.driver.find_element(
-            By.CLASS_NAME, 'footer')
-        btn.click()
+        # Click on the "scum warning" button.
+        self.driver.click(By.CLASS_NAME, "footer")
 
         posts = self.driver.find_elements(
             By.CSS_SELECTOR, '#list [href]')

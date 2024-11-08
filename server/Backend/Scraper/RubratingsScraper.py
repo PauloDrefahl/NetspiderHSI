@@ -142,7 +142,6 @@ class RubratingsScraper(ScraperPrototype):
         print("keywords inside scraper:", self.keywords)
         self.get_data(links)
         print("get data done")
-        # time.sleep(5)
         self.stop_scraper()
         print("closed webpage")
         self.reset_variables()

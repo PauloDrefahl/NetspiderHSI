@@ -1,7 +1,6 @@
 import os
 from datetime import datetime
 import pandas as pd
-import time
 from seleniumbase import Driver
 from seleniumbase.common.exceptions import NoSuchElementException
 from selenium.webdriver.common.by import By
