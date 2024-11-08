@@ -27,3 +27,6 @@ dist/
 
 # Node.js dependencies
 node_modules/
+
+# SeleniumBase
+downloaded_files/

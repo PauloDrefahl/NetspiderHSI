@@ -5,7 +5,6 @@ requires-python = '>=3.11'
 # List direct dependencies and desired optional dependencies. For future
 # reference, list dependent packages next to desired optional dependencies.
 dependencies = [
-  'chromedriver-autoinstaller',
   'eventlet', # For 'Flask-SocketIO', 'python-engineio', 'python-socketio'
   'Flask',
   'Flask-Cors',
@@ -24,6 +23,6 @@ dependencies = [
   'PySocks', # For 'urllib3'
   'seaborn',
   'selenium',
-  'undetected-chromedriver',
+  'seleniumbase',
   'watchdog',
 ]

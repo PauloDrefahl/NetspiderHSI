@@ -2,7 +2,7 @@ import os
 import time
 from datetime import datetime
 import pandas as pd
-import undetected_chromedriver as uc
+from seleniumbase import Driver
 from selenium.common import NoSuchElementException
 from selenium.webdriver.common.by import By
 from Backend.ScraperPrototype import ScraperPrototype
@@ -128,12 +128,16 @@ class YesbackpageScraper(ScraperPrototype):
 
         # Format website URL based on state and city
         self.get_formatted_url()
-        # self.set_search_mode(self.search_mode)
-        options = uc.ChromeOptions()
-        # TODO - uncomment this line to run headless
-        # options.add_argument('--headless')
-        options.headless = self.search_mode  # This determines if you program runs headless or not
-        self.driver = uc.Chrome(subprocress=True, options=options)
+        self.driver = Driver(
+            # Download the latest ChromeDriver for the current major version.
+            driver_version="mlatest",
+            undetectable=True,
+            uc_subprocess=True,
+            headless=self.search_mode,
+            # Override the default mode (headless mode) on Linux.
+            headed=not self.search_mode,
+            window_size="1920,1080",
+        )
 
         # Open Webpage with URL
         self.open_webpage()

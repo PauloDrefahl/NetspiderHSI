@@ -107,5 +107,5 @@ app.on('before-quit', async () => {
   process.kill(flaskPID, 'SIGKILL');
   exec('taskkill /IM NetSpiderServer.exe /F');
   exec('taskkill /IM NetSpiderServer.exe /F');
-  exec('taskkill /IM undetected_chromedriver.exe /F');
+  exec('taskkill /IM uc_driver.exe /F');
 });

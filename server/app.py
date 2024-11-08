@@ -20,7 +20,6 @@ import os
 import webbrowser
 from watchdog.observers import Observer
 from watchdog.events import FileSystemEventHandler
-import chromedriver_autoinstaller
 
 
 app = Flask(__name__)
@@ -342,7 +341,6 @@ def find_open_ports(num):
 
 
 if __name__ == "__main__":
-    chromedriver_autoinstaller.install()
     print("active threads: ", threading.active_count())
 
     num_ports = 1  # Change this to the desired number of open ports
