@@ -112,9 +112,6 @@ class MegapersonalsScraper(ScraperPrototype):
     ---------------------------------------
     '''
     def initialize(self) -> None:
-        # set keywords value
-        #self.keywords = keywords
-
         # format date
         self.date_time = str(datetime.today())[0:19].replace(' ', '_').replace(':', '-')
 

@@ -116,9 +116,6 @@ class EscortalligatorScraper(ScraperPrototype):
     '''
 
     def initialize(self) -> None:
-        # set keywords value
-        #self.keywords = keywords
-
         self.date_time = str(datetime.today())[0:19].replace(' ', '_').replace(':', '-')
 
         # Format website URL based on state and city
@@ -358,7 +355,7 @@ class EscortalligatorScraper(ScraperPrototype):
     Checking and Running Append
     --------------------------
     '''
-    def check_keywords_found(self, description, location_and_age, locationSplits, age, phone_number, link):  # add link as well?
+    def check_keywords_found(self, description, location_and_age, locationSplits, age, phone_number, link):
         self.check_and_append_keywords(description)
         self.check_and_append_keywords(location_and_age)
         self.check_and_append_keywords(locationSplits)
@@ -429,7 +426,6 @@ class EscortalligatorScraper(ScraperPrototype):
             'Keywords-found': self.keywords_found,
             'Number-of-keywords-found': self.number_of_keywords_found
         }
-        # count = 2
         data = pd.DataFrame(titled_columns)
         with pd.ExcelWriter(
                 f'{self.scraper_directory}/RAW-escortalligator-{self.city}-{self.date_time}.xlsx',

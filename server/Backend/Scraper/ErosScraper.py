@@ -95,9 +95,6 @@ class ErosScraper(ScraperPrototype):
     ---------------------------------------
     '''
     def initialize(self) -> None:
-        # set keywords value
-        # self.keywords = keywords
-
         # Date and time of search
         self.date_time = str(datetime.today())[0:19].replace(' ', '_').replace(':', '-')
 

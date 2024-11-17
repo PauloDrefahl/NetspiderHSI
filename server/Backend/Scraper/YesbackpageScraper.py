@@ -121,8 +121,6 @@ class YesbackpageScraper(ScraperPrototype):
     ---------------------------------------
     '''
     def initialize(self) -> None:
-        # set keywords value
-        # self.keywords = keywords
         # set up directories to save screenshots and Excel file.
         self.date_time = str(datetime.today())[0:19].replace(' ', '_').replace(':', '-')
 
