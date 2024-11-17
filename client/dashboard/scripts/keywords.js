@@ -111,6 +111,18 @@ function updateDropdown() {
         addOption('north florida');
         addOption('orlando');
         addOption('tampa');
+    } else if (radioValue === 'RubRatings') {
+        selectedWebsite = 'rubratings';
+        addOption('fort myers');
+        addOption('gainesville');
+        addOption('jacksonville');
+        addOption('miami');
+        addOption('ft lauderdale');
+        addOption('orlando');
+        addOption('panama city');
+        addOption('pensacola');
+        addOption('tallahassee');
+        addOption('tampa');
     }
 
 }

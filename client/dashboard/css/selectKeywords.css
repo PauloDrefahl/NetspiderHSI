@@ -88,7 +88,7 @@ button#select-all-button[aria-expanded="false"]:not(:hover)::after {
 
 #itemList{
     width: 100%;
-    height: 320px;
+    height: 370px;
     padding: 10px;
     text-align: center;
     box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
