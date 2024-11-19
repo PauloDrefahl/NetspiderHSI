@@ -57,7 +57,7 @@ class SkipthegamesScraper(ScraperPrototype):
 
         self.join_keywords = False
         self.search_mode = False
-        self.keywords_found_in_post = []
+        self.keywords_found_in_post = set()
 
         # lists to store data and then send to excel file
         self.link = []
@@ -206,7 +206,7 @@ class SkipthegamesScraper(ScraperPrototype):
                     description = 'N/A'
 
                 # reassign variables for each post
-                self.keywords_found_in_post = []
+                self.keywords_found_in_post.clear()
 
                 # Scan the post's contents for keywords.
                 self.check_keywords_found(about_info, services, description, link)
@@ -302,12 +302,12 @@ class SkipthegamesScraper(ScraperPrototype):
     def check_and_append_keywords(self, data) -> None:
         for key in self.keywords:
             if key in data.lower():
-                self.keywords_found_in_post.append(key)
+                self.keywords_found_in_post.add(key)
 
     def should_discard_post(self, description) -> bool:
         if self.join_keywords:
             # Discard posts that don't contain ALL keywords.
-            if len(set(self.keywords_found_in_post)) < len(self.keywords):
+            if len(self.keywords_found_in_post) < len(self.keywords):
                 return True
         elif not self.only_posts_with_payment_methods and len(self.keywords) > 0:
             # Discard posts that don't contain ANY keywords, unless:
