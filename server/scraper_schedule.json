@@ -1,0 +1,17 @@
+{
+    "testA": {
+        "data": {},
+        "frequency": "weekly",
+        "duration": 10
+    },
+    "testB": {
+        "data": {},
+        "frequency": "daily",
+        "duration": 10
+    },
+    "testC": {
+        "data": {},
+        "frequency": "weekly",
+        "duration": 10
+    }
+}
