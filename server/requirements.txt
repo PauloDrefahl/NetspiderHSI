@@ -14,9 +14,7 @@ contourpy
 cssselect
 cycler
 Deprecated
-dnspython
 et-xmlfile
-eventlet
 exceptiongroup
 execnet
 fasteners
@@ -56,7 +54,6 @@ Pillow
 pip
 platformdirs
 pluggy
-psutil
 py
 pycparser
 pygments
