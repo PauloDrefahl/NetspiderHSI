@@ -55,6 +55,8 @@ Pillow
 pip
 platformdirs
 pluggy
+psycopg
+psycopg-binary
 py
 pycparser
 pygments

@@ -15,6 +15,7 @@ dependencies = [
   'numpy',
   'openpyxl',
   'pandas',
+  'psycopg[binary]',
   'pyinstaller',
   'PyPDF2',
   'PyQt5',
