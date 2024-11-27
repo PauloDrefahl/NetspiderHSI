@@ -1,5 +1,7 @@
 from abc import ABC, abstractmethod
+import psycopg
 from Backend.Keywords import Keywords
+from . import database
 
 
 class ScraperPrototype(ABC):
@@ -46,3 +48,7 @@ class ScraperPrototype(ABC):
     @abstractmethod
     def check_and_append_keywords(self, text):
         pass
+
+    @staticmethod
+    def open_database() -> psycopg.Connection:
+        return database.open()
