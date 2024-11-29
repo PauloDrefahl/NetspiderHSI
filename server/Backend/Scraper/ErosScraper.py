@@ -138,6 +138,7 @@ class ErosScraper(ScraperPrototype):
         self.reset_variables()
 
     def stop_scraper(self) -> None:
+        self.completed = True
         if self.search_mode:
             self.driver.close()
             self.driver.quit()
@@ -193,76 +194,77 @@ class ErosScraper(ScraperPrototype):
         counter = 0
 
         for link in links:
-            self.driver.implicitly_wait(10)
-            self.driver.get(link)
-            assert "Page not found" not in self.driver.page_source
+            while not self.completed:
+                self.driver.implicitly_wait(10)
+                self.driver.get(link)
+                assert "Page not found" not in self.driver.page_source
 
-            try:
-                profile_header = self.driver.find_element(
-                    By.XPATH, '//*[@id="pageone"]/div[1]').text
-            except NoSuchElementException:
-                profile_header = 'N/A'
+                try:
+                    profile_header = self.driver.find_element(
+                        By.XPATH, '//*[@id="pageone"]/div[1]').text
+                except NoSuchElementException:
+                    profile_header = 'N/A'
 
-            try:
-                description = self.driver.find_element(
-                    By.XPATH, '// *[ @ id = "pageone"] / div[3] / div / div[1] / div[2]').text
-            except NoSuchElementException:
-                description = 'N/A'
+                try:
+                    description = self.driver.find_element(
+                        By.XPATH, '// *[ @ id = "pageone"] / div[3] / div / div[1] / div[2]').text
+                except NoSuchElementException:
+                    description = 'N/A'
 
-            try:
-                info_details = self.driver.find_element(
-                    By.XPATH, '//*[@id="pageone"]/div[3]/div/div[2]/div[1]/div').text
-            except NoSuchElementException:
-                info_details = 'N/A'
+                try:
+                    info_details = self.driver.find_element(
+                        By.XPATH, '//*[@id="pageone"]/div[3]/div/div[2]/div[1]/div').text
+                except NoSuchElementException:
+                    info_details = 'N/A'
 
-            try:
-                contact_details = self.driver.find_element(
-                    By.XPATH, '//*[@id="pageone"]/div[3]/div/div[2]/div[2]').text
-            except NoSuchElementException:
-                contact_details = 'N/A'
+                try:
+                    contact_details = self.driver.find_element(
+                        By.XPATH, '//*[@id="pageone"]/div[3]/div/div[2]/div[2]').text
+                except NoSuchElementException:
+                    contact_details = 'N/A'
 
-            # reassign variables for each post
-            self.number_of_keywords_in_post = 0
-            self.keywords_found_in_post = []
+                # reassign variables for each post
+                self.number_of_keywords_in_post = 0
+                self.keywords_found_in_post = []
 
-            if self.join_keywords and self.only_posts_with_payment_methods:
-                if self.check_keywords(profile_header) or self.check_keywords(description) \
-                        or self.check_keywords(info_details) or self.check_keywords(contact_details):
-                    counter = self.join_with_payment_methods(contact_details, counter, description, info_details, link,
-                                                             profile_header)
-
-            elif self.join_keywords or self.only_posts_with_payment_methods:
-                if self.join_keywords:
+                if self.join_keywords and self.only_posts_with_payment_methods:
                     if self.check_keywords(profile_header) or self.check_keywords(description) \
                             or self.check_keywords(info_details) or self.check_keywords(contact_details):
-                        self.check_keywords_found(contact_details, description, info_details, profile_header, link)
-                        counter = self.join_inclusive(contact_details, counter, description, info_details, link,
-                                                      profile_header)
+                        counter = self.join_with_payment_methods(contact_details, counter, description, info_details, link,
+                                                                profile_header)
 
-                elif self.only_posts_with_payment_methods:
+                elif self.join_keywords or self.only_posts_with_payment_methods:
+                    if self.join_keywords:
+                        if self.check_keywords(profile_header) or self.check_keywords(description) \
+                                or self.check_keywords(info_details) or self.check_keywords(contact_details):
+                            self.check_keywords_found(contact_details, description, info_details, profile_header, link)
+                            counter = self.join_inclusive(contact_details, counter, description, info_details, link,
+                                                        profile_header)
+
+                    elif self.only_posts_with_payment_methods:
+                        if len(self.keywords) > 0:
+                            if self.check_keywords(profile_header) or self.check_keywords(description) \
+                                    or self.check_keywords(info_details) or self.check_keywords(contact_details):
+                                self.check_keywords_found(contact_details, description, info_details, profile_header, link)
+
+                        counter = self.payment_methods_only(contact_details, counter, description, info_details, link,
+                                                            profile_header)
+
+                else:
                     if len(self.keywords) > 0:
                         if self.check_keywords(profile_header) or self.check_keywords(description) \
                                 or self.check_keywords(info_details) or self.check_keywords(contact_details):
                             self.check_keywords_found(contact_details, description, info_details, profile_header, link)
+                            self.append_data(contact_details, counter, description, info_details, link, profile_header)
+                            screenshot_name = str(counter) + ".png"
+                            self.capture_screenshot(screenshot_name)
+                            counter += 1
 
-                    counter = self.payment_methods_only(contact_details, counter, description, info_details, link,
-                                                        profile_header)
-
-            else:
-                if len(self.keywords) > 0:
-                    if self.check_keywords(profile_header) or self.check_keywords(description) \
-                            or self.check_keywords(info_details) or self.check_keywords(contact_details):
-                        self.check_keywords_found(contact_details, description, info_details, profile_header, link)
+                    else:
                         self.append_data(contact_details, counter, description, info_details, link, profile_header)
                         screenshot_name = str(counter) + ".png"
                         self.capture_screenshot(screenshot_name)
                         counter += 1
-
-                else:
-                    self.append_data(contact_details, counter, description, info_details, link, profile_header)
-                    screenshot_name = str(counter) + ".png"
-                    self.capture_screenshot(screenshot_name)
-                    counter += 1
 
             self.RAW_format_data_to_excel()
             self.CLEAN_format_data_to_excel()

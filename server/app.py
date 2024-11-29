@@ -48,6 +48,12 @@ class DirectoryWatchHandler(FileSystemEventHandler):
         #     # Notify if the directory is empty or there are no folders
         #     socketio.emit('result_folder_selected', {'error': 'No folders found in the selected directory'})
 
+def list_threads():
+    threads = threading.enumerate()
+    for thread in threads:
+        print(f"Thread Name: {thread.name}, Thread ID: {thread.ident}")
+
+    return len(threads)
 
 
 
@@ -68,14 +74,14 @@ class ScraperManager:
             self.scraper_thread.stop_thread()
             self.scraper_thread.join_with_timeout()  # Wait for the thread to finish
             # thread_id = threading.get_native_id()
-            print("thread count after stop: ", threading.active_count())
+            print("thread count after stop: ", list_threads())
             return {"Response": "Scraper Thread Stopped Forcefully"}
         else:
-            print("number of threads: ", threading.active_count())
+            print("number of threads: ", list_threads())
             return {"Response": "No active Scraper Thread, Forceful Stop Attempted"}
 
     def get_scraper_status(self):
-        print(self.scraper_thread.is_alive())
+        print("get_scraper_status = ", self.scraper_thread.is_alive())
         if self.scraper_thread and self.scraper_thread.is_alive():
             socketio.emit('scraper_update', {'status': 'scraper thread alive'})
         else:
@@ -116,7 +122,7 @@ class ScraperThread(threading.Thread):
         self._stop_event = threading.Event()
 
     def run(self):
-        print("number of threads before: ", threading.active_count())
+        print("number of threads before: ", list_threads())
         while not self._stop_event.is_set() and not self.scraper.completed:
             thread_id = threading.get_native_id()
             print("start thread id", thread_id)
@@ -345,7 +351,7 @@ def find_open_ports(num):
 
 
 if __name__ == "__main__":
-    print("active threads: ", threading.active_count())
+    print("active threads: ", list_threads())
 
     num_ports = 1  # Change this to the desired number of open ports
     open_ports = find_open_ports(num_ports)

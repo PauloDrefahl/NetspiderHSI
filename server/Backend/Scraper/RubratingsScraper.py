@@ -151,6 +151,7 @@ class RubratingsScraper(ScraperPrototype):
         print("done scraping")
 
     def stop_scraper(self) -> None:
+        self.completed = True
         self.driver.close()
         self.driver.quit()
 
@@ -181,6 +182,7 @@ class RubratingsScraper(ScraperPrototype):
         assert "Page not found" not in self.driver.page_source
 
     def close_webpage(self) -> None:
+        self.completed = True
         self.driver.close()
 
     '''
@@ -213,125 +215,128 @@ class RubratingsScraper(ScraperPrototype):
         counter = 0
 
         for link in links:
-            self.driver.implicitly_wait(10)
-            self.driver.get(link)
-            assert "Page not found" not in self.driver.page_source
-            #  looking for last_activity, phone_number, location, provider_id, post_title, description
-            try:
-                last_activity = self.driver.find_element(
-                    By.XPATH, '/html/body/div[2]/div[3]/div/div[1]/div/div/div/div[2]/div[3]/div[1]/ul/li[4]').text
-            except NoSuchElementException:
-                last_activity = 'N/A'
-            try:
-                phone_number_element = self.driver.find_element(By.XPATH, '/html/body/div[2]/div[3]/div/div['
-                                                                          '1]/div/div/div/div[2]/div[3]/div[1]/ul/li['
-                                                                          '1]/a')
-                phone_number = phone_number_element.get_attribute('data-replace')
-                print("phone number: ", phone_number)
-            except NoSuchElementException:
-                phone_number = 'N/A'
 
-            try:
-                location = self.driver.find_element(
-                    By.XPATH, '/html/body/div[2]/div[3]/div/div[1]/div/div/div/div[2]/div[3]/div[1]/ul/li[2]'
-                ).text
+            while not self.completed:
+                self.driver.implicitly_wait(10)
+                self.driver.get(link)
+                assert "Page not found" not in self.driver.page_source
+                #  looking for last_activity, phone_number, location, provider_id, post_title, description
+                try:
+                    last_activity = self.driver.find_element(
+                        By.XPATH, '/html/body/div[2]/div[3]/div/div[1]/div/div/div/div[2]/div[3]/div[1]/ul/li[4]').text
+                except NoSuchElementException:
+                    last_activity = 'N/A'
+                try:
+                    phone_number_element = self.driver.find_element(By.XPATH, '/html/body/div[2]/div[3]/div/div['
+                                                                            '1]/div/div/div/div[2]/div[3]/div[1]/ul/li['
+                                                                            '1]/a')
+                    phone_number = phone_number_element.get_attribute('data-replace')
+                    print("phone number: ", phone_number)
+                except NoSuchElementException:
+                    phone_number = 'N/A'
 
-            except NoSuchElementException:
-                location = 'N/A'
-            try:
-                provider_id_element = self.driver.find_element(
-                    By.XPATH, '/html/body/div[2]/div[3]/div/div[1]/div/div/div/div[2]/div[3]/div[1]/ul/li[3]'
-                ).text
-                provider_id = provider_id_element.split(':')[1].strip()  # Get everything after ':'
+                try:
+                    location = self.driver.find_element(
+                        By.XPATH, '/html/body/div[2]/div[3]/div/div[1]/div/div/div/div[2]/div[3]/div[1]/ul/li[2]'
+                    ).text
 
-            except NoSuchElementException:
-                provider_id = 'N/A'
-            try:
-                post_title = self.driver.find_element(
-                    By.XPATH, '/html/body/div[2]/div[3]/div/div[1]/div/div/div/div[2]/h3').text
+                except NoSuchElementException:
+                    location = 'N/A'
+                try:
+                    provider_id_element = self.driver.find_element(
+                        By.XPATH, '/html/body/div[2]/div[3]/div/div[1]/div/div/div/div[2]/div[3]/div[1]/ul/li[3]'
+                    ).text
+                    provider_id = provider_id_element.split(':')[1].strip()  # Get everything after ':'
 
-            except NoSuchElementException:
-                post_title = 'N/A'
-            try:
-                # Find the first element with the specified XPath
-                first_element = self.driver.find_element(By.XPATH,
-                                                         '/html/body/div[2]/div[3]/div/div[1]/div/div/div/div[2]/p[2] |'
-                                                         '/html/body/div[2]/div[3]/div/div[1]/div/div/div/div[2]/h2[1]')
+                except NoSuchElementException:
+                    provider_id = 'N/A'
+                try:
+                    post_title = self.driver.find_element(
+                        By.XPATH, '/html/body/div[2]/div[3]/div/div[1]/div/div/div/div[2]/h3').text
 
-                # Determine if the first element is an <h2> element
-                if first_element.tag_name == 'h2':
-                    # If it's an <h2> element, find following sibling <h2> elements
-                    following_elements = first_element.find_elements(By.XPATH, './following-sibling::h2')
-                else:
-                    # If it's a <p> element, find following sibling <p> elements
-                    following_elements = first_element.find_elements(By.XPATH, './following-sibling::p')
+                except NoSuchElementException:
+                    post_title = 'N/A'
+                try:
+                    # Find the first element with the specified XPath
+                    first_element = self.driver.find_element(By.XPATH,
+                                                            '/html/body/div[2]/div[3]/div/div[1]/div/div/div/div[2]/p[2] |'
+                                                            '/html/body/div[2]/div[3]/div/div[1]/div/div/div/div[2]/h2[1]')
 
-                # Extract text from the first element
-                description_texts = [first_element.text]
+                    # Determine if the first element is an <h2> element
+                    if first_element.tag_name == 'h2':
+                        # If it's an <h2> element, find following sibling <h2> elements
+                        following_elements = first_element.find_elements(By.XPATH, './following-sibling::h2')
+                    else:
+                        # If it's a <p> element, find following sibling <p> elements
+                        following_elements = first_element.find_elements(By.XPATH, './following-sibling::p')
 
-                # Extract text from all found elements
-                description_texts.extend(element.text for element in following_elements)
+                    # Extract text from the first element
+                    description_texts = [first_element.text]
 
-                # Concatenate the descriptions into a single string
-                description = ' '.join(description_texts)
+                    # Extract text from all found elements
+                    description_texts.extend(element.text for element in following_elements)
 
-                print("Concatenated Description:", description)
-            except NoSuchElementException:
-                print("Description elements not found")
-                description = 'N/A'
+                    # Concatenate the descriptions into a single string
+                    description = ' '.join(description_texts)
 
-            # reassign variables for each post
-            self.number_of_keywords_in_post = 0
-            self.keywords_found_in_post = []
-            # last_activity, phone_number, location, provider_id, post_title, description
-            if self.join_keywords and self.only_posts_with_payment_methods:
-                if self.check_keywords(last_activity) or self.check_keywords(phone_number) or \
-                        self.check_keywords(location) or self.check_keywords(provider_id) \
-                        or self.check_keywords(post_title) or self.check_keywords(description):
-                    self.check_keywords_found(last_activity, phone_number, location, provider_id, post_title,
-                                              description, link)
-                    counter = self.join_with_payment_methods(counter, link, last_activity, phone_number, location,
-                                                             provider_id, post_title, description)
+                    print("Concatenated Description:", description)
+                except NoSuchElementException:
+                    print("Description elements not found")
+                    description = 'N/A'
 
-            elif self.join_keywords or self.only_posts_with_payment_methods:
-                if self.join_keywords:
+                # reassign variables for each post
+                self.number_of_keywords_in_post = 0
+                self.keywords_found_in_post = []
+                # last_activity, phone_number, location, provider_id, post_title, description
+                if self.join_keywords and self.only_posts_with_payment_methods:
                     if self.check_keywords(last_activity) or self.check_keywords(phone_number) or \
                             self.check_keywords(location) or self.check_keywords(provider_id) \
                             or self.check_keywords(post_title) or self.check_keywords(description):
                         self.check_keywords_found(last_activity, phone_number, location, provider_id, post_title,
-                                                  description, link)
-                        counter = self.join_inclusive(counter, link, last_activity, phone_number, location, provider_id,
-                                                      post_title, description)
+                                                description, link)
+                        counter = self.join_with_payment_methods(counter, link, last_activity, phone_number, location,
+                                                                provider_id, post_title, description)
 
-                elif self.only_posts_with_payment_methods:
+                elif self.join_keywords or self.only_posts_with_payment_methods:
+                    if self.join_keywords:
+                        if self.check_keywords(last_activity) or self.check_keywords(phone_number) or \
+                                self.check_keywords(location) or self.check_keywords(provider_id) \
+                                or self.check_keywords(post_title) or self.check_keywords(description):
+                            self.check_keywords_found(last_activity, phone_number, location, provider_id, post_title,
+                                                    description, link)
+                            counter = self.join_inclusive(counter, link, last_activity, phone_number, location, provider_id,
+                                                        post_title, description)
+
+                    elif self.only_posts_with_payment_methods:
+                        if len(self.keywords) > 0:
+                            if self.check_keywords(last_activity) or self.check_keywords(phone_number) or \
+                                    self.check_keywords(location) or self.check_keywords(provider_id) \
+                                    or self.check_keywords(post_title) or self.check_keywords(description):
+                                self.check_keywords_found(last_activity, phone_number, location, provider_id, post_title,
+                                                        description, link)
+
+                        counter = self.payment_methods_only(counter, link, last_activity, phone_number, location,
+                                                            provider_id, post_title, description)
+                else:
+                    # run if keywords
                     if len(self.keywords) > 0:
                         if self.check_keywords(last_activity) or self.check_keywords(phone_number) or \
                                 self.check_keywords(location) or self.check_keywords(provider_id) \
                                 or self.check_keywords(post_title) or self.check_keywords(description):
                             self.check_keywords_found(last_activity, phone_number, location, provider_id, post_title,
-                                                      description, link)
-
-                    counter = self.payment_methods_only(counter, link, last_activity, phone_number, location,
-                                                        provider_id, post_title, description)
-            else:
-                # run if keywords
-                if len(self.keywords) > 0:
-                    if self.check_keywords(last_activity) or self.check_keywords(phone_number) or \
-                            self.check_keywords(location) or self.check_keywords(provider_id) \
-                            or self.check_keywords(post_title) or self.check_keywords(description):
-                        self.check_keywords_found(last_activity, phone_number, location, provider_id, post_title,
-                                                  description, link)
-                        self.append_data(counter, link, last_activity, phone_number, location, provider_id,
-                                         post_title, description)
+                                                    description, link)
+                            self.append_data(counter, link, last_activity, phone_number, location, provider_id,
+                                            post_title, description)
+                            screenshot_name = str(counter) + ".png"
+                            self.capture_screenshot(screenshot_name)
+                            counter += 1
+                    else:
+                        self.append_data(counter, link, last_activity, phone_number, location, provider_id, post_title,
+                                        description)
                         screenshot_name = str(counter) + ".png"
                         self.capture_screenshot(screenshot_name)
                         counter += 1
-                else:
-                    self.append_data(counter, link, last_activity, phone_number, location, provider_id, post_title,
-                                     description)
-                    screenshot_name = str(counter) + ".png"
-                    self.capture_screenshot(screenshot_name)
-                    counter += 1
+
             self.RAW_format_data_to_excel()
             self.CLEAN_format_data_to_excel()
 

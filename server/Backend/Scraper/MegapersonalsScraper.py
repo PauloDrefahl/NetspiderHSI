@@ -154,6 +154,7 @@ class MegapersonalsScraper(ScraperPrototype):
         self.reset_variables()
 
     def stop_scraper(self) -> None:
+        self.completed = True
         if self.search_mode:
             self.driver.close()
             self.driver.quit()
@@ -202,84 +203,87 @@ class MegapersonalsScraper(ScraperPrototype):
         counter = 0
 
         for link in links:
-            self.driver.get(link)
-            assert "Page not found" not in self.driver.page_source
 
-            try:
-                description = self.driver.find_element(
-                    By.XPATH, '/html/body/div/div[6]/span').text
-            except NoSuchElementException:
-                description = 'N/A'
+            while not self.completed:
+                self.driver.get(link)
+                assert "Page not found" not in self.driver.page_source
 
-            try:
-                phone_number = self.driver.find_element(
-                    By.XPATH, '/html/body/div/div[6]/div[1]/span').text
-            except NoSuchElementException:
-                phone_number = 'N/A'
+                try:
+                    description = self.driver.find_element(
+                        By.XPATH, '/html/body/div/div[6]/span').text
+                except NoSuchElementException:
+                    description = 'N/A'
 
-            try:
-                name = self.driver.find_element(
-                    By.XPATH, '/html/body/div/div[6]/p[1]/span[2]').text[5:]
-            except NoSuchElementException:
-                name = 'N/A'
+                try:
+                    phone_number = self.driver.find_element(
+                        By.XPATH, '/html/body/div/div[6]/div[1]/span').text
+                except NoSuchElementException:
+                    phone_number = 'N/A'
 
-            try:
-                city = self.driver.find_element(
-                    By.XPATH, '/html/body/div/div[6]/p[1]/span[1]').text[5:]
-            except NoSuchElementException:
-                city = 'N/A'
+                try:
+                    name = self.driver.find_element(
+                        By.XPATH, '/html/body/div/div[6]/p[1]/span[2]').text[5:]
+                except NoSuchElementException:
+                    name = 'N/A'
 
-            try:
-                location = self.driver.find_element(
-                    By.XPATH, '/html/body/div/div[6]/p[2]').text[9:]
-            except NoSuchElementException:
-                location = 'N/A'
+                try:
+                    city = self.driver.find_element(
+                        By.XPATH, '/html/body/div/div[6]/p[1]/span[1]').text[5:]
+                except NoSuchElementException:
+                    city = 'N/A'
 
-            # reassign variables for each post
-            self.number_of_keywords_in_post = 0
-            self.keywords_found_in_post = []
+                try:
+                    location = self.driver.find_element(
+                        By.XPATH, '/html/body/div/div[6]/p[2]').text[9:]
+                except NoSuchElementException:
+                    location = 'N/A'
 
-            if self.join_keywords and self.only_posts_with_payment_methods:
-                if self.check_keywords(description) or self.check_keywords(name) \
-                        or self.check_keywords(phone_number) or self.check_keywords(city) \
-                        or self.check_keywords(location):
-                    self.check_keywords_found(city, description, location, name, phone_number, link)
-                    counter = self.join_with_payment_methods(city, counter, description, link, location, name,
-                                                             phone_number)
+                # reassign variables for each post
+                self.number_of_keywords_in_post = 0
+                self.keywords_found_in_post = []
 
-            elif self.join_keywords or self.only_posts_with_payment_methods:
-                if self.join_keywords:
+                if self.join_keywords and self.only_posts_with_payment_methods:
                     if self.check_keywords(description) or self.check_keywords(name) \
                             or self.check_keywords(phone_number) or self.check_keywords(city) \
                             or self.check_keywords(location):
                         self.check_keywords_found(city, description, location, name, phone_number, link)
-                        counter = self.join_inclusive(city, counter, description, link, location, name,
-                                                      phone_number)
+                        counter = self.join_with_payment_methods(city, counter, description, link, location, name,
+                                                                phone_number)
 
-                elif self.only_posts_with_payment_methods:
+                elif self.join_keywords or self.only_posts_with_payment_methods:
+                    if self.join_keywords:
+                        if self.check_keywords(description) or self.check_keywords(name) \
+                                or self.check_keywords(phone_number) or self.check_keywords(city) \
+                                or self.check_keywords(location):
+                            self.check_keywords_found(city, description, location, name, phone_number, link)
+                            counter = self.join_inclusive(city, counter, description, link, location, name,
+                                                        phone_number)
+
+                    elif self.only_posts_with_payment_methods:
+                        if len(self.keywords) > 0:
+                            if self.check_keywords(description) or self.check_keywords(name) \
+                                    or self.check_keywords(phone_number) or self.check_keywords(city) \
+                                    or self.check_keywords(location):
+                                self.check_keywords_found(city, description, location, name, phone_number, link)
+
+                        counter = self.payment_methods_only(city, counter, description, link, location, name,
+                                                            phone_number)
+                else:
                     if len(self.keywords) > 0:
                         if self.check_keywords(description) or self.check_keywords(name) \
                                 or self.check_keywords(phone_number) or self.check_keywords(city) \
                                 or self.check_keywords(location):
                             self.check_keywords_found(city, description, location, name, phone_number, link)
-
-                    counter = self.payment_methods_only(city, counter, description, link, location, name,
-                                                        phone_number)
-            else:
-                if len(self.keywords) > 0:
-                    if self.check_keywords(description) or self.check_keywords(name) \
-                            or self.check_keywords(phone_number) or self.check_keywords(city) \
-                            or self.check_keywords(location):
-                        self.check_keywords_found(city, description, location, name, phone_number, link)
+                            self.append_data(city, counter, description, link, location, name, phone_number)
+                            screenshot_name = str(counter) + ".png"
+                            self.capture_screenshot(screenshot_name)
+                            counter += 1
+                    else:
                         self.append_data(city, counter, description, link, location, name, phone_number)
                         screenshot_name = str(counter) + ".png"
                         self.capture_screenshot(screenshot_name)
                         counter += 1
-                else:
-                    self.append_data(city, counter, description, link, location, name, phone_number)
-                    screenshot_name = str(counter) + ".png"
-                    self.capture_screenshot(screenshot_name)
-                    counter += 1
+
             self.RAW_format_data_to_excel()
             self.CLEAN_format_data_to_excel()
 
