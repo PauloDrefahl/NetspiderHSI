@@ -322,6 +322,10 @@ def write_open_ports(ports):
         for port in ports:
             file.write(str(port) + '\n')
 
+    with open('client/open_ports.txt', 'w') as file:
+        for port in ports:
+            file.write(str(port) + '\n')
+
 
 def find_open_port():
     s = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
