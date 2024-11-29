@@ -156,6 +156,7 @@ class EscortalligatorScraper(ScraperPrototype):
         self.reset_variables()
 
     def stop_scraper(self) -> None:
+        self.completed = True
         if self.search_mode:
             self.driver.close()
             self.driver.quit()
@@ -200,75 +201,81 @@ class EscortalligatorScraper(ScraperPrototype):
         links = set(links)
         counter = 0
 
+
         for link in links:
-            self.driver.get(link)
-            assert "Page not found" not in self.driver.page_source
-
-
             try:
-                timestamp = self.driver.find_element(
-                    By.CLASS_NAME, 'postCreatedOn').text
-            except NoSuchElementException:
-                timestamp = 'N/A'
+                while not self.completed:
+                    self.driver.get(link)
+                    assert "Page not found" not in self.driver.page_source
 
-            try:
-                description = self.driver.find_element(
-                    By.CLASS_NAME, 'viewpostbody').text
-            except NoSuchElementException:
-                description = 'N/A'
+                    try:
+                        timestamp = self.driver.find_element(
+                            By.CLASS_NAME, 'postCreatedOn').text
+                    except NoSuchElementException:
+                        timestamp = 'N/A'
 
-            try:
-                phone_number = self.driver.find_element(
-                    By.CLASS_NAME, 'userInfoContainer').text
-            except NoSuchElementException:
-                phone_number = 'N/A'
+                    try:
+                        description = self.driver.find_element(
+                            By.CLASS_NAME, 'viewpostbody').text
+                    except NoSuchElementException:
+                        description = 'N/A'
 
-            try:
-                location_and_age = self.driver.find_element(
-                    By.CLASS_NAME, 'viewpostlocationIconBabylon').text
-                age, locationSplits = self.parse_location_and_age(location_and_age)
-            except NoSuchElementException:
-                location_and_age = 'N/A'
-                age = 'N/A'
-                locationSplits = 'N/A'
+                    try:
+                        phone_number = self.driver.find_element(
+                            By.CLASS_NAME, 'userInfoContainer').text
+                    except NoSuchElementException:
+                        phone_number = 'N/A'
 
-            # reassign variables for each post
-            self.number_of_keywords_in_post = 0
-            self.keywords_found_in_post = []
+                    try:
+                        location_and_age = self.driver.find_element(
+                            By.CLASS_NAME, 'viewpostlocationIconBabylon').text
+                        age, locationSplits = self.parse_location_and_age(location_and_age)
+                    except NoSuchElementException:
+                        location_and_age = 'N/A'
+                        age = 'N/A'
+                        locationSplits = 'N/A'
 
-            if self.join_keywords and self.only_posts_with_payment_methods:
-                if self.check_keywords(phone_number) or self.check_keywords(location_and_age) or \
-                        self.check_keywords(description):
-                    counter = self.join_with_payment_methods(counter, description, link, location_and_age, locationSplits, age, phone_number, timestamp)
+                    # reassign variables for each post
+                    self.number_of_keywords_in_post = 0
+                    self.keywords_found_in_post = []
 
-            elif self.join_keywords or self.only_posts_with_payment_methods:
-                if self.join_keywords:
-                    if self.check_keywords(phone_number) or self.check_keywords(location_and_age)  or \
-                            self.check_keywords(description):
-                        self.check_keywords_found(description, location_and_age, locationSplits, age, phone_number, link)
-                        counter = self.join_inclusive(counter, description, link, location_and_age, locationSplits, age, phone_number, timestamp)
-
-                elif self.only_posts_with_payment_methods:
-                    if len(self.keywords) > 0:
+                    if self.join_keywords and self.only_posts_with_payment_methods:
                         if self.check_keywords(phone_number) or self.check_keywords(location_and_age) or \
                                 self.check_keywords(description):
-                            self.check_keywords_found(description, location_and_age, locationSplits, age, phone_number, link)
+                            counter = self.join_with_payment_methods(counter, description, link, location_and_age, locationSplits, age, phone_number, timestamp)
 
-                    counter = self.payment_methods_only(counter, description, link, location_and_age, locationSplits, age, phone_number, timestamp)
-            else:
-                if len(self.keywords) > 0:
-                    if self.check_keywords(phone_number) or self.check_keywords(location_and_age) or \
-                            self.check_keywords(description):
-                        self.check_keywords_found(description, location_and_age, locationSplits, age, phone_number, link)
-                        self.append_data(counter, description, link, location_and_age, locationSplits, age, phone_number, timestamp)
-                        screenshot_name = str(counter) + ".png"
-                        self.capture_screenshot(screenshot_name)
-                        counter += 1
-                else:
-                    self.append_data(counter, description, link, location_and_age, locationSplits, age, phone_number, timestamp)
-                    screenshot_name = str(counter) + ".png"
-                    self.capture_screenshot(screenshot_name)
-                    counter += 1
+                    elif self.join_keywords or self.only_posts_with_payment_methods:
+                        if self.join_keywords:
+                            if self.check_keywords(phone_number) or self.check_keywords(location_and_age)  or \
+                                    self.check_keywords(description):
+                                self.check_keywords_found(description, location_and_age, locationSplits, age, phone_number, link)
+                                counter = self.join_inclusive(counter, description, link, location_and_age, locationSplits, age, phone_number, timestamp)
+
+                        elif self.only_posts_with_payment_methods:
+                            if len(self.keywords) > 0:
+                                if self.check_keywords(phone_number) or self.check_keywords(location_and_age) or \
+                                        self.check_keywords(description):
+                                    self.check_keywords_found(description, location_and_age, locationSplits, age, phone_number, link)
+
+                            counter = self.payment_methods_only(counter, description, link, location_and_age, locationSplits, age, phone_number, timestamp)
+                    else:
+                        if len(self.keywords) > 0:
+                            if self.check_keywords(phone_number) or self.check_keywords(location_and_age) or \
+                                    self.check_keywords(description):
+                                self.check_keywords_found(description, location_and_age, locationSplits, age, phone_number, link)
+                                self.append_data(counter, description, link, location_and_age, locationSplits, age, phone_number, timestamp)
+                                screenshot_name = str(counter) + ".png"
+                                self.capture_screenshot(screenshot_name)
+                                counter += 1
+                        else:
+                            self.append_data(counter, description, link, location_and_age, locationSplits, age, phone_number, timestamp)
+                            screenshot_name = str(counter) + ".png"
+                            self.capture_screenshot(screenshot_name)
+                            counter += 1
+        
+            except Exception as e:
+                print(f"Error processing link {link}: {e}")
+                continue
 
             self.RAW_format_data_to_excel()
             self.CLEAN_format_data_to_excel()

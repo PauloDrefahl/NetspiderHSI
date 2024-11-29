@@ -148,6 +148,7 @@ class SkipthegamesScraper(ScraperPrototype):
         self.reset_variables()
 
     def stop_scraper(self) -> None:
+        self.completed = True
         if self.search_mode:
             self.driver.close()
             self.driver.quit()
@@ -189,63 +190,65 @@ class SkipthegamesScraper(ScraperPrototype):
         counter = 0
 
         for link in links:
-            self.driver.get(link)
-            assert "Page not found" not in self.driver.page_source
-            try:
-                about_info = self.driver.wait_for_element(
-                    By.CSS_SELECTOR, '#post-body tbody').text
-            except NoSuchElementException:
-                about_info = 'N/A'
 
-            try:
-                services = self.driver.wait_for_element(
-                    By.XPATH, '//*[@id="post-services"]').text
-            except NoSuchElementException:
-                services = 'N/A'
+            while not self.completed:
+                self.driver.get(link)
+                assert "Page not found" not in self.driver.page_source
+                try:
+                    about_info = self.driver.wait_for_element(
+                        By.CSS_SELECTOR, '#post-body tbody').text
+                except NoSuchElementException:
+                    about_info = 'N/A'
 
-            try:
-                # NOTE: It's possible for two elements to have the same ID.
-                description = self.driver.wait_for_element(
-                    By.CSS_SELECTOR, '#post-body #post-body').text
-            except NoSuchElementException:
-                description = 'N/A'
+                try:
+                    services = self.driver.wait_for_element(
+                        By.XPATH, '//*[@id="post-services"]').text
+                except NoSuchElementException:
+                    services = 'N/A'
 
-            # reassign variables for each post
-            self.number_of_keywords_in_post = 0
-            self.keywords_found_in_post = []
+                try:
+                    # NOTE: It's possible for two elements to have the same ID.
+                    description = self.driver.wait_for_element(
+                        By.CSS_SELECTOR, '#post-body #post-body').text
+                except NoSuchElementException:
+                    description = 'N/A'
 
-            if self.join_keywords and self.only_posts_with_payment_methods:
-                if self.check_keywords(about_info) or self.check_keywords(services) or self.check_keywords(description):
-                    self.check_keywords_found(about_info, services, description, link)
-                    counter = self.join_with_payment_methods(about_info, counter, description, link, services)
+                # reassign variables for each post
+                self.number_of_keywords_in_post = 0
+                self.keywords_found_in_post = []
 
-            elif self.join_keywords or self.only_posts_with_payment_methods:
-                if self.join_keywords:
-                    if self.check_keywords(about_info) or self.check_keywords(services) or self.check_keywords(
-                            description):
+                if self.join_keywords and self.only_posts_with_payment_methods:
+                    if self.check_keywords(about_info) or self.check_keywords(services) or self.check_keywords(description):
                         self.check_keywords_found(about_info, services, description, link)
-                        counter = self.join_inclusive(about_info, counter, description, link, services)
+                        counter = self.join_with_payment_methods(about_info, counter, description, link, services)
 
-                elif self.only_posts_with_payment_methods:
+                elif self.join_keywords or self.only_posts_with_payment_methods:
+                    if self.join_keywords:
+                        if self.check_keywords(about_info) or self.check_keywords(services) or self.check_keywords(
+                                description):
+                            self.check_keywords_found(about_info, services, description, link)
+                            counter = self.join_inclusive(about_info, counter, description, link, services)
+
+                    elif self.only_posts_with_payment_methods:
+                        if len(self.keywords) > 0:
+                            if self.check_keywords(about_info) or self.check_keywords(services) or self.check_keywords(
+                                    description):
+                                self.check_keywords_found(about_info, services, description, link)
+                        counter = self.payment_methods_only(about_info, counter, description, link, services)
+                else:
                     if len(self.keywords) > 0:
                         if self.check_keywords(about_info) or self.check_keywords(services) or self.check_keywords(
                                 description):
                             self.check_keywords_found(about_info, services, description, link)
-                    counter = self.payment_methods_only(about_info, counter, description, link, services)
-            else:
-                if len(self.keywords) > 0:
-                    if self.check_keywords(about_info) or self.check_keywords(services) or self.check_keywords(
-                            description):
-                        self.check_keywords_found(about_info, services, description, link)
+                            self.append_data(about_info, counter, description, link, services)
+                            screenshot_name = str(counter) + ".png"
+                            self.capture_screenshot(screenshot_name)
+                            counter += 1
+                    else:
                         self.append_data(about_info, counter, description, link, services)
                         screenshot_name = str(counter) + ".png"
                         self.capture_screenshot(screenshot_name)
                         counter += 1
-                else:
-                    self.append_data(about_info, counter, description, link, services)
-                    screenshot_name = str(counter) + ".png"
-                    self.capture_screenshot(screenshot_name)
-                    counter += 1
 
             self.RAW_format_data_to_excel()
             self.CLEAN_format_data_to_excel()

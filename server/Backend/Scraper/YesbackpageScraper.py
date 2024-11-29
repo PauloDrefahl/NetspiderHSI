@@ -165,6 +165,7 @@ class YesbackpageScraper(ScraperPrototype):
         print("done scraping")
 
     def stop_scraper(self) -> None:
+        self.completed = True
         self.driver.close()
         self.driver.quit()
 
@@ -200,130 +201,132 @@ class YesbackpageScraper(ScraperPrototype):
         counter = 0
 
         for link in links:
-            self.driver.implicitly_wait(10)
-            self.driver.get(link)
-            assert "Page not found" not in self.driver.page_source
+            while not self.completed:
+                self.driver.implicitly_wait(10)
+                self.driver.get(link)
+                assert "Page not found" not in self.driver.page_source
 
-            try:
-                description = self.driver.find_element(
-                    By.XPATH, '/html/body/div[3]/div/div[1]/table/tbody/tr[1]/td/table[2]/tbody/'
-                              'tr/td/div/p[2]').text
-            except NoSuchElementException:
-                description = 'N/A'
-
-            try:
-                timestamp = self.driver.find_element(
-                    By.XPATH, '/html/body/div[3]/div/div[1]/table/tbody/tr[1]/td/table[1]/tbody/'
-                              'tr/td/div[3]/div[1]').text
-                posted_on, expires_on, reply_to = self.parse_timestamp(timestamp)
-            except NoSuchElementException:
-                posted_on = 'N/A'
-                expires_on = 'N/A'
-                reply_to = 'N/A'
-
-            # check if page contains "col-sm-6 offset-sm-3" which is the table that contains name, phone number, etc.
-            if self.driver.find_elements(By.XPATH, '//*[@id="mainCellWrapper"]/div[1]/table/tbody/tr[1]/td/div[1]/div'):
                 try:
-                    name = self.driver.find_element(
-                        By.XPATH, '/html/body/div[3]/div/div[1]/table/tbody/tr[1]/td/div[1]/div/table/'
-                                  'tbody/tr[1]/td[2]').text[2:]
+                    description = self.driver.find_element(
+                        By.XPATH, '/html/body/div[3]/div/div[1]/table/tbody/tr[1]/td/table[2]/tbody/'
+                                'tr/td/div/p[2]').text
                 except NoSuchElementException:
+                    description = 'N/A'
+
+                try:
+                    timestamp = self.driver.find_element(
+                        By.XPATH, '/html/body/div[3]/div/div[1]/table/tbody/tr[1]/td/table[1]/tbody/'
+                                'tr/td/div[3]/div[1]').text
+                    posted_on, expires_on, reply_to = self.parse_timestamp(timestamp)
+                except NoSuchElementException:
+                    posted_on = 'N/A'
+                    expires_on = 'N/A'
+                    reply_to = 'N/A'
+
+                # check if page contains "col-sm-6 offset-sm-3" which is the table that contains name, phone number, etc.
+                if self.driver.find_elements(By.XPATH, '//*[@id="mainCellWrapper"]/div[1]/table/tbody/tr[1]/td/div[1]/div'):
+                    try:
+                        name = self.driver.find_element(
+                            By.XPATH, '/html/body/div[3]/div/div[1]/table/tbody/tr[1]/td/div[1]/div/table/'
+                                    'tbody/tr[1]/td[2]').text[2:]
+                    except NoSuchElementException:
+                        name = 'N/A'
+
+                    try:
+                        sex = self.driver.find_element(
+                            By.XPATH, '/html/body/div[3]/div/div[1]/table/tbody/tr[1]/td/div[1]/div/table/'
+                                    'tbody/tr[2]/td[2]').text[2:]
+                    except NoSuchElementException:
+                        sex = 'N/A'
+
+                    try:
+                        phone_number = self.driver.find_element(
+                            By.XPATH, '/html/body/div[3]/div/div[1]/table/tbody/tr[1]/td/div[1]/div/table/'
+                                    'tbody/tr[6]/td[2]').text[2:]
+                    except NoSuchElementException:
+                        phone_number = 'NA'
+
+                    try:
+                        email = self.driver.find_element(
+                            By.XPATH, '/html/body/div[3]/div/div[1]/table/tbody/tr[1]/td/div[1]/div/table/'
+                                    'tbody/tr[8]/td[2]').text[2:]
+                        # email = self.validate_email(email)
+                    except NoSuchElementException:
+                        email = 'N/A'
+
+                    try:
+                        location = self.driver.find_element(
+                            By.XPATH, '/html/body/div[3]/div/div[1]/table/tbody/tr[1]/td/div[1]/div/table/'
+                                    'tbody/tr[9]/td[2]').text[2:]
+                    except NoSuchElementException:
+                        location = 'N/A'
+
+                    try:
+                        services = self.driver.find_element(
+                            By.XPATH, '//*[@id="mainCellWrapper"]/div/table/tbody/tr/td/div[1]/div/table/'
+                                    'tbody/tr[5]/td[2]').text[2:]
+                    except NoSuchElementException:
+                        services = 'N/A'
+                else:
+                    posted_on = 'N/A'
+                    expires_on = 'N/A'
+                    reply_to = 'N/A'
                     name = 'N/A'
-
-                try:
-                    sex = self.driver.find_element(
-                        By.XPATH, '/html/body/div[3]/div/div[1]/table/tbody/tr[1]/td/div[1]/div/table/'
-                                  'tbody/tr[2]/td[2]').text[2:]
-                except NoSuchElementException:
                     sex = 'N/A'
-
-                try:
-                    phone_number = self.driver.find_element(
-                        By.XPATH, '/html/body/div[3]/div/div[1]/table/tbody/tr[1]/td/div[1]/div/table/'
-                                  'tbody/tr[6]/td[2]').text[2:]
-                except NoSuchElementException:
-                    phone_number = 'NA'
-
-                try:
-                    email = self.driver.find_element(
-                        By.XPATH, '/html/body/div[3]/div/div[1]/table/tbody/tr[1]/td/div[1]/div/table/'
-                                  'tbody/tr[8]/td[2]').text[2:]
-                    # email = self.validate_email(email)
-                except NoSuchElementException:
+                    phone_number = 'N/A'
                     email = 'N/A'
-
-                try:
-                    location = self.driver.find_element(
-                        By.XPATH, '/html/body/div[3]/div/div[1]/table/tbody/tr[1]/td/div[1]/div/table/'
-                                  'tbody/tr[9]/td[2]').text[2:]
-                except NoSuchElementException:
                     location = 'N/A'
-
-                try:
-                    services = self.driver.find_element(
-                        By.XPATH, '//*[@id="mainCellWrapper"]/div/table/tbody/tr/td/div[1]/div/table/'
-                                  'tbody/tr[5]/td[2]').text[2:]
-                except NoSuchElementException:
                     services = 'N/A'
-            else:
-                posted_on = 'N/A'
-                expires_on = 'N/A'
-                reply_to = 'N/A'
-                name = 'N/A'
-                sex = 'N/A'
-                phone_number = 'N/A'
-                email = 'N/A'
-                location = 'N/A'
-                services = 'N/A'
 
-            # reassign variables for each post
-            self.number_of_keywords_in_post = 0
-            self.keywords_found_in_post = []
+                # reassign variables for each post
+                self.number_of_keywords_in_post = 0
+                self.keywords_found_in_post = []
 
-            if self.join_keywords and self.only_posts_with_payment_methods:
-                if self.check_keywords(description) or self.check_keywords(name) or self.check_keywords(sex) \
-                        or self.check_keywords(phone_number) or self.check_keywords(email) \
-                        or self.check_keywords(location) or self.check_keywords(services):
-                    self.check_keywords_found(description, name, sex, phone_number, email, location, services, link)
-                    counter = self.join_with_payment_methods(counter, description, email, link, location, name,
-                                                             phone_number, services, sex, posted_on, expires_on, reply_to)
-
-            elif self.join_keywords or self.only_posts_with_payment_methods:
-                if self.join_keywords:
+                if self.join_keywords and self.only_posts_with_payment_methods:
                     if self.check_keywords(description) or self.check_keywords(name) or self.check_keywords(sex) \
                             or self.check_keywords(phone_number) or self.check_keywords(email) \
                             or self.check_keywords(location) or self.check_keywords(services):
                         self.check_keywords_found(description, name, sex, phone_number, email, location, services, link)
-                        counter = self.join_inclusive(counter, description, email, link, location, name, phone_number,
-                                                      services, sex, posted_on, expires_on, reply_to)
+                        counter = self.join_with_payment_methods(counter, description, email, link, location, name,
+                                                                phone_number, services, sex, posted_on, expires_on, reply_to)
 
-                elif self.only_posts_with_payment_methods:
+                elif self.join_keywords or self.only_posts_with_payment_methods:
+                    if self.join_keywords:
+                        if self.check_keywords(description) or self.check_keywords(name) or self.check_keywords(sex) \
+                                or self.check_keywords(phone_number) or self.check_keywords(email) \
+                                or self.check_keywords(location) or self.check_keywords(services):
+                            self.check_keywords_found(description, name, sex, phone_number, email, location, services, link)
+                            counter = self.join_inclusive(counter, description, email, link, location, name, phone_number,
+                                                        services, sex, posted_on, expires_on, reply_to)
+
+                    elif self.only_posts_with_payment_methods:
+                        if len(self.keywords) > 0:
+                            if self.check_keywords(description) or self.check_keywords(name) or self.check_keywords(sex) \
+                                    or self.check_keywords(phone_number) or self.check_keywords(email) \
+                                    or self.check_keywords(location) or self.check_keywords(services):
+                                self.check_keywords_found(description, name, sex, phone_number, email, location, services, link)
+
+                        counter = self.payment_methods_only(counter, description, email, link, location, name,
+                                                            phone_number, services, sex, posted_on, expires_on, reply_to)
+                else:
+                    # run if keywords
                     if len(self.keywords) > 0:
                         if self.check_keywords(description) or self.check_keywords(name) or self.check_keywords(sex) \
                                 or self.check_keywords(phone_number) or self.check_keywords(email) \
                                 or self.check_keywords(location) or self.check_keywords(services):
                             self.check_keywords_found(description, name, sex, phone_number, email, location, services, link)
-
-                    counter = self.payment_methods_only(counter, description, email, link, location, name,
-                                                        phone_number, services, sex, posted_on, expires_on, reply_to)
-            else:
-                # run if keywords
-                if len(self.keywords) > 0:
-                    if self.check_keywords(description) or self.check_keywords(name) or self.check_keywords(sex) \
-                            or self.check_keywords(phone_number) or self.check_keywords(email) \
-                            or self.check_keywords(location) or self.check_keywords(services):
-                        self.check_keywords_found(description, name, sex, phone_number, email, location, services, link)
+                            self.append_data(counter, description, email, link, location, name, phone_number, services,
+                                            sex, posted_on, expires_on, reply_to)
+                            screenshot_name = str(counter) + ".png"
+                            self.capture_screenshot(screenshot_name)
+                            counter += 1
+                    else:
                         self.append_data(counter, description, email, link, location, name, phone_number, services,
-                                         sex, posted_on, expires_on, reply_to)
+                                        sex, posted_on, expires_on, reply_to)
                         screenshot_name = str(counter) + ".png"
                         self.capture_screenshot(screenshot_name)
                         counter += 1
-                else:
-                    self.append_data(counter, description, email, link, location, name, phone_number, services,
-                                     sex, posted_on, expires_on, reply_to)
-                    screenshot_name = str(counter) + ".png"
-                    self.capture_screenshot(screenshot_name)
-                    counter += 1
+                        
             self.RAW_format_data_to_excel()
             self.CLEAN_format_data_to_excel()
 
