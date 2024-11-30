@@ -39,7 +39,6 @@ function updateDropdown() {
         addOption('tampa');
         addOption('treasure coast');
         addOption('west palm beach');
-        addOption('jacksonville');
     } else if (radioValue === 'Mega Personals') {
         selectedWebsite = 'megapersonals';
         addOption('daytona');
@@ -62,7 +61,6 @@ function updateDropdown() {
         addOption('tampa');
         addOption('treasure coast');
         addOption('west palm beach');
-        addOption('jacksonville');
     } else if (radioValue === 'Skip The Games') {
         selectedWebsite = 'skipthegames';
         addOption('bonita springs');
