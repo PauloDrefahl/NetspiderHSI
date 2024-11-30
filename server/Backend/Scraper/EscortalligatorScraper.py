@@ -141,6 +141,8 @@ class EscortalligatorScraper(ScraperPrototype):
         # Find links of posts
         links = self.get_links()
 
+        #Debugged to here
+
         # Create directory for search data
         self.scraper_directory = f'{self.path}/escortalligator-{self.city}-{self.date_time}'
         os.mkdir(self.scraper_directory)
@@ -204,7 +206,7 @@ class EscortalligatorScraper(ScraperPrototype):
 
         for link in links:
             try:
-                while not self.completed:
+                if not self.completed:
                     self.driver.get(link)
                     assert "Page not found" not in self.driver.page_source
 
@@ -272,7 +274,7 @@ class EscortalligatorScraper(ScraperPrototype):
                             screenshot_name = str(counter) + ".png"
                             self.capture_screenshot(screenshot_name)
                             counter += 1
-        
+
             except Exception as e:
                 print(f"Error processing link {link}: {e}")
                 continue
