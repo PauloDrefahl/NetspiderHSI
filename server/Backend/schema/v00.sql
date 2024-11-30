@@ -9,6 +9,8 @@ drop domain if exists url, phone_number, email_address cascade;
 drop domain if exists non_empty_text, non_empty_texts cascade;
 drop table if exists raw_skipthegames_posts cascade;
 drop view if exists clean_skipthegames_view cascade;
+drop table if exists raw_yesbackpage_posts cascade;
+drop view if exists clean_yesbackpage_view cascade;
 */
 
 --=================================================================
@@ -17,7 +19,7 @@ drop view if exists clean_skipthegames_view cascade;
 
 do language plpgsql $$
     begin
-        create type sex as enum ('Male', 'Female');
+        create type sex as enum ('Male', 'Female', 'Other');
         create domain url as varchar(256) check (value <> '');
         create domain phone_number as varchar(64) check (value <> '');
         create domain email_address as varchar(128) check (value <> '');
@@ -68,3 +70,56 @@ create or replace view clean_skipthegames_view as
         social_media_accounts,
         keywords
     from raw_skipthegames_posts;
+
+--=================================================================
+-- YesBackpage
+--=================================================================
+
+create table if not exists raw_yesbackpage_posts (
+    primary key (link, city_or_region),
+    link url not null,
+    city_or_region non_empty_text not null,
+    specified_location varchar(128) check (specified_location <> ''),
+    posted_on timestamp without time zone not null,
+    expires_on timestamp without time zone not null,
+    poster_phone_number phone_number,
+    poster_email_address email_address,
+    poster_name varchar(64) check (poster_name <> ''),
+    poster_sex sex,
+    reply_to email_address,
+    description varchar(2048) check (description <> ''),
+    services varchar(256) check (services <> ''),
+    payment_methods non_empty_texts not null,
+    social_media_accounts non_empty_texts not null,
+    keywords non_empty_texts not null
+);
+
+----------------
+-- Clean View
+
+create or replace view clean_yesbackpage_view as
+    select
+        link,
+        city_or_region,
+        coalesce(specified_location, 'N/A') as specified_location,
+        posted_on as timeline,
+        concat_ws(
+            ' ||| ',
+            coalesce(poster_phone_number, 'N/A'),
+            coalesce(poster_email_address, 'N/A')
+        ) as contacts,
+        concat_ws(
+            ' ||| ',
+            coalesce(poster_name, 'N/A'),
+            coalesce(cast(poster_sex as text), 'N/A')
+        ) as poster,
+        concat_ws(
+            ' ||| ',
+            coalesce(description, 'N/A'),
+            coalesce(services, 'N/A'),
+            coalesce(reply_to, 'N/A')
+        ) as description,
+        payment_methods,
+        social_media_accounts,
+        keywords
+    from raw_yesbackpage_posts;
