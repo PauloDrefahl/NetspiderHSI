@@ -191,7 +191,7 @@ class SkipthegamesScraper(ScraperPrototype):
 
         for link in links:
 
-            while not self.completed:
+            if not self.completed:
                 self.driver.get(link)
                 assert "Page not found" not in self.driver.page_source
                 try:
