@@ -11,6 +11,10 @@ function updateDropdown() {
     // selectedWebsite = radioValue; // Assign value to selectedWebsite globally
     let dropdownContent = document.querySelector('.dropdown-content');
 
+    // Resets the location box back to Select Location, so that values are not kept when switching websites
+    let dropdownItem = document.querySelector('.dropdown-item');
+    dropdownItem.textContent = "Select Location";
+
     dropdownContent.innerHTML = ''; // Clear previous options
 
     if (radioValue === 'Escort Alligator') {
