@@ -279,8 +279,10 @@ class ErosScraper(ScraperPrototype):
         self.about_info.append(description)
         self.info_details.append(info_details)
         self.contact_details.append(contact_details)
-        self.check_and_append_payment_methods(description)
-        self.check_for_social_media(description)
+        payment_methods = self.get_payment_methods(description)
+        self.payment_methods_found.append("\n".join(payment_methods) or "N/A")
+        social_media = self.get_social_media(description)
+        self.social_media_found.append("\n".join(social_media) or "N/A")
         self.keywords_found.append(', '.join(self.keywords_found_in_post) or 'N/A')
         self.number_of_keywords_found.append(self.number_of_keywords_in_post or 'N/A')
 
@@ -330,27 +332,23 @@ class ErosScraper(ScraperPrototype):
                 return True
         return False
 
-    def check_and_append_payment_methods(self, description):
-        payments = ''
-        for payment in self.known_payment_methods:
-            if payment in description.lower():
-                payments += payment + '\n'
+    def get_payment_methods(self, description: str) -> list[str]:
+        # Normalize the case of the description.
+        description = description.lower()
+        payment_methods: list[str] = []
+        for payment_method in self.known_payment_methods:
+            if payment_method in description:
+                payment_methods.append(payment_method)
+        return payment_methods
 
-        if payments != '':
-            self.payment_methods_found.append(payments)
-        else:
-            self.payment_methods_found.append('N/A')
-
-    def check_for_social_media(self, description) -> None:
-        social_media = ''
+    def get_social_media(self, description: str) -> list[str]:
+        # Normalize the case of the description.
+        description = description.lower()
+        social_media: list[str] = []
         for social in self.known_social_media:
-            if social in description.lower():
-                social_media += social + '\n'
-
-        if social_media != '':
-            self.social_media_found.append(social_media)
-        else:
-            self.social_media_found.append('N/A')
+            if social in description:
+                social_media.append(social)
+        return social_media
 
     def check_keywords(self, data) -> bool:
         for key in self.keywords:
