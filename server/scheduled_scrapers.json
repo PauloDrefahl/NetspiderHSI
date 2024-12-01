@@ -1,0 +1,20 @@
+{
+    "EA": {
+        "data": {},
+        "frequency": "weekly",
+        "duration": 10,
+        "last_run": "None"
+    },
+    "ERos": {
+        "data": {},
+        "frequency": "daily",
+        "duration": 10,
+        "last_run": "None"
+    },
+    "whatever": {
+        "data": {},
+        "frequency": "weekly",
+        "duration": 10,
+        "last_run": "None"
+    }
+}
