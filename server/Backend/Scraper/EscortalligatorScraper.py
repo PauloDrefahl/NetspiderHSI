@@ -203,7 +203,6 @@ class EscortalligatorScraper(ScraperPrototype):
         links = set(links)
         counter = 0
 
-
         for link in links:
             try:
                 if not self.completed:
@@ -274,7 +273,9 @@ class EscortalligatorScraper(ScraperPrototype):
                             screenshot_name = str(counter) + ".png"
                             self.capture_screenshot(screenshot_name)
                             counter += 1
-
+                # Breaks the links loop for fast closing time once user presses stop scraper
+                else:
+                    break
             except Exception as e:
                 print(f"Error processing link {link}: {e}")
                 continue
