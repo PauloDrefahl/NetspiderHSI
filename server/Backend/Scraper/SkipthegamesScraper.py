@@ -249,7 +249,9 @@ class SkipthegamesScraper(ScraperPrototype):
                         screenshot_name = str(counter) + ".png"
                         self.capture_screenshot(screenshot_name)
                         counter += 1
-
+            # Breaks the links loop for fast closing time once user presses stop scraper
+            else:
+                break
             self.RAW_format_data_to_excel()
             self.CLEAN_format_data_to_excel()
 
