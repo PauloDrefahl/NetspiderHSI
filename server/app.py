@@ -317,6 +317,53 @@ def handle_error(e):
     return response, 500
 
 
+
+
+#---------------------------------Auto Scraper---------------------------------
+
+
+def start_auto_scraper():
+
+    #need to loop through json object and look for last run times for each of the scraper 
+
+    # if none, run scraper at given time... logic needed
+
+    print("Auto scraper started")
+
+    #example data
+    data = {
+        "EscortAlligator": {
+            "data": {},
+            "frequency": "weekly",
+            "duration": 10,
+            "last_run": "None"
+        },
+        "Eros": {
+            "data": {},
+            "frequency": "daily",
+            "duration": 10,
+            "last_run": "None"
+        },
+        "Yesbackpage": {
+            "data": {},
+            "frequency": "weekly",
+            "duration": 10,
+            "last_run": "None"
+        }
+    }
+    
+    format_data = data
+
+    #Same function if sending data from front end
+    start_scraper(data)
+
+    #wait duration from JSON object
+
+    #same function if stopping from front end
+    stop_scraper()
+
+
+
 '''
     ---------------------------------
     Finding ports
