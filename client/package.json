@@ -7,9 +7,10 @@
   },
   "scripts": {
     "start": "electron .",
-    "package-win": "electron-packager . netspiderhsi --platform=win32 --arch=x64 --out=dist --overwrite --app-version=3.0.2 --description=\"NetSpider Web Scraper\" --icon=download-removebg-preview.ico"
+    "package-win": "electron-packager . netspiderhsi --platform=win32 --arch=x64 --out=dist --overwrite --app-version=3.0.2 --description=\"NetSpider Web Scraper\" --icon=download-removebg-preview.ico --extra-resource=NetSpiderServer.exe"
   },
   "dependencies": {
+    "electron-packager": "^17.1.2",
     "electron-squirrel-startup": "^1.0.0",
     "socket.io-client": "^4.7.4"
   },
