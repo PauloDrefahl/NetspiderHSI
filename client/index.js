@@ -5,8 +5,7 @@ const { execFile, exec } = require('child_process');
 
 
 // Specify the path to your Flask executable
-const flaskExecutablePath = 'NetSpiderServer.exe';
-
+const flaskExecutablePath = 'resources/NetSpiderServer.exe';
 
 // Use exec to run the Flask executable
 let flaskProcess = execFile(flaskExecutablePath, (error, stdout, stderr) => {
@@ -42,7 +41,7 @@ const createWindow = () => {
         webPreferences: {
             nodeIntegration: true,
             preload: path.join(__dirname, 'dashboard/scripts/preload.js'),
-            devTools: false // Disable developer tools
+            devTools: true // Disable developer tools
         },
         icon: 'download-removebg-preview.ico'
     });
@@ -74,7 +73,18 @@ const createWindow = () => {
                 { role: 'separator'},
                 { role: 'resetZoom'},
                 { role: 'zoomIn'},
-                { role: 'zoomOut'}
+                { role: 'zoomOut'},
+                { type: 'separator' },
+                {
+                    label: 'Toggle Developer Tools',
+                    accelerator: process.platform === 'darwin' ? 'Command+Alt+I' : 'Ctrl+Shift+I',
+                    click: () => {
+                        const focusedWindow = BrowserWindow.getFocusedWindow();
+                        if (focusedWindow) {
+                            focusedWindow.webContents.toggleDevTools();
+                        }
+                    }
+                }
             ]
         }
     ];
@@ -90,7 +100,7 @@ app.on('ready', () => {
     // Add a delay before creating the window
     setTimeout(() => {
         createWindow();
-    }, 15000); // 15000 milliseconds = 15 seconds
+    }, 1500); // 15000 milliseconds = 15 seconds
 });
 
 // Quit when all windows are closed, except on macOS. There, it's common
