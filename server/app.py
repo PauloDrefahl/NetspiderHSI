@@ -22,6 +22,10 @@ import webbrowser
 from watchdog.observers import Observer
 from watchdog.events import FileSystemEventHandler
 
+import time
+import json
+from datetime import datetime, timedelta
+import schedule
 
 app = Flask(__name__)
 qt_app = QApplication([])
@@ -321,46 +325,68 @@ def handle_error(e):
 
 #---------------------------------Auto Scraper---------------------------------
 
+#------Load the schedule json file------
+def load_config():
+    try:
+        with open("scheduled_scraper.json", 'r') as file:
+            return json.load(file)
+    except FileNotFoundError:
+        print(f"File {file_path} not found. Ensure the file exists.")
+        return {}
+    except json.JSONDecodeError:
+        print(f"Error decoding JSON from {file_path}.")
+        return {}
+    
+
+#------function that will run if the schedule is due------
+def process_item(item_name, item_data):
+    print(f"Processing {item_name}")
+    start_scraper(item_data['data'])
+
+    time.sleep(item_data['duration'])  # Simulate the duration for the scraper
+
+    stop_scraper()
+    item_data['last_run'] = datetime.now().strftime('%Y-%m-%d %H:%M:%S')
+
+
+#------function that will run if the schedule is due------
+def run_scheduled_scrapers():
+
+    config = load_config()
+
+    print("Checking for scrapers to run...")
+
+    for item_name, item_data in config.items():
+        last_run = item_data['last_run']
+        frequency = item_data['frequency']
+
+        if last_run == "None":
+            print(f"{item_name} has not run yet. Running now.")
+            process_item(item_name, item_data)
+        else:
+            last_run_date = datetime.strptime(last_run, '%Y-%m-%d %H:%M:%S')
+            now = datetime.now()
+
+            if frequency == "daily" and now - last_run_date >= timedelta(days=1):
+                print(f"{item_name} is scheduled for daily run. Running now.")
+                process_item(item_name, item_data)
+            elif frequency == "weekly" and now - last_run_date >= timedelta(weeks=1):
+                print(f"{item_name} is scheduled for weekly run. Running now.")
+                process_item(item_name, item_data)
+            else:
+                print(f"{item_name} is not due to run yet.")
+
 
 def start_auto_scraper():
 
-    #need to loop through json object and look for last run times for each of the scraper 
+    # Schedule the task to check every night at 2:00
+    schedule.every().day.at("02:00").do(run_scheduled_scrapers)
 
-    # if none, run scraper at given time... logic needed
+    while True: #need to change this line so that auto scraper will only run with the user enables it via the front end
+        schedule.run_pending()
+        time.sleep(1)
 
-    print("Auto scraper started")
-
-    #example data
-    data = {
-        "EscortAlligator": {
-            "data": {},
-            "frequency": "weekly",
-            "duration": 10,
-            "last_run": "None"
-        },
-        "Eros": {
-            "data": {},
-            "frequency": "daily",
-            "duration": 10,
-            "last_run": "None"
-        },
-        "Yesbackpage": {
-            "data": {},
-            "frequency": "weekly",
-            "duration": 10,
-            "last_run": "None"
-        }
-    }
-    
-    format_data = data
-
-    #Same function if sending data from front end
-    start_scraper(data)
-
-    #wait duration from JSON object
-
-    #same function if stopping from front end
-    stop_scraper()
+ 
 
 
 
@@ -406,5 +432,7 @@ if __name__ == "__main__":
 
     # Use the open ports as needed in the rest of your program
     # Note: You may want to handle the case where `open_ports` is an empty list.
-    socketio.run(app, host='127.0.0.1', port=open_ports[0],
-                 allow_unsafe_werkzeug=True)
+    socketio.run(app, host='127.0.0.1', port=open_ports[0], allow_unsafe_werkzeug=True)
+    
+    #uncomment line when testing of the autoscraper is ready. Current goal is to get logic written down for discussion.  
+    #start_auto_scraper()
