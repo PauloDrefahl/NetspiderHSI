@@ -14,6 +14,7 @@ from Backend.Scraper import MegapersonalsScraper, SkipthegamesScraper, Yesbackpa
 from Backend.resultManager.appendResults import FolderAppender, FolderAppender
 from Backend.resultManager.resultManager import ResultManager
 from PyQt5.QtWidgets import QFileDialog, QApplication
+from engineio.async_drivers import gevent
 import subprocess
 import sys
 import os
@@ -325,10 +326,6 @@ def handle_error(e):
 
 def write_open_ports(ports):
     with open('open_ports.txt', 'w') as file:
-        for port in ports:
-            file.write(str(port) + '\n')
-
-    with open('client/open_ports.txt', 'w') as file:
         for port in ports:
             file.write(str(port) + '\n')
 
