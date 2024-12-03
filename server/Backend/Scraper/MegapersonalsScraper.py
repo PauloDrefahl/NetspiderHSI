@@ -304,6 +304,26 @@ class MegapersonalsScraper(ScraperPrototype):
         self.number_of_keywords_found.append(self.number_of_keywords_in_post or 'N/A')
         social_media = self.get_social_media(description)
         self.social_media_found.append("\n".join(social_media) or "N/A")
+        with self.open_database() as connection:
+            with connection.cursor() as cursor:
+                cursor.execute(
+                    """
+                    insert into raw_skipthegames_posts
+                    values (%s, %s, %s, %s, %s, %s, %s, %s, %s, %s);
+                    """,
+                    (
+                        link,
+                        self.city,
+                        location,
+                        phone_number,
+                        name,
+                        description,
+                        payment_methods,
+                        social_media,
+                        self.keywords_found_in_post,
+                        self.number_of_keywords_in_post,
+                    ),
+                )
 
     def join_inclusive(self, city, counter, description, link, location, name, phone_number) -> int:
         if len(self.keywords) == len(set(self.keywords_found_in_post)):
