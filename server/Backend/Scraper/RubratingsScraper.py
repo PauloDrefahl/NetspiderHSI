@@ -219,8 +219,12 @@ class RubratingsScraper(ScraperPrototype):
                 assert "Page not found" not in self.driver.page_source
                 #  looking for last_activity, phone_number, location, provider_id, post_title, description
                 try:
+                    label = "Latest Activity: "
+                    # NOTE: XPath 1.0 does not allow quotes to be escaped.
+                    assert "'" not in label
                     last_activity = self.driver.find_element(
-                        By.XPATH, '/html/body/div[2]/div[3]/div/div[1]/div/div/div/div[2]/div[3]/div[1]/ul/li[4]').text
+                        By.XPATH, f"//*[contains(text(), '{label}')]"
+                    ).text.replace(label, "")
                 except NoSuchElementException:
                     last_activity = 'N/A'
                 try:
