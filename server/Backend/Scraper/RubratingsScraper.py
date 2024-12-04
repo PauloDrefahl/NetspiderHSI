@@ -522,32 +522,20 @@ class RubratingsScraper(ScraperPrototype):
                     col[0].column_letter].width = adjusted_width
 
     def CLEAN_format_data_to_excel(self) -> None:
-        personal_info = [
-            f"{id_poster}"
-            for id_poster in zip(
-                self.provider_id
-            )
-        ]
-
-        contact_info = [
-            f"{phone_number}"
-            for phone_number in zip(
-                self.phone_number
-            )
-        ]
-
-        overall_desc = [
+        # Concatenate attributes to fit into the CLEAN spreadsheet format, which
+        # is consistent across all scrapers.
+        overall_description = [
             f"{post_title} ||| {description}"
-            for post_title, description in zip(
-                self.provider_id, self.description
+            for (post_title, description) in zip(
+                self.post_title, self.description, strict=True
             )
         ]
 
-        post_time = [
-            f"Last Activity: {last_active}"
-            for last_active in zip(
-                self.last_activity
-            )
+        # These timestamps do *not* indicate when the post was created, unlike
+        # the timestamps from YesBackpage and Escort Alligator.
+        timeline = [
+            f"Last Activity: {last_activity}"
+            for last_activity in self.last_activity
         ]
 
         titled_columns = pd.DataFrame({
@@ -556,10 +544,10 @@ class RubratingsScraper(ScraperPrototype):
             # ------
             'Inputted City / Region': self.city,
             'Specified Location': self.location,
-            'Timeline': post_time,
-            'Contacts': contact_info,
-            'Personal Info': personal_info,
-            'Overall Description': overall_desc,
+            'Timeline': timeline,
+            'Contacts': self.phone_number,
+            'Personal Info': self.provider_id,
+            'Overall Description': overall_description,
             # ------
             'Payment-methods': self.payment_methods_found,
             'Social-media-found': self.social_media_found,

@@ -417,21 +417,14 @@ class ErosScraper(ScraperPrototype):
                     col[0].column_letter].width = adjusted_width
 
     def CLEAN_format_data_to_excel(self) -> None:
-
-        contact_info = [
-            f"{contact_deets}"
-            for contact_deets in zip(
-                self.contact_details
+        # Concatenate attributes to fit into the CLEAN spreadsheet format, which
+        # is consistent across all scrapers.
+        overall_description = [
+            f"{profile_header} ||| {info_details}"
+            for (profile_header, info_details) in zip(
+                self.profile_header, self.info_details, strict=True
             )
         ]
-
-        overall_desc = [
-            f"{profile_head} ||| {info_deets} "
-            for profile_head, info_deets in zip(
-                self.profile_header, self.info_details
-            )
-        ]
-
 
         titled_columns = pd.DataFrame({
             'Post-identifier': self.post_identifier,
@@ -440,9 +433,9 @@ class ErosScraper(ScraperPrototype):
             'Inputted City / Region': self.city,
             'Specified Location': 'N/A',
             'Timeline': 'N/A',
-            'Contacts': contact_info,
+            'Contacts': self.contact_details,
             'Personal Info': self.about_info,
-            'Overall Description': overall_desc,
+            'Overall Description': overall_description,
             # ------
             'Payment-methods': self.payment_methods_found,
             'Social-media-found': self.social_media_found,

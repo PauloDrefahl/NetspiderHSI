@@ -457,45 +457,25 @@ class MegapersonalsScraper(ScraperPrototype):
                     col[0].column_letter].width = adjusted_width
 
     def CLEAN_format_data_to_excel(self) -> None:
-        location = [
-            f" {city} ||| {location} "
-            for city, location in zip(
-                self.contentCity, self.location
+        # Concatenate attributes to fit into the CLEAN spreadsheet format, which
+        # is consistent across all scrapers.
+        specified_location = [
+            f"{contentCity} ||| {location}"
+            for (contentCity, location) in zip(
+                self.contentCity, self.location, strict=True
             )
         ]
-
-        personal_info = [
-            f"{name}"
-            for name in zip(
-                self.name
-            )
-        ]
-
-        contact_info = [
-            f"{phone_number}"
-            for phone_number in zip(
-                self.phoneNumber
-            )
-        ]
-
-        overall_desc = [
-            f"{description} "
-            for description in zip(
-                self.description
-            )
-        ]
-
 
         titled_columns = pd.DataFrame({
             'Post-identifier': self.post_identifier,
             'Link': self.link,
             # -------
             'Inputted City / Region': self.city,
-            'Specified Location': location,
+            'Specified Location': specified_location,
             'Timeline': 'N/A',
-            'Contacts': contact_info,
+            'Contacts': self.phoneNumber,
             'Personal Info': self.name,
-            'Overall Description': overall_desc,
+            'Overall Description': self.description,
             # -----
             'Payment-methods': self.payment_methods_found,
             'Social-media-found': self.social_media_found,

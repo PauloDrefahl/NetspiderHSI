@@ -434,24 +434,7 @@ class EscortalligatorScraper(ScraperPrototype):
                 worksheet.column_dimensions[
                     col[0].column_letter].width = adjusted_width
 
-    #call it
     def CLEAN_format_data_to_excel(self) -> None:
-
-        # append certain info together
-        contact_info = [
-            f"{phone_number}"
-            for phone_number in zip(
-                self.phone_number,
-            )
-        ]
-        location = [
-            f"{city}||| {local}"
-            for city, local in zip(
-                self.city, self.locationSplits
-            )
-        ]
-
-        # define columns
         titled_columns = pd.DataFrame({
             # ---- abs identifiers
             'Post-identifier': self.post_identifier,
@@ -461,7 +444,7 @@ class EscortalligatorScraper(ScraperPrototype):
             'Specified Location': self.locationSplits,  # could also be a keyword source too
             'Timeline': self.timestamps,
             # ------ methods of tracking
-            'Contacts': contact_info,  # could also be a keyword source too
+            'Contacts': self.phone_number,  # could also be a keyword source too
             # ----- keyword sources
             'Personal Info': self.age,
             'Overall Description': self.description,

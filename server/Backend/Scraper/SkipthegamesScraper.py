@@ -417,17 +417,12 @@ class SkipthegamesScraper(ScraperPrototype):
                     col[0].column_letter].width = adjusted_width
 
     def CLEAN_format_data_to_excel(self) -> None:
-        personal_info = [
-            f"{ab_info } "
-            for ab_info in zip(
-                self.about_info
-            )
-        ]
-
-        overall_desc = [
-            f"{description} ||| {services} "
-            for description, services in zip(
-                self.description, self.services
+        # Concatenate attributes to fit into the CLEAN spreadsheet format, which
+        # is consistent across all scrapers.
+        overall_description = [
+            f"{description} ||| {services}"
+            for (description, services) in zip(
+                self.description, self.services, strict=True
             )
         ]
 
@@ -439,8 +434,8 @@ class SkipthegamesScraper(ScraperPrototype):
             'Specified Location': 'N/A',
             'Timeline': 'N/A',
             'Contacts': 'N/A',
-            'Personal Info': personal_info,
-            'Overall Description': overall_desc,
+            'Personal Info': self.about_info,
+            'Overall Description': overall_description,
             # -------
             'Payment-methods': self.payment_methods_found,
             'Social-media-found': self.social_media_found,

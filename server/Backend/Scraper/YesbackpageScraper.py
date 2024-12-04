@@ -527,31 +527,24 @@ class YesbackpageScraper(ScraperPrototype):
                     col[0].column_letter].width = adjusted_width
 
     def CLEAN_format_data_to_excel(self) -> None:
+        # Concatenate attributes to fit into the CLEAN spreadsheet format, which
+        # is consistent across all scrapers.
         personal_info = [
-            f"{name} ||| {sex} "
-            for name, sex in zip(
-                self.name, self.sex
-            )
+            f"{name} ||| {sex}"
+            for (name, sex) in zip(self.name, self.sex, strict=True)
         ]
 
-        contact_info = [
+        contacts = [
             f"{phone_number} ||| {email}"
-            for phone_number, email in zip(
-                self.phone_number, self.email
+            for (phone_number, email) in zip(
+                self.phone_number, self.email, strict=True
             )
         ]
 
-        overall_desc = [
-            f"{description} ||| {services} ||| {Reply_to}"
-            for description, services, Reply_to in zip(
-                self.description, self.services, self.reply_to
-            )
-        ]
-
-        post_time = [
-            f" Posted on: {posted_on} Expires on: {expires_on}"
-            for posted_on, expires_on in zip(
-                self.posted_on, self.expires_on
+        overall_description = [
+            f"{description} ||| {services} ||| {reply_to}"
+            for (description, services, reply_to) in zip(
+                self.description, self.services, self.reply_to, strict=True
             )
         ]
 
@@ -562,9 +555,9 @@ class YesbackpageScraper(ScraperPrototype):
             'Inputted City / Region': self.city,
             'Specified Location': self.location,
             'Timeline': self.posted_on,
-            'Contacts': contact_info,
+            'Contacts': contacts,
             'Personal Info': personal_info,
-            'Overall Description': overall_desc,
+            'Overall Description': overall_description,
             # -----
             'Payment-methods': self.payment_methods_found,
             'Social-media-found': self.social_media_found,
