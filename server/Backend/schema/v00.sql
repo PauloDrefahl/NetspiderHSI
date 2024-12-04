@@ -9,6 +9,8 @@ drop domain if exists url, phone_number, email_address cascade;
 drop domain if exists non_empty_text, non_empty_texts cascade;
 drop table if exists raw_eros_posts cascade;
 drop view if exists clean_eros_view cascade;
+drop table if exists raw_escort_alligator_posts cascade;
+drop view if exists clean_escort_alligator_view cascade;
 drop table if exists raw_skipthegames_posts cascade;
 drop view if exists clean_skipthegames_view cascade;
 drop table if exists raw_yesbackpage_posts cascade;
@@ -73,6 +75,41 @@ create or replace view clean_eros_view as
         social_media_accounts,
         keywords
     from raw_eros_posts;
+
+--=================================================================
+-- Escort Alligator
+--=================================================================
+
+create table if not exists raw_escort_alligator_posts (
+    primary key (link, city_or_region),
+    link url not null,
+    city_or_region non_empty_text not null,
+    specified_location varchar(1024) check (specified_location <> ''),
+    posted_on timestamp without time zone,
+    poster_phone_number phone_number,
+    poster_age integer check (poster_age > 0),
+    description varchar(2048) check (description <> ''),
+    payment_methods non_empty_texts not null,
+    social_media_accounts non_empty_texts not null,
+    keywords non_empty_texts not null
+);
+
+----------------
+-- Clean View
+
+create or replace view clean_escort_alligator_view as
+    select
+        link,
+        city_or_region,
+        coalesce(specified_location, 'N/A') as specified_location,
+        posted_on as timeline,
+        coalesce(poster_phone_number, 'N/A') as contacts,
+        coalesce(cast(poster_age as text), 'N/A') as poster,
+        coalesce(description, 'N/A') as description,
+        payment_methods,
+        social_media_accounts,
+        keywords
+    from raw_escort_alligator_posts;
 
 --=================================================================
 -- SkipTheGames

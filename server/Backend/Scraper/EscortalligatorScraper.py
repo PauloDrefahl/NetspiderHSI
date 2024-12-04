@@ -1,4 +1,5 @@
 import os
+import re
 from datetime import datetime
 import pandas as pd
 from seleniumbase import Driver
@@ -299,6 +300,30 @@ class EscortalligatorScraper(ScraperPrototype):
         social_media = self.get_social_media(description)
         self.social_media_found.append("\n".join(social_media) or "N/A")
         self.timestamps.append(timestamp)
+        # Store information about the post in the database.
+        with self.open_database() as connection:
+            with connection.cursor() as cursor:
+                # Escort Alligator displays timestamps in 24-hour notation, but
+                # still includes 'AM' and 'PM', which confuses PostgreSQL.
+                timestamp = re.sub("AM|PM", "", timestamp)
+                cursor.execute(
+                    """
+                    insert into raw_escort_alligator_posts
+                    values (%s, %s, %s, %s, %s, %s, %s, %s, %s, %s);
+                    """,
+                    (
+                        link,
+                        self.city,
+                        locationSplits,
+                        timestamp,
+                        phone_number,
+                        age,
+                        description,
+                        payment_methods,
+                        social_media,
+                        self.keywords_found_in_post,
+                    ),
+                )
 
     def join_inclusive(self, counter, description, link, location_and_age, locationSplits, age, phone_number, timestamp):
         if len(self.keywords) == len(set(self.keywords_found_in_post)):
