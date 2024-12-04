@@ -7,6 +7,8 @@
 drop type if exists sex cascade;
 drop domain if exists url, phone_number, email_address cascade;
 drop domain if exists non_empty_text, non_empty_texts cascade;
+drop table if exists raw_eros_posts cascade;
+drop view if exists clean_eros_view cascade;
 drop table if exists raw_skipthegames_posts cascade;
 drop view if exists clean_skipthegames_view cascade;
 drop table if exists raw_yesbackpage_posts cascade;
@@ -33,6 +35,44 @@ do language plpgsql $$
             null;
     end;
 $$;
+
+--=================================================================
+-- Eros
+--=================================================================
+
+create table if not exists raw_eros_posts (
+    primary key (link, city_or_region),
+    link url not null,
+    city_or_region non_empty_text not null,
+    profile_header varchar(2048) check (profile_header <> ''),
+    about_info varchar(2048) check (about_info <> ''),
+    info_details varchar(2048) check (info_details <> ''),
+    contact_details varchar(2048) check (contact_details <> ''),
+    payment_methods non_empty_texts not null,
+    social_media_accounts non_empty_texts not null,
+    keywords non_empty_texts not null
+);
+
+----------------
+-- Clean View
+
+create or replace view clean_eros_view as
+    select
+        link,
+        city_or_region,
+        'N/A' as specified_location,
+        cast(null as timestamp without time zone) as timeline,
+        coalesce(contact_details, 'N/A') as contacts,
+        coalesce(about_info, 'N/A') as poster,
+        concat_ws(
+            ' ||| ',
+            coalesce(profile_header, 'N/A'),
+            coalesce(info_details, 'N/A')
+        ) as description,
+        payment_methods,
+        social_media_accounts,
+        keywords
+    from raw_eros_posts;
 
 --=================================================================
 -- SkipTheGames

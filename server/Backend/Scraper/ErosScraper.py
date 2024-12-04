@@ -285,6 +285,26 @@ class ErosScraper(ScraperPrototype):
         self.social_media_found.append("\n".join(social_media) or "N/A")
         self.keywords_found.append(', '.join(self.keywords_found_in_post) or 'N/A')
         self.number_of_keywords_found.append(self.number_of_keywords_in_post or 'N/A')
+        # Store information about the post in the database.
+        with self.open_database() as connection:
+            with connection.cursor() as cursor:
+                cursor.execute(
+                    """
+                    insert into raw_eros_posts
+                    values (%s, %s, %s, %s, %s, %s, %s, %s, %s);
+                    """,
+                    (
+                        link,
+                        self.city,
+                        profile_header,
+                        description,
+                        info_details,
+                        contact_details,
+                        payment_methods,
+                        social_media,
+                        self.keywords_found_in_post,
+                    ),
+                )
 
     def join_inclusive(self, contact_details, counter, description, info_details, link, profile_header):
         if len(self.keywords) == len(set(self.keywords_found_in_post)):
