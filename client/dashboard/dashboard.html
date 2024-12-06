@@ -152,20 +152,52 @@
                 </div>
             </div>
         </div>
-
+<!---------------------------Automatic Scraper Setup----------------------------->
         <div id="big-box">
-            <h2><img src="./icons/pager-solid.svg" class="icon"/>Automatic Scraping Setup:</h2>
             <div class="column">
-                <h2>Select Date to Start Scraping</h2>
-                <input type="date">
-                <h2>Select Date to Stop Scraping</h2>
-                <input type="date">
-            </div>
-            <div class="column">
-                <h2>Select Frequency to Scrape</h2>
-                <div>
-                    <label onclick="StartScraper(selectedWebsite, selectedLocation)" id="startButton">Schedule</label>
+                <h2>Add Automatic Scraper:</h2>
+                <h3>Scraper Name:</h3>
+                <div class="input-container">
+                    <input type="text" class="setScrp-input" placeholder="Type Scraper Name" id="addScraperText">
                 </div>
+                <h3>Number of Days to Scrape:</h3>
+                <div class="input-container">
+                    <input type="number" class="auto-days-input" placeholder="Number of Days" id="addLengthNumber" min="1">
+                </div>
+                <h3>Scraper Frequency:</h3>
+                <h4> 
+                    <select id="frequency" name="frequency">
+                        <option value="daily">Daily</option>
+                        <option value="weekly">Weekly</option>
+                    </select>
+                </h4>
+                <div>
+                    <label onclick="saveScheduledScraper(
+                        document.getElementById('addScraperText'),
+                        document.getElementById('addLengthNumber'),
+                        document.getElementById('frequency'),
+                    )" id="addScheduleButton">Schedule Scraper</label>
+                </div>
+            </div>
+
+            <div class="column">
+                <h2>Delete AutoScraper:</h2>
+                <h3>Scraper Name:</h3>
+                <div class="input-container">
+                    <input type="text" class="setScrp-input" placeholder="Type Scraper Name" id="deleteScraperText">
+                </div>
+                <div>
+                    <label onclick="deleteScheduledScraper(
+                        document.getElementById('deleteScraperText'),
+                    )" id="deleteScheduleButton">Delete Scheduled Scraper</label>
+                </div>
+            </div>
+
+            <div class="column">
+                <h2><img src="./icons/pager-solid.svg" class="icon"/>Active Schedules:</h2>
+                <ul id="scheduleList">
+                    <!--Dynamic Schedule List-->
+                </ul>
             </div>
         </div>
 
@@ -324,6 +356,7 @@
 </script>
 
 <script src="scripts/resultManager.js"></script>
+<script src="scripts/scheduler.js"></script>
 
 </body>
 </html>

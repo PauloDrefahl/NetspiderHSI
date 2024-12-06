@@ -76,6 +76,29 @@ body {
     text-align: center;
 }
 
+.column h3{
+    margin-top: 20px;
+    margin-bottom: 17px;
+    color: #09558B;
+    text-align: center;
+    padding: 5px;
+    border: 2px solid #000000;
+    padding: 2%;
+    border-radius: 12px; /* Rounded corners */
+    background-color: #09558B;
+    color: #fff;
+    transition: background-color 0.3s, color 0.3s, border-color 0.3s;
+    box-shadow: 0 6px 8px 0 rgba(0,0,0,0.24),0 8.5px 25px 0 rgba(0,0,0,0.19);
+}
+
+/* Input styles for the Auto Scraper big box */
+#frequency {
+    display: block;
+    width: 50%;
+    margin-left: auto;
+    margin-right: auto;
+}
+
 
 /* Title styles for the big box */
 #big-box h2 {
