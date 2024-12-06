@@ -4,6 +4,9 @@
 const { ipcRenderer, contextBridge, shell } = require('electron');
 const io = require('socket.io-client');
 const fs = require('fs');
+const path = require('path');
+
+
 
 
 // Read the port from a text file;
@@ -202,3 +205,103 @@ contextBridge.exposeInMainWorld('editFile', {
     }
 });
 
+contextBridge.exposeInMainWorld('scraperFile', {
+
+    getSchedules: () => {
+        try {
+            const filePath = path.join(__dirname, 'scheduled_scraper.json');
+
+            if (fs.existsSync(filePath)) {
+                const scheduledScrapers = fs.readFileSync(filePath, 'utf-8');
+                return JSON.parse(scheduledScrapers); // Return parsed JSON from file
+            } else {
+                return {};
+            }
+        } catch (error) {
+            console.error('Error reading scheduled_scraper file:', error);
+            return {};
+        }
+    },
+
+    saveScraperData: (fileName, data) => {
+        const filePath = path.join(__dirname, fileName);
+    
+        try {
+            let existingSchedules = {};
+    
+            // Check if the file exists and read scheduled_scraper.json
+            if (fs.existsSync(filePath)) {
+                try {
+                    const fileContent = fs.readFileSync(filePath, 'utf-8');
+                    
+                    // Check if the file is empty
+                    if (fileContent.trim()) {
+                        existingSchedules = JSON.parse(fileContent);
+                    }
+                } catch (parseError) {
+                    console.error(`Error parsing the existing file ${fileName}:`, parseError);
+                    // If parsing fails, send an empty object
+                    existingSchedules = {};
+                }
+            }
+    
+            // Merge the new schedule with the existing
+            const mergedData = { ...existingSchedules, ...data };
+    
+            // Attempt to write the merged data back to the file
+            try {
+                fs.writeFileSync(filePath, JSON.stringify(mergedData, null, 2));
+                console.log(`Schedule successfully written to ${fileName}`);
+            } catch (writeError) {
+                console.error(`Error writing to file ${fileName}:`, writeError);
+                throw writeError;
+            }
+        } catch (err) {
+            console.error(`Error in saveScraperData for file ${fileName}:`, err);
+            throw err;
+        }
+    },
+
+    deleteScraperData: (fileName, data) => {
+        const filePath = path.join(__dirname, fileName); // Use the provided fileName
+
+        try {
+            if (fs.existsSync(filePath)) {
+                // Read the existing data from the file
+                const fileContent = fs.readFileSync(filePath, 'utf-8');
+                let existingSchedules = {};
+
+                // Parse the file content to JSON
+                try {
+                    existingSchedules = JSON.parse(fileContent);
+                } catch (parseError) {
+                    console.error('Error parsing the scheduled_scraper file:', parseError);
+                    return;
+                }
+
+                // Check if the scraperName exists in the data object
+                const scraperName = data.scraperName;  // Extract scraperName from the data object
+
+                if (existingSchedules.hasOwnProperty(scraperName)) {
+                    // Delete the scraper by its name
+                    delete existingSchedules[scraperName];
+
+                    // Write the updated content back to the file
+                    try {
+                        fs.writeFileSync(filePath, JSON.stringify(existingSchedules, null, 2));
+                        console.log(`Scraper with name "${scraperName}" deleted successfully.`);
+                    } catch (writeError) {
+                        console.error('Error writing to the scheduled_scraper file:', writeError);
+                    }
+                } else {
+                    console.log(`Scraper with name "${scraperName}" not found.`);
+                }
+            } else {
+                console.error(`${fileName} file not found.`);
+            }
+        } catch (err) {
+            console.error('Error in deleteScraperData:', err);
+        }
+    }
+
+});
