@@ -4,6 +4,13 @@ function saveScheduledScraper(name, duration, frequency) {
     const scraperDuration = parseInt(duration.value, 10);  // Get the duration (should be a number)
 
     try {
+
+        // Make sure inputs are valid
+        if (!scraperName || !scraperDuration) {
+            console.error('Please fill all AutoScraper fields');
+            return;
+        }
+
         const scraperData = {
             [scraperName]: {
                 data: {
@@ -22,7 +29,6 @@ function saveScheduledScraper(name, duration, frequency) {
                 last_run: "none"
             }
         };
-
         try {
             console.log("saving scraper data ... ");
             window.scraperFile.saveScraperData('scheduled_scraper.json', scraperData);
