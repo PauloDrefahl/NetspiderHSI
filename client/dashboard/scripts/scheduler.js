@@ -26,7 +26,7 @@ function saveScheduledScraper(name, duration, frequency) {
                 },
                 frequency: scraperFrequency,
                 duration: scraperDuration,
-                last_run: "none"
+                last_run: "None"
             }
         };
         try {
