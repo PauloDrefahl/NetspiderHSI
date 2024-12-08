@@ -36,8 +36,8 @@ class ErosScraper(ScraperPrototype):
         self.scraper_directory = None
         self.screenshot_directory = None
         self.pdf_filename = None
-        self.keywords = None
-        self.flagged_keywords = None
+        self.keywords: set[str] = set()
+        self.flagged_keywords: set[str] = set()
         self.completed = False
 
         self.join_keywords = False
@@ -83,10 +83,10 @@ class ErosScraper(ScraperPrototype):
     def set_search_mode(self, search_mode) -> None:
         self.search_mode = search_mode
 
-    def set_flagged_keywords(self, flagged_keywords) -> None:
+    def set_flagged_keywords(self, flagged_keywords: set[str]) -> None:
         self.flagged_keywords = flagged_keywords
 
-    def set_keywords(self, keywords) -> None:
+    def set_keywords(self, keywords: set[str]) -> None:
         self.keywords = keywords
 
     '''
