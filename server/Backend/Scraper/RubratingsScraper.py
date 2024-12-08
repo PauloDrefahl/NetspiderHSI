@@ -45,8 +45,8 @@ class RubratingsScraper(ScraperPrototype):
         self.screenshot_directory = None
         self.pdf_filename = None
         self.pdf = None
-        self.keywords = set()
-        self.flagged_keywords = set()
+        self.keywords: set[str] = set()
+        self.flagged_keywords: set[str] = set()
         self.search_mode = False
         self.completed = False
 
@@ -95,10 +95,10 @@ class RubratingsScraper(ScraperPrototype):
     def set_search_mode(self, search_mode) -> None:
         self.search_mode = search_mode
 
-    def set_flagged_keywords(self, flagged_keywords) -> None:
+    def set_flagged_keywords(self, flagged_keywords: set[str]) -> None:
         self.flagged_keywords = flagged_keywords
 
-    def set_keywords(self, keywords) -> None:
+    def set_keywords(self, keywords: set[str]) -> None:
         self.keywords = keywords
 
     '''

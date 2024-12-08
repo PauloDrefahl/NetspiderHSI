@@ -95,12 +95,12 @@ class ScraperManager:
 
 class ScraperThread(threading.Thread):
     def __init__(self, kwargs):
-        keywords = set(kwargs['keywords'].split(','))
-        if kwargs['flagged_keywords'] == '':
-            flagged_keywords = []
-        else:
-            flagged_keywords = set(kwargs['flagged_keywords'].split(','))
-        super(ScraperThread, self).__init__()
+        super().__init__()
+        keywords = set(kwargs["keywords"])
+        flagged_keywords = set(kwargs["flagged_keywords"])
+        # Ignore empty search text.
+        if kwargs["search_text"] != "":
+            keywords.add(kwargs["search_text"])
         if kwargs['website'] == 'eros':
             self.scraper = ErosScraper()
         elif kwargs['website'] == 'escortalligator':
@@ -118,8 +118,6 @@ class ScraperThread(threading.Thread):
         self.scraper.set_flagged_keywords(flagged_keywords)
         if kwargs['inclusive_search']:
             self.scraper.set_join_keywords()
-        if kwargs['search_text'] != '':  # disables search text if blank
-            self.scraper.keywords.add(kwargs['search_text'])
         self.scraper.set_search_mode(kwargs['search_mode'])
         if kwargs['payment_methods_only']:
             self.scraper.set_only_posts_with_payment_methods()

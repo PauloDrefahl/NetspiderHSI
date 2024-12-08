@@ -16,10 +16,10 @@ function saveScheduledScraper(name, duration, frequency) {
                 data: {
                     website: selectedWebsite,
                     city: selectedLocation,
-                    keywords: selectedKeywords.join(','),
-                    flagged_keywords: flaggedKeywords.join(','),
+                    keywords: selectedKeywords,
+                    flagged_keywords: flaggedKeywords,
                     search_mode: searchMode.checked,
-                    search_text: searchText.innerText,
+                    search_text: searchText.value,
                     payment_methods_only: paymentSearch.checked,
                     inclusive_search: inclusiveSearch.checked,
                     path: resultFolder
