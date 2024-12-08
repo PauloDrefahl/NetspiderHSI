@@ -21,6 +21,7 @@ import os
 import webbrowser
 from watchdog.observers import Observer
 from watchdog.events import FileSystemEventHandler
+from apscheduler.schedulers.background import BackgroundScheduler
 
 import time
 import json
@@ -322,69 +323,113 @@ def handle_error(e):
 
 
 #---------------------------------Auto Scraper---------------------------------
+#Example data
+# {
+#     "Test": {
+#       "data": {
+#         "website": "escortalligator",
+#         "city": "daytona",
+#         "keywords": "",
+#         "flagged_keywords": "",
+#         "search_mode": false,
+#         "search_text": "",
+#         "payment_methods_only": false,
+#         "inclusive_search": false,
+#         "path": "result"
+#       },
+#       "frequency": "daily",
+#       "duration": 5,
+#       "last_run": "none"
+#     }
+#   }
 
-#------Load the schedule json file------
-def load_config():
-    try:
-        with open("scheduled_scraper.json", 'r') as file:
-            return json.load(file)
-    except FileNotFoundError:
-        print(f"File {file_path} not found. Ensure the file exists.")
-        return {}
-    except json.JSONDecodeError:
-        print(f"Error decoding JSON from {file_path}.")
-        return {}
+
+#------function that will be called if the schedule is due------
+def process_scraper(item_name, item_data):
+
+    print(f"Processing {item_name}")
+    #start the scraper with the given data, handled the same way as if the user clicked start from the site. 
+    start_scraper(item_data['data'])
     
 
-#------function that will run if the schedule is due------
-def process_item(item_name, item_data):
-    print(f"Processing {item_name}")
-    start_scraper(item_data['data'])
-
-    time.sleep(item_data['duration'])  # Simulate the duration for the scraper
-
-    stop_scraper()
-    item_data['last_run'] = datetime.now().strftime('%Y-%m-%d %H:%M:%S')
 
 
 #------function that will run if the schedule is due------
 def run_scheduled_scrapers():
 
-    config = load_config()
+    file_path = "server/scheduled_scrapers.json" #need to add the path to the file
+    #if the file is not found (has been deleted), error out without crashing
+    try:
+        with open(file_path, 'r') as file:
+            config = json.load(file)
+    except FileNotFoundError:
+        print(f"File {file_path} not found. Ensure the file exists.")
+    except json.JSONDecodeError:
+        print(f"Error decoding JSON from {file_path}.")
 
     print("Checking for scrapers to run...")
 
     for item_name, item_data in config.items():
+
         last_run = item_data['last_run']
         frequency = item_data['frequency']
 
         if last_run == "None":
             print(f"{item_name} has not run yet. Running now.")
-            process_item(item_name, item_data)
+
+            last_run = datetime.now().strftime('%Y-%m-%d %H:%M:%S')
+
+            config["Test"]["last_run"] = last_run  # Example new value
+            print(config)
+            with open(file_path, 'w') as json_file:
+                json.dump(config, json_file, indent=4)
+
+            process_scraper(item_name, item_data)
+
+        
         else:
+
             last_run_date = datetime.strptime(last_run, '%Y-%m-%d %H:%M:%S')
             now = datetime.now()
 
             if frequency == "daily" and now - last_run_date >= timedelta(days=1):
                 print(f"{item_name} is scheduled for daily run. Running now.")
-                process_item(item_name, item_data)
+                process_scraper(item_name, item_data)
+
+                last_run = datetime.now().strftime('%Y-%m-%d %H:%M:%S')
+
+                config["Test"]["last_run"] = last_run  # Example new value
+                print(config)
+                with open(file_path, 'w') as json_file:
+                    json.dump(config, json_file, indent=4)
+
+                process_scraper(item_name, item_data)
+                
+
             elif frequency == "weekly" and now - last_run_date >= timedelta(weeks=1):
                 print(f"{item_name} is scheduled for weekly run. Running now.")
-                process_item(item_name, item_data)
+                process_scraper(item_name, item_data)
+
+                last_run = datetime.now().strftime('%Y-%m-%d %H:%M:%S')
+
+                config["Test"]["last_run"] = last_run  # Example new value
+                print(config)
+                with open(file_path, 'w') as json_file:
+                    json.dump(config, json_file, indent=4)
+
+                process_scraper(item_name, item_data)
+
             else:
                 print(f"{item_name} is not due to run yet.")
 
 
-def start_auto_scraper():
+#------End of Auto Scraper------
 
-    # Schedule the task to check every night at 2:00
-    schedule.every().day.at("02:00").do(run_scheduled_scrapers)
+# Initialize the scheduler
+scheduler = BackgroundScheduler()
+scheduler.add_job(run_scheduled_scrapers, 'cron', hour=2, minute=00) 
+scheduler.start()
 
-    while True: #need to change this line so that auto scraper will only run with the user enables it via the front end
-        schedule.run_pending()
-        time.sleep(1)
-
- 
 
 
 
@@ -432,5 +477,3 @@ if __name__ == "__main__":
     # Note: You may want to handle the case where `open_ports` is an empty list.
     socketio.run(app, host='127.0.0.1', port=open_ports[0], allow_unsafe_werkzeug=True)
     
-    #uncomment line when testing of the autoscraper is ready. Current goal is to get logic written down for discussion.  
-    #start_auto_scraper()
