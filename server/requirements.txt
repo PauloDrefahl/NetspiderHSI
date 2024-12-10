@@ -91,6 +91,7 @@ seaborn
 selenium
 seleniumbase
 setuptools
+schedule
 simple-websocket
 six
 sniffio

@@ -75,6 +75,12 @@ class ScraperManager:
         else:
             return {"Response": "Scraper Thread is already running"}
 
+    def wait_for_scraper_to_complete(self):
+        if self.scraper_thread and self.scraper_thread.is_alive():
+            print("Waiting for the scraper thread to finish...")
+            self.scraper_thread.join()
+
+
     def manage_stop_scraper(self):
         if self.scraper_thread and self.scraper_thread.is_alive():
             self.scraper_thread.stop_thread()
@@ -346,10 +352,14 @@ def handle_error(e):
 
 #------function that will be called if the schedule is due------
 def process_scraper(item_name, item_data):
-
     print(f"Processing {item_name}")
-    #start the scraper with the given data, handled the same way as if the user clicked start from the site. 
+    # Start the scraper
     start_scraper(item_data['data'])
+    
+    # Wait for the scraper to complete
+    scraper_manager.wait_for_scraper_to_complete()
+    print(f"{item_name} processing complete.")
+
     
 
 
@@ -379,7 +389,7 @@ def run_scheduled_scrapers():
 
             last_run = datetime.now().strftime('%Y-%m-%d %H:%M:%S')
 
-            config["Test"]["last_run"] = last_run  # Example new value
+            config[item_name]["last_run"] = last_run  # Example new value
             print(config)
             with open(file_path, 'w') as json_file:
                 json.dump(config, json_file, indent=4)
@@ -398,12 +408,11 @@ def run_scheduled_scrapers():
 
                 last_run = datetime.now().strftime('%Y-%m-%d %H:%M:%S')
 
-                config["Test"]["last_run"] = last_run  # Example new value
+                config[item_name]["last_run"] = last_run  # Example new value
                 print(config)
                 with open(file_path, 'w') as json_file:
                     json.dump(config, json_file, indent=4)
 
-                process_scraper(item_name, item_data)
                 
 
             elif frequency == "weekly" and now - last_run_date >= timedelta(weeks=1):
@@ -412,12 +421,10 @@ def run_scheduled_scrapers():
 
                 last_run = datetime.now().strftime('%Y-%m-%d %H:%M:%S')
 
-                config["Test"]["last_run"] = last_run  # Example new value
+                config[item_name]["last_run"] = last_run  # Example new value
                 print(config)
                 with open(file_path, 'w') as json_file:
                     json.dump(config, json_file, indent=4)
-
-                process_scraper(item_name, item_data)
 
             else:
                 print(f"{item_name} is not due to run yet.")
