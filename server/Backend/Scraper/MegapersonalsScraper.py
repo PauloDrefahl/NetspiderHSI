@@ -152,14 +152,10 @@ class MegapersonalsScraper(ScraperPrototype):
         self.get_data(links)
         self.close_webpage()
         self.reset_variables()
+        self.completed = True
 
     def stop_scraper(self) -> None:
         self.completed = True
-        if self.search_mode:
-            self.driver.close()
-            self.driver.quit()
-        else:
-            self.driver.close()
 
     def open_webpage(self) -> None:
         self.driver.implicitly_wait(10)
@@ -180,7 +176,7 @@ class MegapersonalsScraper(ScraperPrototype):
         self.driver.find_element(By.XPATH, '//*[@id="megapCategoriesOrangeButton"]').click()
 
     def close_webpage(self) -> None:
-        self.driver.close()
+        self.driver.quit()
 
     '''
     ---------------------------------------
