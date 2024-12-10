@@ -112,6 +112,87 @@ create or replace view clean_escort_alligator_view as
     from raw_escort_alligator_posts;
 
 --=================================================================
+-- MegaPersonals
+--=================================================================
+
+create table if not exists raw_mega_personals_posts (
+    primary key (link, city_or_region),
+    link url not null,
+    city_or_region non_empty_text not null,
+    specified_city_or_region varchar(128) check (specified_city_or_region <> ''),
+    specified_location varchar(256) check (specified_location <> ''),
+    poster_phone_number phone_number,
+    poster_name varchar(64) check (poster_name <> ''),
+    description varchar(4096) check (description <> ''),
+    payment_methods non_empty_texts not null,
+    social_media_accounts non_empty_texts not null,
+    keywords non_empty_texts not null
+);
+
+----------------
+-- Clean View
+
+create or replace view clean_mega_personals_view as
+    select
+        link,
+        city_or_region,
+        concat_ws(
+            ' ||| ',
+            coalesce(specified_city_or_region, 'N/A'),
+            coalesce(specified_location, 'N/A')
+        ) as specified_location,
+        cast(null as timestamp without time zone) as timeline,
+        coalesce(poster_phone_number, 'N/A') as contacts,
+        coalesce(poster_name, 'N/A') as poster,
+        coalesce(description, 'N/A') as description,
+        payment_methods,
+        social_media_accounts,
+        keywords
+    from raw_mega_personals_posts;
+
+--=================================================================
+-- RubRatings
+--=================================================================
+
+create table if not exists raw_rub_ratings_posts (
+    primary key (link, city_or_region),
+    link url not null,
+    city_or_region non_empty_text not null,
+    specified_location varchar(128) not null check (specified_location <> ''),
+    last_activity date not null,
+    poster_phone_number phone_number not null,
+    -- TODO(Daniel): Add a not-null constraint here once the provider ID locator
+    -- is fixed; every page should have a provider ID.
+    provider_id integer,
+    title varchar(512) check (title <> ''),
+    description varchar(2048) check (description <> ''),
+    payment_methods non_empty_texts not null,
+    social_media_accounts non_empty_texts not null,
+    keywords non_empty_texts not null
+);
+
+----------------
+-- Clean View
+
+create or replace view clean_rub_ratings_view as
+    select
+        link,
+        city_or_region,
+        specified_location,
+        cast(last_activity as timestamp without time zone) as timeline,
+        poster_phone_number as contacts,
+        cast(provider_id as text) as poster,
+        concat_ws(
+            ' ||| ',
+            coalesce(title, 'N/A'),
+            coalesce(description, 'N/A')
+        ) as description,
+        payment_methods,
+        social_media_accounts,
+        keywords
+    from raw_rub_ratings_posts;
+
+--=================================================================
 -- SkipTheGames
 --=================================================================
 

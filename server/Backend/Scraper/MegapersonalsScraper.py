@@ -308,12 +308,13 @@ class MegapersonalsScraper(ScraperPrototype):
             with connection.cursor() as cursor:
                 cursor.execute(
                     """
-                    insert into raw_skipthegames_posts
+                    insert into raw_mega_personals_posts
                     values (%s, %s, %s, %s, %s, %s, %s, %s, %s, %s);
                     """,
                     (
                         link,
                         self.city,
+                        city,
                         location,
                         phone_number,
                         name,
@@ -321,7 +322,6 @@ class MegapersonalsScraper(ScraperPrototype):
                         payment_methods,
                         social_media,
                         self.keywords_found_in_post,
-                        self.number_of_keywords_in_post,
                     ),
                 )
 

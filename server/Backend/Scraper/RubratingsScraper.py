@@ -367,23 +367,32 @@ class RubratingsScraper(ScraperPrototype):
         # Store information about the post in the database.
         with self.open_database() as connection:
             with connection.cursor() as cursor:
+                # PostgreSQL expects `last_activity` to contain the year, but
+                # RubRatings only shows the month and day, e.g., 'Mon, 9 Dec'.
+                last_activity += " " + str(datetime.now(tz=None).year)
+                # In the database, the provider ID is stored as an `integer`, so
+                # we must remove the '#' and cast `provider_id` to an `int`.
+                provider_id = provider_id.removeprefix("#")
+                # TODO(Daniel): Remove the check for "N/A" once the provider ID
+                # locator is fixed; every page should have a provider ID.
+                provider_id = None if provider_id == "N/A" else int(provider_id)
                 cursor.execute(
                     """
-                    insert into raw_skipthegames_posts
-                    values (%s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s);
+                    insert into raw_rub_ratings_posts
+                    values (%s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s);
                     """,
                     (
                         link,
                         self.city,
+                        location,
                         last_activity,
                         phone_number,
                         provider_id,
-                        post_title,
-                        description,
+                        post_title or None,
+                        description or None,
                         payment_methods,
                         social_media,
                         self.keywords_found_in_post,
-                        self.number_of_keywords_in_post,
                     ),
                 )
 
