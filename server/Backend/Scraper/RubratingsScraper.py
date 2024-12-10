@@ -143,7 +143,7 @@ class RubratingsScraper(ScraperPrototype):
         print("keywords inside scraper:", self.keywords)
         self.get_data(links)
         print("get data done")
-        self.stop_scraper()
+        self.close_webpage()
         print("closed webpage")
         self.reset_variables()
         print("reset variables")
@@ -152,8 +152,6 @@ class RubratingsScraper(ScraperPrototype):
 
     def stop_scraper(self) -> None:
         self.completed = True
-        self.driver.close()
-        self.driver.quit()
 
     def open_webpage(self) -> None:
         self.driver.implicitly_wait(10)
@@ -182,8 +180,7 @@ class RubratingsScraper(ScraperPrototype):
         assert "Page not found" not in self.driver.page_source
 
     def close_webpage(self) -> None:
-        self.completed = True
-        self.driver.close()
+        self.driver.quit()
 
     '''
     ---------------------------------------
