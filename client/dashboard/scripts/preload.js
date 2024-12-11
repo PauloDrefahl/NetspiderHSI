@@ -209,7 +209,7 @@ contextBridge.exposeInMainWorld('scraperFile', {
 
     getSchedules: () => {
         try {
-            const filePath = path.join(__dirname, 'scheduled_scraper.json');
+            const filePath = 'scheduled_scraper.json';
 
             if (fs.existsSync(filePath)) {
                 const scheduledScrapers = fs.readFileSync(filePath, 'utf-8');
@@ -224,7 +224,7 @@ contextBridge.exposeInMainWorld('scraperFile', {
     },
 
     saveScraperData: (fileName, data) => {
-        const filePath = path.join(__dirname, fileName);
+        const filePath = 'scheduled_scraper.json';
     
         try {
             let existingSchedules = {};
@@ -263,7 +263,7 @@ contextBridge.exposeInMainWorld('scraperFile', {
     },
 
     deleteScraperData: (fileName, data) => {
-        const filePath = path.join(__dirname, fileName); // Use the provided fileName
+        const filePath = 'scheduled_scraper.json'; // Use the provided fileName
 
         try {
             if (fs.existsSync(filePath)) {
