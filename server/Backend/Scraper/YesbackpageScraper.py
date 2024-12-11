@@ -362,6 +362,9 @@ class YesbackpageScraper(ScraperPrototype):
                 sex_enum_map = defaultdict(
                     lambda: "Other", {"Male": "Male", "Female": "Female"}
                 )
+                # Convert missing timestamps to `None`.
+                posted_on = None if posted_on == "N/A" else posted_on
+                expires_on = None if expires_on == "N/A" else expires_on
                 cursor.execute(
                     """
                     insert into raw_yesbackpage_posts
