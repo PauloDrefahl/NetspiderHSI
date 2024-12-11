@@ -309,7 +309,8 @@ class MegapersonalsScraper(ScraperPrototype):
                 cursor.execute(
                     """
                     insert into raw_mega_personals_posts
-                    values (%s, %s, %s, %s, %s, %s, %s, %s, %s, %s);
+                    values (%s, %s, %s, %s, %s, %s, %s, %s, %s, %s)
+                    on conflict do nothing;
                     """,
                     (
                         link,

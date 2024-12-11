@@ -274,7 +274,8 @@ class SkipthegamesScraper(ScraperPrototype):
                 cursor.execute(
                     """
                     insert into raw_skipthegames_posts
-                    values (%s, %s, %s, %s, %s, %s, %s, %s);
+                    values (%s, %s, %s, %s, %s, %s, %s, %s)
+                    on conflict do nothing;
                     """,
                     (
                         link,

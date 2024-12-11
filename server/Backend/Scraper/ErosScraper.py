@@ -291,7 +291,8 @@ class ErosScraper(ScraperPrototype):
                 cursor.execute(
                     """
                     insert into raw_eros_posts
-                    values (%s, %s, %s, %s, %s, %s, %s, %s, %s);
+                    values (%s, %s, %s, %s, %s, %s, %s, %s, %s)
+                    on conflict do nothing;
                     """,
                     (
                         link,

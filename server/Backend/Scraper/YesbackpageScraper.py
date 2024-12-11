@@ -368,7 +368,8 @@ class YesbackpageScraper(ScraperPrototype):
                 cursor.execute(
                     """
                     insert into raw_yesbackpage_posts
-                    values (%s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s);
+                    values (%s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s)
+                    on conflict do nothing;
                     """,
                     (
                         link,
