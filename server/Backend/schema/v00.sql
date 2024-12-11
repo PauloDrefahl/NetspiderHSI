@@ -24,9 +24,9 @@ drop view if exists clean_yesbackpage_view cascade;
 do language plpgsql $$
     begin
         create type sex as enum ('Male', 'Female', 'Other');
-        create domain url as varchar(256) check (value <> '');
-        create domain phone_number as varchar(64) check (value <> '');
-        create domain email_address as varchar(128) check (value <> '');
+        create domain url as varchar(512) check (value <> '');
+        create domain phone_number as varchar(128) check (value <> '');
+        create domain email_address as varchar(256) check (value <> '');
         create domain non_empty_text as text check (value <> '');
         create domain non_empty_texts as text[] check (
             array_position(value, '') is null
@@ -46,10 +46,10 @@ create table if not exists raw_eros_posts (
     primary key (link, city_or_region),
     link url not null,
     city_or_region non_empty_text not null,
-    profile_header varchar(2048) check (profile_header <> ''),
-    about_info varchar(2048) check (about_info <> ''),
-    info_details varchar(2048) check (info_details <> ''),
-    contact_details varchar(2048) check (contact_details <> ''),
+    profile_header varchar(4096) check (profile_header <> ''),
+    about_info varchar(4096) check (about_info <> ''),
+    info_details varchar(4096) check (info_details <> ''),
+    contact_details varchar(4096) check (contact_details <> ''),
     payment_methods non_empty_texts not null,
     social_media_accounts non_empty_texts not null,
     keywords non_empty_texts not null
@@ -84,11 +84,11 @@ create table if not exists raw_escort_alligator_posts (
     primary key (link, city_or_region),
     link url not null,
     city_or_region non_empty_text not null,
-    specified_location varchar(1024) check (specified_location <> ''),
+    specified_location varchar(2048) check (specified_location <> ''),
     posted_on timestamp without time zone,
     poster_phone_number phone_number,
     poster_age integer check (poster_age > 0),
-    description varchar(2048) check (description <> ''),
+    description varchar(4096) check (description <> ''),
     payment_methods non_empty_texts not null,
     social_media_accounts non_empty_texts not null,
     keywords non_empty_texts not null
@@ -119,10 +119,10 @@ create table if not exists raw_mega_personals_posts (
     primary key (link, city_or_region),
     link url not null,
     city_or_region non_empty_text not null,
-    specified_city_or_region varchar(128) check (specified_city_or_region <> ''),
-    specified_location varchar(256) check (specified_location <> ''),
+    specified_city_or_region varchar(256) check (specified_city_or_region <> ''),
+    specified_location varchar(512) check (specified_location <> ''),
     poster_phone_number phone_number,
-    poster_name varchar(64) check (poster_name <> ''),
+    poster_name varchar(128) check (poster_name <> ''),
     description varchar(4096) check (description <> ''),
     payment_methods non_empty_texts not null,
     social_media_accounts non_empty_texts not null,
@@ -158,14 +158,14 @@ create table if not exists raw_rub_ratings_posts (
     primary key (link, city_or_region),
     link url not null,
     city_or_region non_empty_text not null,
-    specified_location varchar(128) not null check (specified_location <> ''),
+    specified_location varchar(256) not null check (specified_location <> ''),
     last_activity date not null,
     poster_phone_number phone_number not null,
     -- TODO(Daniel): Add a not-null constraint here once the provider ID locator
     -- is fixed; every page should have a provider ID.
     provider_id integer,
-    title varchar(512) check (title <> ''),
-    description varchar(2048) check (description <> ''),
+    title varchar(1024) check (title <> ''),
+    description varchar(4096) check (description <> ''),
     payment_methods non_empty_texts not null,
     social_media_accounts non_empty_texts not null,
     keywords non_empty_texts not null
@@ -200,9 +200,9 @@ create table if not exists raw_skipthegames_posts (
     primary key (link, city_or_region),
     link url not null,
     city_or_region non_empty_text not null,
-    poster varchar(512) check (poster <> ''),
-    description varchar(2048) check (description <> ''),
-    services varchar(1024) check (services <> ''),
+    poster varchar(1024) check (poster <> ''),
+    description varchar(4096) check (description <> ''),
+    services varchar(2048) check (services <> ''),
     payment_methods non_empty_texts not null,
     social_media_accounts non_empty_texts not null,
     keywords non_empty_texts not null
@@ -237,16 +237,16 @@ create table if not exists raw_yesbackpage_posts (
     primary key (link, city_or_region),
     link url not null,
     city_or_region non_empty_text not null,
-    specified_location varchar(128) check (specified_location <> ''),
+    specified_location varchar(256) check (specified_location <> ''),
     posted_on timestamp without time zone,
     expires_on timestamp without time zone,
     poster_phone_number phone_number,
     poster_email_address email_address,
-    poster_name varchar(64) check (poster_name <> ''),
+    poster_name varchar(128) check (poster_name <> ''),
     poster_sex sex,
     reply_to email_address,
-    description varchar(2048) check (description <> ''),
-    services varchar(256) check (services <> ''),
+    description varchar(4096) check (description <> ''),
+    services varchar(512) check (services <> ''),
     payment_methods non_empty_texts not null,
     social_media_accounts non_empty_texts not null,
     keywords non_empty_texts not null
