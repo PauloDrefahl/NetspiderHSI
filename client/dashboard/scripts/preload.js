@@ -209,7 +209,7 @@ contextBridge.exposeInMainWorld('scraperFile', {
 
     getSchedules: () => {
         try {
-            const filePath = 'scheduled_scraper.json';
+            const filePath = 'scheduled_scrapers.json';
 
             if (fs.existsSync(filePath)) {
                 const scheduledScrapers = fs.readFileSync(filePath, 'utf-8');
@@ -218,18 +218,18 @@ contextBridge.exposeInMainWorld('scraperFile', {
                 return {};
             }
         } catch (error) {
-            console.error('Error reading scheduled_scraper file:', error);
+            console.error('Error reading scheduled_scrapers file:', error);
             return {};
         }
     },
 
     saveScraperData: (fileName, data) => {
-        const filePath = 'scheduled_scraper.json';
+        const filePath = 'scheduled_scrapers.json';
     
         try {
             let existingSchedules = {};
     
-            // Check if the file exists and read scheduled_scraper.json
+            // Check if the file exists and read scheduled_scrapers.json
             if (fs.existsSync(filePath)) {
                 try {
                     const fileContent = fs.readFileSync(filePath, 'utf-8');
@@ -263,7 +263,7 @@ contextBridge.exposeInMainWorld('scraperFile', {
     },
 
     deleteScraperData: (fileName, data) => {
-        const filePath = 'scheduled_scraper.json'; // Use the provided fileName
+        const filePath = 'scheduled_scrapers.json'; // Use the provided fileName
 
         try {
             if (fs.existsSync(filePath)) {
@@ -291,7 +291,7 @@ contextBridge.exposeInMainWorld('scraperFile', {
                         fs.writeFileSync(filePath, JSON.stringify(existingSchedules, null, 2));
                         console.log(`Scraper with name "${scraperName}" deleted successfully.`);
                     } catch (writeError) {
-                        console.error('Error writing to the scheduled_scraper file:', writeError);
+                        console.error('Error writing to the scheduled_scrapers file:', writeError);
                     }
                 } else {
                     console.log(`Scraper with name "${scraperName}" not found.`);
