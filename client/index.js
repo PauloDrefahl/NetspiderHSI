@@ -7,17 +7,18 @@ const { execFile, exec } = require('child_process');
 // Specify the path to your Flask executable
 const flaskExecutablePath = 'resources/NetSpiderServer.exe';
 
-// Use exec to run the Flask executable
-let flaskProcess = execFile(flaskExecutablePath, (error, stdout, stderr) => {
-  if (error) {
-    console.error(`Error: ${error.message}`);
-    return;
-  }
-  if (stderr) {
-    console.error(`stderr: ${stderr}`);
-    return;
-  }
-  console.log(`stdout: ${stdout}`);
+let flaskProcess = execFile(flaskExecutablePath);
+
+flaskProcess.stdout.on('data', (data) => {
+  console.log(`[Flask stdout]: ${data.toString().trim()}`);
+});
+
+flaskProcess.stderr.on('data', (data) => {
+  console.error(`[Flask stderr]: ${data.toString().trim()}`);
+});
+
+flaskProcess.on('exit', (code, signal) => {
+  console.log(`Flask process exited with code ${code} and signal ${signal}`);
 });
 
 const flaskPID = flaskProcess.pid
