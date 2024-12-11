@@ -26,7 +26,6 @@ from apscheduler.schedulers.background import BackgroundScheduler
 import time
 import json
 from datetime import datetime, timedelta
-import schedule
 
 app = Flask(__name__)
 qt_app = QApplication([])
