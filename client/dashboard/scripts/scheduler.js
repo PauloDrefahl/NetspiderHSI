@@ -31,7 +31,7 @@ function saveScheduledScraper(name, duration, frequency) {
         };
         try {
             console.log("saving scraper data ... ");
-            window.scraperFile.saveScraperData('scheduled_scraper.json', scraperData);
+            window.scraperFile.saveScraperData('scheduled_scrapers.json', scraperData);
         } catch (err) {
             console.error('Failed to save scraper data:', err);
         }
@@ -59,7 +59,7 @@ function deleteScheduledScraper(name) {
 
         console.log("Deleting scraper data for:", scraperName);
 
-        window.scraperFile.deleteScraperData('scheduled_scraper.json', { scraperName });
+        window.scraperFile.deleteScraperData('scheduled_scrapers.json', { scraperName });
 
     } catch (error) {
         console.error('Error deleting scheduled scraper:', error);
