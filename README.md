@@ -187,6 +187,7 @@ This project is licensed under the MIT License. See the [LICENSE](LICENSE) file 
 
 * **Paulo Drefahl** - pdrefahl@fgcu.edu
 * **Zachary Sutton** - zesutton2619@eagle.fgcu.edu
+* **Kevin Kostage** - kskostage9457@eagle.fgcu.edu
 
 ## Disclaimer
 
