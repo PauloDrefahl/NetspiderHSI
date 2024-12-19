@@ -21,7 +21,9 @@ def _connect() -> psycopg.Connection:
         port=5432,
         dbname="netspider",
         user="postgres",
-        password="password",
+        # NOTE(Daniel): NetSpider is intended to be run locally, so we don't
+        # need to worry about authentication.
+        password="password",  # noqa: S106
     )
 
 
