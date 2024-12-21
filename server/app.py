@@ -381,6 +381,7 @@ def run_scheduled_scrapers():
     for item_name, item_data in config.items():
 
         last_run = item_data['last_run']
+        duration = item_data['duration']
         frequency = item_data['frequency']
 
         if last_run == "None":
@@ -388,7 +389,8 @@ def run_scheduled_scrapers():
 
             last_run = datetime.now().strftime('%Y-%m-%d %H:%M:%S')
 
-            config[item_name]["last_run"] = last_run  # Example new value
+            config[item_name]["last_run"] = last_run  # Updates last run time value
+            config[item_name]["duration"] = duration - 1  # Updates count of days/weeks left
             print(config)
             with open(file_path, 'w') as json_file:
                 json.dump(config, json_file, indent=4)
@@ -407,7 +409,8 @@ def run_scheduled_scrapers():
 
                 last_run = datetime.now().strftime('%Y-%m-%d %H:%M:%S')
 
-                config[item_name]["last_run"] = last_run  # Example new value
+                config[item_name]["last_run"] = last_run  # Updates last run time value
+                config[item_name]["duration"] = duration - 1  # Updates count of days/weeks left
                 print(config)
                 with open(file_path, 'w') as json_file:
                     json.dump(config, json_file, indent=4)
@@ -420,7 +423,8 @@ def run_scheduled_scrapers():
 
                 last_run = datetime.now().strftime('%Y-%m-%d %H:%M:%S')
 
-                config[item_name]["last_run"] = last_run  # Example new value
+                config[item_name]["last_run"] = last_run  # Updates last run time value
+                config[item_name]["duration"] = duration - 1  # Updates count of days/weeks left
                 print(config)
                 with open(file_path, 'w') as json_file:
                     json.dump(config, json_file, indent=4)
