@@ -19,6 +19,7 @@ from typing import LiteralString, cast
 
 import psycopg
 from psycopg import sql
+from psycopg.rows import namedtuple_row
 
 MAIN_DATABASE_NAME = "netspider"
 logger = logging.getLogger(__name__)
@@ -77,6 +78,7 @@ def _connect_to(database_name: str) -> psycopg.Connection:
     logger.debug("Connecting to the '%s' database...", database_name)
     return psycopg.connect(
         autocommit=True,
+        row_factory=namedtuple_row,
         host="localhost",
         port=5432,
         dbname=database_name,
