@@ -245,12 +245,12 @@ class RubratingsScraper(ScraperPrototype):
                     location = 'N/A'
                 try:
                     provider_id_element = self.driver.find_element(
-                        By.XPATH, '/html/body/div[2]/div[3]/div/div[1]/div/div/div/div[2]/div[3]/div[1]/ul/li[3]'
+                        By.CSS_SELECTOR, ".info > li:nth-of-type(3)"
                     ).text
                     provider_id = provider_id_element.split(':')[1].strip()  # Get everything after ':'
 
                 except NoSuchElementException:
-                    provider_id = 'N/A'
+                    provider_id = None
                 try:
                     post_title = self.driver.find_element(
                         By.XPATH, '/html/body/div[2]/div[3]/div/div[1]/div/div/div/div[2]/h3').text
@@ -370,12 +370,6 @@ class RubratingsScraper(ScraperPrototype):
                 # PostgreSQL expects `last_activity` to contain the year, but
                 # RubRatings only shows the month and day, e.g., 'Mon, 9 Dec'.
                 last_activity += " " + str(datetime.now(tz=None).year)
-                # In the database, the provider ID is stored as an `integer`, so
-                # we must remove the '#' and cast `provider_id` to an `int`.
-                provider_id = provider_id.removeprefix("#")
-                # TODO(Daniel): Remove the check for "N/A" once the provider ID
-                # locator is fixed; every page should have a provider ID.
-                provider_id = None if provider_id == "N/A" else int(provider_id)
                 cursor.execute(
                     """
                     insert into raw_rub_ratings_posts
