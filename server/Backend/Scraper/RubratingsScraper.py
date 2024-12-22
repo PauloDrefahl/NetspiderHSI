@@ -365,31 +365,30 @@ class RubratingsScraper(ScraperPrototype):
         social_media = self.get_social_media(description)
         self.social_media_found.append("\n".join(social_media) or "N/A")
         # Store information about the post in the database.
-        with self.open_database() as connection:
-            with connection.cursor() as cursor:
-                # PostgreSQL expects `last_activity` to contain the year, but
-                # RubRatings only shows the month and day, e.g., 'Mon, 9 Dec'.
-                last_activity += " " + str(datetime.now(tz=None).year)
-                cursor.execute(
-                    """
-                    insert into raw_rub_ratings_posts
-                    values (%s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s)
-                    on conflict do nothing;
-                    """,
-                    (
-                        link,
-                        self.city,
-                        location,
-                        last_activity,
-                        phone_number,
-                        provider_id,
-                        post_title or None,
-                        description or None,
-                        payment_methods,
-                        social_media,
-                        self.keywords_found_in_post,
-                    ),
-                )
+        with self.open_database() as connection, connection.cursor() as cursor:
+            # PostgreSQL expects `last_activity` to contain the year, but
+            # RubRatings only shows the month and day, e.g., 'Mon, 9 Dec'.
+            last_activity += " " + str(datetime.now(tz=None).year)
+            cursor.execute(
+                """
+                insert into raw_rub_ratings_posts
+                values (%s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s)
+                on conflict do nothing;
+                """,
+                (
+                    link,
+                    self.city,
+                    location,
+                    last_activity,
+                    phone_number,
+                    provider_id,
+                    post_title or None,
+                    description or None,
+                    payment_methods,
+                    social_media,
+                    self.keywords_found_in_post,
+                ),
+            )
 
     def join_inclusive(self, counter, link, last_activity, phone_number, location, provider_id, post_title,
                        description) -> int:
