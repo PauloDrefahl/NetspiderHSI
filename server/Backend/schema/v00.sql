@@ -1,21 +1,7 @@
--- This schema is a work-in-progress and MUST NOT be used in production!
+-- This version is FROZEN and MUST NOT be modified!
 
--- During development, the following lines can be uncommented to DROP (!!!)
--- all data types, domains, and relations every time the scraper is run:
-
-/*
-drop type if exists sex cascade;
-drop domain if exists url, phone_number, email_address cascade;
-drop domain if exists non_empty_text, non_empty_texts cascade;
-drop table if exists raw_eros_posts cascade;
-drop view if exists clean_eros_view cascade;
-drop table if exists raw_escort_alligator_posts cascade;
-drop view if exists clean_escort_alligator_view cascade;
-drop table if exists raw_skipthegames_posts cascade;
-drop view if exists clean_skipthegames_view cascade;
-drop table if exists raw_yesbackpage_posts cascade;
-drop view if exists clean_yesbackpage_view cascade;
-*/
+-- If you want to make changes, create a new SQL file that modifies any data
+-- types, domains, and relations as you see fit, fixing up data along the way.
 
 --=================================================================
 -- Common Data Types and Domains
