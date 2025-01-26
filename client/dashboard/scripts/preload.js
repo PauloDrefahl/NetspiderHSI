@@ -53,6 +53,7 @@ contextBridge.exposeInMainWorld('electronAPI', {
     })
 });
 
+// Editing KeywordsFile & KeysetsFile
 contextBridge.exposeInMainWorld('editFile', {
     addKeywordToFile: (keywordsFile, keyword) => {
         fs.appendFile(keywordsFile, '\n' + keyword, (err) => {
@@ -205,6 +206,7 @@ contextBridge.exposeInMainWorld('editFile', {
     }
 });
 
+// Scheduling Scrapers
 contextBridge.exposeInMainWorld('scraperFile', {
 
     getSchedules: () => {
