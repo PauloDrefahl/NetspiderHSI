@@ -41,7 +41,7 @@ const createWindow = () => {
         height: 1200,
         webPreferences: {
             nodeIntegration: true,
-            preload: path.join(__dirname, 'dashboard/scripts/preload.js'),
+            preload: path.join(__dirname, 'static/scripts/preload.js'),
             devTools: true // Disable developer tools
         },
         icon: 'download-removebg-preview.ico'
