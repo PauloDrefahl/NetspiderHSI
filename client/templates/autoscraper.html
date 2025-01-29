@@ -1,0 +1,120 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>DHS Netspider</title>
+    <link rel="icon" type="icons" href="icons/spider-solid.svg"> 
+    <link rel="stylesheet" href="../static/css/dashboard.css">    
+    <link rel="stylesheet" href="../static/css/icons.css">
+    <link rel="stylesheet" href="../static/css/fileInput.css">
+    <link rel="stylesheet" href="../static/css/help.css">
+    <link rel="stylesheet" href="../static/css/navbar.css">
+    <link rel="stylesheet" href="../static/css/scrapersettings.css">
+    <link rel="stylesheet" href="../static/css/website.css">
+    <link rel="stylesheet" href="../static/css/editKeywords.css">
+    <link rel="stylesheet" href="../static/css/selectKeywords.css">
+    <link rel="stylesheet" href="../static/css/resultManager.css">
+
+    
+    <script src="../static/scripts/files.js" defer></script>
+    <script src="../static/scripts/keywords.js" defer></script>
+    <script src="../static/scripts/nav.js" defer></script>
+    <script src="../static/scripts/scraper.js" defer></script>
+
+    <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.6.0/jquery.min.js"></script>
+    
+</head>
+
+<body>
+
+<div id="navbar"> <!-- Added hamburger menu into navbar and reorganized navbar into classes -->
+    <div class="hamburger" onclick="toggleMenu()">
+        &#9776;
+    </div>
+
+    <div class="nav-logo">
+        <img src="../static/photos/logo-hsi.png">
+        <h1>Homeland Security Netspider</h1>
+    </div>
+
+    <div class="nav-links">
+        <a href="#" id="settings-link"  ><img src="../static/icons/gear-solid.svg" class="icon"/><span>Settings</span></a>
+        <a href="#" id="netspider-link"><img src="../static/icons/spider-solid.svg" class="icon"/><span>Netspider</span></a>
+        <a href="./autoscraper.html" id="autoscraper-link"><img src="../static/icons/spider-solid.svg" class="icon"/><span>AutoScraper</span></a>
+        <a href="#med-box" id="keyword-link"><img src="../static/icons/key-solid.svg" class="icon"/><span>Keyword</span></a>
+        <a href="#big-box-2" id="results-link"><img src="../static/icons/box-archive-solid.svg" class="icon"/><span>Results</span></a>
+        <a href="../index.html" id="logout-link" class="last-child-divider"><img src="../static/icons/right-from-bracket-solid.svg" class="icon"/><span>Logout</span></a>
+    </div>
+    <div class="nav-logo">
+        <img src="../static/photos/fgcu-logo.png" class="fgcu-logo">
+        <div class="divider"></div>
+    </div>
+</div>
+
+<div id="wrapper">
+<div id="content">
+    <div id="content-wrapper">
+<!---------------------------Automatic Scraper Setup----------------------------->
+        <div id="big-box">
+            <div class="column">
+                <h2>Add Automatic Scraper:</h2>
+                <h3>Scraper Name:</h3>
+                <div class="input-container">
+                    <input type="text" class="setScrp-input setname-input" placeholder="Type Scraper Name" id="addScraperText">
+                </div>
+                <h3>Number of Days to Scrape:</h3>
+                <div class="input-container">
+                    <input type="number" class="auto-days-input setname-input" placeholder="Number of Days" id="addLengthNumber" min="1">
+                </div>
+                <h3>Scraper Frequency:</h3>
+                <h4> 
+                    <select id="frequency" name="frequency">
+                        <option value="daily">Daily</option>
+                        <option value="weekly">Weekly</option>
+                    </select>
+                </h4>
+                <div>
+                    <label onclick="saveScheduledScraper(
+                        document.getElementById('addScraperText'),
+                        document.getElementById('addLengthNumber'),
+                        document.getElementById('frequency'),
+                    )" id="addScheduleButton">Schedule Scraper</label>
+                </div>
+            </div>
+
+            <div class="column">
+                <h2>Delete AutoScraper:</h2>
+                <h3>Scraper Name:</h3>
+                <div class="input-container">
+                    <input type="text" class="setScrp-input setname-input" placeholder="Type Scraper Name" id="deleteScraperText">
+                </div>
+                <div>
+                    <label onclick="deleteScheduledScraper(
+                        document.getElementById('deleteScraperText'),
+                    )" id="deleteScheduleButton">Delete Scheduled Scraper</label>
+                </div>
+            </div>
+
+            <div class="column">
+                <h2><img src="../static/icons/pager-solid.svg" class="icon"/>Active Schedules:</h2>
+                <ul id="scheduleList">
+                    <!--Dynamic Schedule List-->
+                </ul>
+            </div>
+        </div>
+    </div>
+</div>
+</div>
+
+<script>
+    function FocusON() {
+        document.getElementById("settings-link").focus();
+    }
+</script>
+
+<script src="../static/scripts/resultManager.js"></script>
+<script src="../static/scripts/scheduler.js"></script>
+
+</body>
+</html>
