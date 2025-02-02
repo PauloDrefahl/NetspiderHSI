@@ -146,7 +146,7 @@ class ErosScraper(ScraperPrototype):
         assert "Page not found" not in self.driver.page_source
 
     def close_webpage(self) -> None:
-        self.driver.close()
+        self.driver.quit()
 
     '''
     ---------------------------------------
