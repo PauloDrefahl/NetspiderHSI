@@ -95,16 +95,12 @@ class ErosScraper(ScraperPrototype):
     ---------------------------------------
     '''
     def initialize(self) -> None:
-        # set keywords value
-        # self.keywords = keywords
-
         # Date and time of search
         self.date_time = str(datetime.today())[0:19].replace(' ', '_').replace(':', '-')
 
         # Format website URL based on state and city
         self.get_formatted_url()
 
-        # Selenium Web Driver setup
         self.driver = Driver(
             # Download the latest ChromeDriver for the current major version.
             driver_version="mlatest",

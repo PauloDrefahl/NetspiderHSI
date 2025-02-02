@@ -112,13 +112,9 @@ class MegapersonalsScraper(ScraperPrototype):
     ---------------------------------------
     '''
     def initialize(self) -> None:
-        # set keywords value
-        #self.keywords = keywords
-
         # format date
         self.date_time = str(datetime.today())[0:19].replace(' ', '_').replace(':', '-')
 
-        # Selenium Web Driver setup
         self.driver = Driver(
             # Download the latest ChromeDriver for the current major version.
             driver_version="mlatest",

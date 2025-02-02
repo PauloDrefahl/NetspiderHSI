@@ -116,15 +116,11 @@ class EscortalligatorScraper(ScraperPrototype):
     '''
 
     def initialize(self) -> None:
-        # set keywords value
-        #self.keywords = keywords
-
         self.date_time = str(datetime.today())[0:19].replace(' ', '_').replace(':', '-')
 
         # Format website URL based on state and city
         self.get_formatted_url()
 
-        # Selenium Web Driver setup
         self.driver = Driver(
             # Download the latest ChromeDriver for the current major version.
             driver_version="mlatest",
@@ -141,8 +137,6 @@ class EscortalligatorScraper(ScraperPrototype):
         self.open_webpage()
         # Find links of posts
         links = self.get_links()
-
-        #Debugged to here
 
         # Create directory for search data
         self.scraper_directory = f'{self.path}/escortalligator-{self.city}-{self.date_time}'
@@ -358,7 +352,7 @@ class EscortalligatorScraper(ScraperPrototype):
     Checking and Running Append
     --------------------------
     '''
-    def check_keywords_found(self, description, location_and_age, locationSplits, age, phone_number, link):  # add link as well?
+    def check_keywords_found(self, description, location_and_age, locationSplits, age, phone_number, link):
         self.check_and_append_keywords(description)
         self.check_and_append_keywords(location_and_age)
         self.check_and_append_keywords(locationSplits)
@@ -429,7 +423,6 @@ class EscortalligatorScraper(ScraperPrototype):
             'Keywords-found': self.keywords_found,
             'Number-of-keywords-found': self.number_of_keywords_found
         }
-        # count = 2
         data = pd.DataFrame(titled_columns)
         with pd.ExcelWriter(
                 f'{self.scraper_directory}/RAW-escortalligator-{self.city}-{self.date_time}.xlsx',

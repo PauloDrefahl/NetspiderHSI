@@ -57,7 +57,6 @@ class RubratingsScraper(ScraperPrototype):
         self.only_posts_with_payment_methods = False
 
         # lists to store data and then send to csv file
-        # last_activity, phone_number, location, provider_id, post_title, description
         self.last_activity = []
         self.phone_number = []
         self.link = []
@@ -107,13 +106,12 @@ class RubratingsScraper(ScraperPrototype):
     ---------------------------------------
     '''
     def initialize(self) -> None:
-        # set keywords value
-        # self.keywords = keywords
         # set up directories to save screenshots and Excel file.
         self.date_time = str(datetime.today())[0:19].replace(' ', '_').replace(':', '-')
 
         # Format website URL based on state and city
         self.get_formatted_url()
+
         self.driver = Driver(
             # Download the latest ChromeDriver for the current major version.
             driver_version="mlatest",
@@ -189,7 +187,7 @@ class RubratingsScraper(ScraperPrototype):
     '''
     def get_links(self) -> list:
         try:
-            posts = self.driver.find_elements(By.CSS_SELECTOR, '.listing .list-img.lazy')  # Find specific elements
+            posts = self.driver.find_elements(By.CSS_SELECTOR, '.listing .list-img.lazy')
             links = []
             for post in posts:
                 try:
@@ -217,7 +215,6 @@ class RubratingsScraper(ScraperPrototype):
                 self.driver.implicitly_wait(10)
                 self.driver.get(link)
                 assert "Page not found" not in self.driver.page_source
-                #  looking for last_activity, phone_number, location, provider_id, post_title, description
                 try:
                     label = "Latest Activity: "
                     # NOTE: XPath 1.0 does not allow quotes to be escaped.
@@ -288,7 +285,6 @@ class RubratingsScraper(ScraperPrototype):
                 # reassign variables for each post
                 self.number_of_keywords_in_post = 0
                 self.keywords_found_in_post = []
-                # last_activity, phone_number, location, provider_id, post_title, description
                 if self.join_keywords and self.only_posts_with_payment_methods:
                     if self.check_keywords(last_activity) or self.check_keywords(phone_number) or \
                             self.check_keywords(location) or self.check_keywords(provider_id) \
@@ -349,7 +345,6 @@ class RubratingsScraper(ScraperPrototype):
     --------------------------
     '''
     def append_data(self, counter, link, last_activity, phone_number, location, provider_id, post_title, description):
-        # last_activity, phone_number, location, provider_id, post_title, description
         self.post_identifier.append(counter)
         self.link.append(link)
         self.last_activity.append(last_activity)
@@ -430,8 +425,6 @@ class RubratingsScraper(ScraperPrototype):
             return counter + 1
         return counter
 
-    # last_activity, phone_number, location, provider_id, post_title, description
-
     '''
     --------------------------
     Checking and Running Append
@@ -488,7 +481,6 @@ class RubratingsScraper(ScraperPrototype):
     ---------------------------------
     '''
     def RAW_format_data_to_excel(self) -> None:
-        # last_activity, phone_number, location, provider_id, post_title, description
         titled_columns = pd.DataFrame({
             'Post-identifier': self.post_identifier,
             'Link': self.link,
@@ -617,7 +609,6 @@ class RubratingsScraper(ScraperPrototype):
             f.write(img2pdf.convert(screenshot_files))
 
     def reset_variables(self) -> None:
-        # last_activity, phone_number, location, provider_id, post_title, description
         self.last_activity = []
         self.phone_number = []
         self.location = []
