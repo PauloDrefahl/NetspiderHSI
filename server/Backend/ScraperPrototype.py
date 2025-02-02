@@ -1,13 +1,12 @@
 from abc import ABC, abstractmethod
 import psycopg
-from Backend.Keywords import Keywords
 from . import database
 
 
 class ScraperPrototype(ABC):
-    def __init__(self):
+    def __init__(self) -> None:
         self.location = None
-        self.keywords = Keywords()
+        self.keywords: set[str] = set()
         self.join = None
         self.payment = None
         self.url = None
