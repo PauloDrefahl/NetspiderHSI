@@ -19,16 +19,16 @@ class RubratingsScraper(ScraperPrototype):
         self.path = None
         self.driver = None
         self.cities = {
-            "fort myers": 'http://rubsratings.com/list/index/39',
-            "gainesville": 'http://rubsratings.com/list/index/40',
-            "jacksonville": 'http://rubsratings.com/list/index/41',
-            "miami": 'http://rubsratings.com/list/index/42',
-            "ft lauderdale": 'http://rubsratings.com/list/index/43',
-            "orlando": 'http://rubsratings.com/list/index/44',
-            "panama city": 'http://rubsratings.com/list/index/45',
-            "pensacola": 'http://rubsratings.com/list/index/46',
-            "tallahassee": 'http://rubsratings.com/list/index/47',
-            "tampa": 'http://rubsratings.com/list/index/48'
+            "fort myers": "http://rubsratings.com/list/list/39",
+            "gainesville": "http://rubsratings.com/list/list/40",
+            "jacksonville": "http://rubsratings.com/list/list/41",
+            "miami": "http://rubsratings.com/list/list/42",
+            "ft lauderdale": "http://rubsratings.com/list/list/43",
+            "orlando": "http://rubsratings.com/list/list/44",
+            "panama city": "http://rubsratings.com/list/list/45",
+            "pensacola": "http://rubsratings.com/list/list/46",
+            "tallahassee": "http://rubsratings.com/list/list/47",
+            "tampa": "http://rubsratings.com/list/list/48",
         }
         self.city = ''
         self.url = ''
@@ -173,7 +173,6 @@ class RubratingsScraper(ScraperPrototype):
         # https://chromium.googlesource.com/chromium/src.git/+/f2bdeab65/ui/views/win/hwnd_message_handler_headless.cc#264
         if not self.search_mode:
             self.driver.maximize_window()
-        self.driver.find_element(By.XPATH, '/html/body/div[4]/div[2]/div/div[3]/button').click()
         assert "Page not found" not in self.driver.page_source
 
     def close_webpage(self) -> None:
@@ -184,21 +183,10 @@ class RubratingsScraper(ScraperPrototype):
     Getting the Data Running the Appending Functions and Getters
     ---------------------------------------
     '''
-    def get_links(self) -> list:
-        try:
-            posts = self.driver.find_elements(By.CSS_SELECTOR, '.listing .list-img.lazy')
-            links = []
-            for post in posts:
-                try:
-                    parent_a = post.find_element(By.XPATH, './ancestor::a[1]')
-                    link = parent_a.get_attribute('href')
-                    links.append(link)
-                except NoSuchElementException:
-                    print("Parent <a> element not found for post element:", post)
-        except NoSuchElementException:
-            print("Posts elements not found")
-            links = []
-        return links
+    def get_links(self) -> list[str]:
+        links = self.driver.find_elements(By.CSS_SELECTOR, ".container .list-item a")
+        urls = [link.get_attribute("href") for link in links]
+        return urls
 
     def get_formatted_url(self) -> None:
         self.url = self.cities.get(self.city)
