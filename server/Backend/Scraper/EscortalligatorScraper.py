@@ -62,7 +62,6 @@ class EscortalligatorScraper(ScraperPrototype):
         self.join_keywords = False
         self.search_mode = False
 
-        self.number_of_keywords_in_post = 0
         self.keywords_found_in_post = []
 
         # lists to store data and then send to Excel file
@@ -228,7 +227,6 @@ class EscortalligatorScraper(ScraperPrototype):
                         locationSplits = 'N/A'
 
                     # reassign variables for each post
-                    self.number_of_keywords_in_post = 0
                     self.keywords_found_in_post = []
 
                     if self.join_keywords and self.only_posts_with_payment_methods:
@@ -290,7 +288,7 @@ class EscortalligatorScraper(ScraperPrototype):
         payment_methods = self.get_payment_methods(description)
         self.payment_methods_found.append("\n".join(payment_methods) or "N/A")
         self.keywords_found.append(', '.join(self.keywords_found_in_post) or 'N/A')
-        self.number_of_keywords_found.append(self.number_of_keywords_in_post or 'N/A')
+        self.number_of_keywords_found.append(len(self.keywords_found_in_post) or "N/A")
         social_media = self.get_social_media(description)
         self.social_media_found.append("\n".join(social_media) or "N/A")
         self.timestamps.append(timestamp)
@@ -394,7 +392,6 @@ class EscortalligatorScraper(ScraperPrototype):
         for key in self.keywords:
             if key in data.lower():
                 self.keywords_found_in_post.append(key)
-                self.number_of_keywords_in_post += 1
 
     '''
     ---------------------------------
