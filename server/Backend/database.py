@@ -8,10 +8,11 @@ def open() -> psycopg.Connection:
     connection = _connect()
     try:
         _prepare(connection)
-        return connection
-    except Exception:
+    except:
         connection.close()
         raise
+    else:
+        return connection
 
 
 def _connect() -> psycopg.Connection:
