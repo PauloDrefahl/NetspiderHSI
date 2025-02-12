@@ -1,0 +1,111 @@
+<!DOCTYPE html>
+<html lang="en">
+    <head>
+        <meta charset="UTF-8">
+        <meta name="viewport" content="width=device-width, initial-scale=1.0">
+        <title>DHS Netspider</title>
+        <link rel="icon" type="icons" href="icons/spider-solid.svg"> 
+        <link rel="stylesheet" href="../static/css/dashboard.css">    
+        <link rel="stylesheet" href="../static/css/icons.css">
+        <link rel="stylesheet" href="../static/css/fileInput.css">
+        <link rel="stylesheet" href="../static/css/help.css">
+        <link rel="stylesheet" href="../static/css/navbar.css">
+        <link rel="stylesheet" href="../static/css/scrapersettings.css">
+        <link rel="stylesheet" href="../static/css/website.css">
+        <link rel="stylesheet" href="../static/css/editKeywords.css">
+        <link rel="stylesheet" href="../static/css/selectKeywords.css">
+        <link rel="stylesheet" href="../static/css/resultManager.css">
+
+        
+        <script src="../static/scripts/files.js" defer></script>
+        <script src="../static/scripts/keywords.js" defer></script>
+        <script src="../static/scripts/nav.js" defer></script>
+        <script src="../static/scripts/scraper.js" defer></script>
+
+        <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.6.0/jquery.min.js"></script>
+        
+    </head>
+
+
+    <div id="navbar"> <!-- Added hamburger menu into navbar and reorganized navbar into classes -->
+        <div class="hamburger" onclick="toggleMenu()">
+            &#9776;
+        </div>
+
+        <div class="nav-logo">
+            <img src="../static/photos/logo-hsi.png">
+            <h1>Homeland Security Netspider</h1>
+        </div>
+
+        <div class="nav-links">
+            <a href="#" id="settings-link"  ><img src="../static/icons/gear-solid.svg" class="icon"/><span>Settings</span></a>
+            <a href="#" id="netspider-link"><img src="../static/icons/spider-solid.svg" class="icon"/><span>Netspider</span></a>
+            <a href="./autoscraper.html" id="autoscraper-link"><img src="../static/icons/spider-solid.svg" class="icon"/><span>AutoScraper</span></a>
+            <a href="#med-box" id="keyword-link"><img src="../static/icons/key-solid.svg" class="icon"/><span>Keyword</span></a>
+            <a href="#big-box-2" id="results-link"><img src="../static/icons/box-archive-solid.svg" class="icon"/><span>Results</span></a>
+            <a href="../index.html" id="logout-link" class="last-child-divider"><img src="../static/icons/right-from-bracket-solid.svg" class="icon"/><span>Logout</span></a>
+        </div>
+        <div class="nav-logo">
+            <img src="../static/photos/fgcu-logo.png" class="fgcu-logo">
+            <div class="divider"></div>
+        </div>
+    </div>
+
+    <div id="wrapper">
+        <div id="content">
+            <div id="content-wrapper">
+                <div id="box-header">
+                    <h2 style="color: #09558B;"><img src="../static/icons/pen-to-square-solid" class="icon"/>Edit Keywords & Sets:</h2>
+                </div>
+                <div>
+                    <h2><img src="../static/icons/file-regular.svg" class="icon"/> Select Keywords File</h2>
+                    <input type="file" id="file1" name="file1" class="file-input">
+                </div>
+                <div class="column">
+                    <h3>Enter New Keyword:</h3>
+                    <div class="input-container">
+                        <input type="text" class="setname-input" placeholder="Type new keyword" id="addKeywordText">
+                        <button class="create-set-btn" id="addKeyword">Add Keyword</button>
+                    </div>
+                    <div class="listbox-area2">
+                        <select id="itemListKeywords" multiple="multiple"></select>
+                    </div>
+                    <div class="button-container">
+                        <button class="deleteButton" id="deleteKeyword" style="width: 60%; display: inline-block; white-space: nowrap; padding-right: 10px;">Delete Keyword<img style="height: 12px; margin-left: 5%;" src="../static/icons/trash-solid.svg"/> </button>
+                    </div>
+                </div>
+                <div class="column">
+                    <h3>Enter Set Name:</h3>
+                    <div class="input-container">
+                        <input type="text" class="setname-input" placeholder="Type new set name" id="setname">
+                        <button class="create-set-btn" id="create-set">Create Set</button>
+                    </div>
+                    <div class="listbox-area2">
+                        <select id="itemListSet" multiple="multiple"></select>
+                    </div>
+                    <div class="button-container">
+                        <button class="deleteButton" id="delete-set">Delete Set <img style="height: 12px; margin-left: 5%;" src="../static/icons/trash-solid.svg"/> </button>
+                    </div>
+                </div>
+                <div class="column">
+                    <h3>Keyword Translator</h3>
+                    <div class="input-container">
+                        <select class="setname-input" id="setname">
+                            <option value="" disabled selected>Select from list of languages</option>
+                            <option value="spanish">Spanish</option>
+                            <option value="portuguese">Portuguese</option>
+                            <option value="haitian_creole">Haitian Creole</option>
+                            </select>
+                        <button class="translate-btn" id="translate-words">Translate Keywords</button>
+                    </div>
+                    <div class="listbox-area2">
+                        <select id="itemListTranslated" multiple="multiple"></select>
+                    </div>
+                    <div class="button-container">
+                        <button class="deleteButton" id="delete-translated-list">Delete List<img style="height: 12px; margin-left: 5%;" src="../static/icons/trash-solid.svg"/> </button>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</html>
