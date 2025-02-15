@@ -221,10 +221,12 @@ class RubratingsScraper(ScraperPrototype):
                     phone_number = 'N/A'
 
                 try:
+                    label = "Location: "
+                    # NOTE: XPath 1.0 does not allow quotes to be escaped.
+                    assert "'" not in label
                     location = self.driver.find_element(
-                        By.XPATH, '/html/body/div[2]/div[3]/div/div[1]/div/div/div/div[2]/div[3]/div[1]/ul/li[2]'
-                    ).text
-
+                        By.XPATH, f"//li[contains(., '{label}')]"
+                    ).text.replace(label, "")
                 except NoSuchElementException:
                     location = 'N/A'
 
