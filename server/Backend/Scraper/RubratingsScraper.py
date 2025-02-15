@@ -227,12 +227,15 @@ class RubratingsScraper(ScraperPrototype):
 
                 except NoSuchElementException:
                     location = 'N/A'
+
                 try:
+                    label = "Provider ID: "
+                    # NOTE: XPath 1.0 does not allow quotes to be escaped.
+                    assert "'" not in label
                     provider_id_element = self.driver.find_element(
-                        By.XPATH, '/html/body/div[2]/div[3]/div/div[1]/div/div/div/div[2]/div[3]/div[1]/ul/li[3]'
+                        By.XPATH, f"//*[contains(text(), '{label}')]"
                     ).text
                     provider_id = provider_id_element.split(':')[1].strip()  # Get everything after ':'
-
                 except NoSuchElementException:
                     provider_id = 'N/A'
                 try:
