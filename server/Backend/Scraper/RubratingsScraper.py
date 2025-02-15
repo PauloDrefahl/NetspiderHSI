@@ -240,10 +240,11 @@ class RubratingsScraper(ScraperPrototype):
                     provider_id = provider_id_element.split(':')[1].strip()  # Get everything after ':'
                 except NoSuchElementException:
                     provider_id = 'N/A'
+
                 try:
                     post_title = self.driver.find_element(
-                        By.XPATH, '/html/body/div[2]/div[3]/div/div[1]/div/div/div/div[2]/h3').text
-
+                        By.CSS_SELECTOR, "#provider .info-outer h3"
+                    ).text
                 except NoSuchElementException:
                     post_title = 'N/A'
                 try:
