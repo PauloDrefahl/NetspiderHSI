@@ -1,5 +1,6 @@
 import os
 import time
+import urllib.parse
 from datetime import datetime
 import pandas as pd
 from seleniumbase import Driver
@@ -191,9 +192,7 @@ class RubratingsScraper(ScraperPrototype):
     def get_formatted_url(self) -> None:
         self.url = self.cities.get(self.city)
 
-    def get_data(self, links) -> None:
-        links = links
-
+    def get_data(self, links: list[str]) -> None:
         counter = 0
 
         for link in links:
@@ -230,16 +229,9 @@ class RubratingsScraper(ScraperPrototype):
                 except NoSuchElementException:
                     location = 'N/A'
 
-                try:
-                    label = "Provider ID: "
-                    # NOTE: XPath 1.0 does not allow quotes to be escaped.
-                    assert "'" not in label
-                    provider_id_element = self.driver.find_element(
-                        By.XPATH, f"//*[contains(text(), '{label}')]"
-                    ).text
-                    provider_id = provider_id_element.split(':')[1].strip()  # Get everything after ':'
-                except NoSuchElementException:
-                    provider_id = 'N/A'
+                path = urllib.parse.urlsplit(link).path
+                # The last segment is always the provider ID.
+                provider_id = "#" + path.strip("/").rsplit("/", 1)[-1].strip()
 
                 try:
                     post_title = self.driver.find_element(
