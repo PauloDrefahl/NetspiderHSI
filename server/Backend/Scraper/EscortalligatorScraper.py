@@ -68,13 +68,12 @@ class EscortalligatorScraper(ScraperPrototype):
         # lists to store data and then send to Excel file
         self.phone_number = []
         self.description = []
-        self.location_and_age = []
         self.links = []
         self.post_identifier = []
         self.payment_methods_found = []
         self.timestamps = []
+        self.location = []
         self.age = []
-        self.locationSplits = []
 
         self.number_of_keywords_found = []
         self.keywords_found = []
@@ -221,23 +220,21 @@ class EscortalligatorScraper(ScraperPrototype):
                     try:
                         location_and_age = self.driver.find_element(
                             By.CLASS_NAME, 'viewpostlocationIconBabylon').text
-                        age, locationSplits = self.parse_location_and_age(location_and_age)
+                        location, age = self.parse_location_and_age(location_and_age)
                     except NoSuchElementException:
-                        location_and_age = 'N/A'
-                        age = 'N/A'
-                        locationSplits = 'N/A'
+                        location, age = "N/A", "N/A"
 
                     # reassign variables for each post
                     self.keywords_found_in_post = []
 
                     # Search the post's contents for keywords.
-                    self.check_keywords_found(description, location_and_age, locationSplits, age, phone_number, link)
+                    self.check_keywords_found(description, location, age, phone_number, link)
 
                     if self._should_discard_post(description):
                         continue
 
                     # Save the data we collected about the post.
-                    self.append_data(counter, description, link, location_and_age, locationSplits, age, phone_number, timestamp)
+                    self.append_data(counter, description, link, location, age, phone_number, timestamp)
                     screenshot_name = str(counter) + ".png"
                     self.capture_screenshot(screenshot_name)
                     counter += 1
@@ -256,12 +253,11 @@ class EscortalligatorScraper(ScraperPrototype):
     Appending Data
     --------------------------
     '''
-    def append_data(self, counter, description, link, location_and_age, locationSplits, age, phone_number, timestamp) -> None:
+    def append_data(self, counter, description, link, location, age, phone_number, timestamp) -> None:
         self.post_identifier.append(counter)
         self.phone_number.append(phone_number)
         self.links.append(link)
-        self.location_and_age.append(location_and_age)
-        self.locationSplits.append(locationSplits)
+        self.location.append(location)
         self.age.append(age)
         self.description.append(description)
         payment_methods = self.get_payment_methods(description)
@@ -285,7 +281,7 @@ class EscortalligatorScraper(ScraperPrototype):
                 (
                     link,
                     self.city,
-                    locationSplits,
+                    location,
                     timestamp,
                     phone_number,
                     age,
@@ -301,10 +297,9 @@ class EscortalligatorScraper(ScraperPrototype):
     Checking and Running Append
     --------------------------
     '''
-    def check_keywords_found(self, description, location_and_age, locationSplits, age, phone_number, link):
+    def check_keywords_found(self, description, location, age, phone_number, link):
         self.check_and_append_keywords(description)
-        self.check_and_append_keywords(location_and_age)
-        self.check_and_append_keywords(locationSplits)
+        self.check_and_append_keywords(location)
         self.check_and_append_keywords(age)
         self.check_and_append_keywords(phone_number)
         self.check_and_append_keywords(link)
@@ -370,7 +365,7 @@ class EscortalligatorScraper(ScraperPrototype):
             'Link': self.links,
             # -------
             'Inputted City / Region': self.city,
-            'Specified Location': self.locationSplits,
+            'Specified Location': self.location,
             # ------
             'Timestamp': self.timestamps,
             # -------
@@ -423,7 +418,7 @@ class EscortalligatorScraper(ScraperPrototype):
             'Link': self.links,  # could also be a keyword source too
             # ------- time and place of posting
             'Inputted City / Region': self.city,
-            'Specified Location': self.locationSplits,  # could also be a keyword source too
+            'Specified Location': self.location,  # could also be a keyword source too
             'Timeline': self.timestamps,
             # ------ methods of tracking
             'Contacts': self.phone_number,  # could also be a keyword source too
@@ -485,7 +480,7 @@ class EscortalligatorScraper(ScraperPrototype):
         if len(parts) > 1:
             location = parts[1].strip()
 
-        return age, location
+        return location, age
 
     def capture_screenshot(self, screenshot_name) -> None:
         self.driver.save_screenshot(f'{self.screenshot_directory}/{screenshot_name}')
@@ -501,9 +496,8 @@ class EscortalligatorScraper(ScraperPrototype):
     def reset_variables(self) -> None:
         self.phone_number = []
         self.description = []
-        self.locationSplits = []
+        self.location = []
         self.age = []
-        self.location_and_age = []
         self.links = []
         self.post_identifier = []
         self.timestamps = []
