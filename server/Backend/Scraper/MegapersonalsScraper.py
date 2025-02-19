@@ -4,6 +4,7 @@ import pandas as pd
 from seleniumbase import Driver
 from selenium.common import NoSuchElementException
 from selenium.webdriver.common.by import By
+from typing_extensions import override
 from Backend.ScraperPrototype import ScraperPrototype
 import img2pdf
 from openpyxl.styles import PatternFill
@@ -232,52 +233,23 @@ class MegapersonalsScraper(ScraperPrototype):
                 # reassign variables for each post
                 self.keywords_found_in_post = []
 
-                if self.join_keywords and self.only_posts_with_payment_methods:
-                    if self.check_keywords(description) or self.check_keywords(name) \
-                            or self.check_keywords(phone_number) or self.check_keywords(city) \
-                            or self.check_keywords(location):
-                        self.check_keywords_found(city, description, location, name, phone_number, link)
-                        counter = self.join_with_payment_methods(city, counter, description, link, location, name,
-                                                                phone_number)
+                # Search the post's contents for keywords.
+                self.check_keywords_found(city, description, location, name, phone_number, link)
 
-                elif self.join_keywords or self.only_posts_with_payment_methods:
-                    if self.join_keywords:
-                        if self.check_keywords(description) or self.check_keywords(name) \
-                                or self.check_keywords(phone_number) or self.check_keywords(city) \
-                                or self.check_keywords(location):
-                            self.check_keywords_found(city, description, location, name, phone_number, link)
-                            counter = self.join_inclusive(city, counter, description, link, location, name,
-                                                        phone_number)
+                if self._should_discard_post(description):
+                    continue
 
-                    elif self.only_posts_with_payment_methods:
-                        if len(self.keywords) > 0:
-                            if self.check_keywords(description) or self.check_keywords(name) \
-                                    or self.check_keywords(phone_number) or self.check_keywords(city) \
-                                    or self.check_keywords(location):
-                                self.check_keywords_found(city, description, location, name, phone_number, link)
+                # Save the data we collected about the post.
+                self.append_data(city, counter, description, link, location, name, phone_number)
+                screenshot_name = str(counter) + ".png"
+                self.capture_screenshot(screenshot_name)
+                counter += 1
 
-                        counter = self.payment_methods_only(city, counter, description, link, location, name,
-                                                            phone_number)
-                else:
-                    if len(self.keywords) > 0:
-                        if self.check_keywords(description) or self.check_keywords(name) \
-                                or self.check_keywords(phone_number) or self.check_keywords(city) \
-                                or self.check_keywords(location):
-                            self.check_keywords_found(city, description, location, name, phone_number, link)
-                            self.append_data(city, counter, description, link, location, name, phone_number)
-                            screenshot_name = str(counter) + ".png"
-                            self.capture_screenshot(screenshot_name)
-                            counter += 1
-                    else:
-                        self.append_data(city, counter, description, link, location, name, phone_number)
-                        screenshot_name = str(counter) + ".png"
-                        self.capture_screenshot(screenshot_name)
-                        counter += 1
+                self.RAW_format_data_to_excel()
+                self.CLEAN_format_data_to_excel()
             # Breaks the links loop for fast closing time once user presses stop scraper
             else:
                 break
-            self.RAW_format_data_to_excel()
-            self.CLEAN_format_data_to_excel()
 
     '''
     --------------------------
@@ -319,34 +291,6 @@ class MegapersonalsScraper(ScraperPrototype):
                 ),
             )
 
-    def join_inclusive(self, city, counter, description, link, location, name, phone_number) -> int:
-        if len(self.keywords) == len(set(self.keywords_found_in_post)):
-            self.append_data(city, counter, description, link, location, name, phone_number)
-            screenshot_name = str(counter) + ".png"
-            self.capture_screenshot(screenshot_name)
-
-            return counter + 1
-        return counter
-
-    def payment_methods_only(self, city, counter, description, link, location, name,
-                             phone_number) -> int:
-        if self.check_for_payment_methods(description):
-            self.append_data(city, counter, description, link, location, name, phone_number)
-            screenshot_name = str(counter) + ".png"
-            self.capture_screenshot(screenshot_name)
-
-            return counter + 1
-        return counter
-
-    def join_with_payment_methods(self, city, counter, description, link, location, name, phone_number) -> int:
-        if self.check_for_payment_methods(description) and len(self.keywords) == len(set(self.keywords_found_in_post)):
-            self.append_data(city, counter, description, link, location, name, phone_number)
-            screenshot_name = str(counter) + ".png"
-            self.capture_screenshot(screenshot_name)
-
-            return counter + 1
-        return counter
-
     '''
     --------------------------
     Checking and Running Append
@@ -360,7 +304,8 @@ class MegapersonalsScraper(ScraperPrototype):
         self.check_and_append_keywords(phone_number)
         self.check_and_append_keywords(link)
 
-    def check_for_payment_methods(self, description) -> bool:
+    @override
+    def check_for_payment_methods(self, description: str) -> bool:
         for payment in self.known_payment_methods:
             if payment in description.lower():
                 return True
@@ -384,16 +329,30 @@ class MegapersonalsScraper(ScraperPrototype):
                 social_media.append(social)
         return social_media
 
-    def check_keywords(self, data) -> bool:
-        for key in self.keywords:
-            if key in data:
-                return True
-        return False
-
-    def check_and_append_keywords(self, data) -> None:
+    @override
+    def check_and_append_keywords(self, data: str) -> None:
         for key in self.keywords:
             if key in data.lower():
                 self.keywords_found_in_post.append(key)
+
+    def _should_discard_post(self, description: str) -> bool:
+        if self.join_keywords:
+            # Discard posts that don't contain ALL keywords.
+            if len(set(self.keywords_found_in_post)) < len(self.keywords):
+                return True
+        elif not self.only_posts_with_payment_methods and len(self.keywords) > 0:
+            # Discard posts that don't contain ANY keywords, unless:
+            # 1. We're specifically looking for posts with payment methods, in
+            #    which case we keep *all* posts with payment methods.
+            # 2. No keywords were originally provided.
+            if len(self.keywords_found_in_post) == 0:
+                return True
+
+        if self.only_posts_with_payment_methods:
+            if not self.check_for_payment_methods(description):
+                return True
+
+        return False
 
     '''
     ---------------------------------

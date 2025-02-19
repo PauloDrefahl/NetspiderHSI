@@ -23,5 +23,6 @@ dependencies = [
   'seaborn',
   'selenium',
   'seleniumbase',
+  'typing-extensions',
   'watchdog',
 ]

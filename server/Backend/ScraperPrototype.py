@@ -33,7 +33,7 @@ class ScraperPrototype(ABC):
         pass
 
     @abstractmethod
-    def check_for_payment_methods(self, description):
+    def check_for_payment_methods(self, description: str) -> bool:
         pass
 
     @abstractmethod
@@ -41,11 +41,7 @@ class ScraperPrototype(ABC):
         pass
 
     @abstractmethod
-    def check_keywords(self, text):
-        pass
-
-    @abstractmethod
-    def check_and_append_keywords(self, text):
+    def check_and_append_keywords(self, data: str) -> None:
         pass
 
     @staticmethod
