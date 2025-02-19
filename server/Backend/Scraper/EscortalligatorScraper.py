@@ -63,7 +63,7 @@ class EscortalligatorScraper(ScraperPrototype):
         self.join_keywords = False
         self.search_mode = False
 
-        self.keywords_found_in_post = []
+        self.keywords_found_in_post: set[str] = set()
 
         # lists to store data and then send to Excel file
         self.phone_number = []
@@ -225,7 +225,7 @@ class EscortalligatorScraper(ScraperPrototype):
                         location, age = "N/A", "N/A"
 
                     # reassign variables for each post
-                    self.keywords_found_in_post = []
+                    self.keywords_found_in_post.clear()
 
                     # Search the post's contents for keywords.
                     self.check_keywords_found(description, location, age, phone_number, link)
@@ -288,7 +288,7 @@ class EscortalligatorScraper(ScraperPrototype):
                     description,
                     payment_methods,
                     social_media,
-                    self.keywords_found_in_post,
+                    list(self.keywords_found_in_post),
                 ),
             )
 
@@ -333,12 +333,12 @@ class EscortalligatorScraper(ScraperPrototype):
     def check_and_append_keywords(self, data: str) -> None:
         for key in self.keywords:
             if key in data.lower():
-                self.keywords_found_in_post.append(key)
+                self.keywords_found_in_post.add(key)
 
     def _should_discard_post(self, description: str) -> bool:
         if self.join_keywords:
             # Discard posts that don't contain ALL keywords.
-            if len(set(self.keywords_found_in_post)) < len(self.keywords):
+            if len(self.keywords_found_in_post) < len(self.keywords):
                 return True
         elif not self.only_posts_with_payment_methods and len(self.keywords) > 0:
             # Discard posts that don't contain ANY keywords, unless:
