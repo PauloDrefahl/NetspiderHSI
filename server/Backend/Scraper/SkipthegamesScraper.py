@@ -4,6 +4,7 @@ import pandas as pd
 from seleniumbase import Driver
 from seleniumbase.common.exceptions import NoSuchElementException
 from selenium.webdriver.common.by import By
+from typing_extensions import override
 from Backend.ScraperPrototype import ScraperPrototype
 import img2pdf
 from openpyxl.styles import PatternFill
@@ -207,43 +208,23 @@ class SkipthegamesScraper(ScraperPrototype):
                 # reassign variables for each post
                 self.keywords_found_in_post = []
 
-                if self.join_keywords and self.only_posts_with_payment_methods:
-                    if self.check_keywords(about_info) or self.check_keywords(services) or self.check_keywords(description):
-                        self.check_keywords_found(about_info, services, description, link)
-                        counter = self.join_with_payment_methods(about_info, counter, description, link, services)
+                # Search the post's contents for keywords.
+                self.check_keywords_found(about_info, services, description, link)
 
-                elif self.join_keywords or self.only_posts_with_payment_methods:
-                    if self.join_keywords:
-                        if self.check_keywords(about_info) or self.check_keywords(services) or self.check_keywords(
-                                description):
-                            self.check_keywords_found(about_info, services, description, link)
-                            counter = self.join_inclusive(about_info, counter, description, link, services)
+                if self._should_discard_post(description):
+                    continue
 
-                    elif self.only_posts_with_payment_methods:
-                        if len(self.keywords) > 0:
-                            if self.check_keywords(about_info) or self.check_keywords(services) or self.check_keywords(
-                                    description):
-                                self.check_keywords_found(about_info, services, description, link)
-                        counter = self.payment_methods_only(about_info, counter, description, link, services)
-                else:
-                    if len(self.keywords) > 0:
-                        if self.check_keywords(about_info) or self.check_keywords(services) or self.check_keywords(
-                                description):
-                            self.check_keywords_found(about_info, services, description, link)
-                            self.append_data(about_info, counter, description, link, services)
-                            screenshot_name = str(counter) + ".png"
-                            self.capture_screenshot(screenshot_name)
-                            counter += 1
-                    else:
-                        self.append_data(about_info, counter, description, link, services)
-                        screenshot_name = str(counter) + ".png"
-                        self.capture_screenshot(screenshot_name)
-                        counter += 1
+                # Save the data we collected about the post.
+                self.append_data(about_info, counter, description, link, services)
+                screenshot_name = str(counter) + ".png"
+                self.capture_screenshot(screenshot_name)
+                counter += 1
+
+                self.RAW_format_data_to_excel()
+                self.CLEAN_format_data_to_excel()
             # Breaks the links loop for fast closing time once user presses stop scraper
             else:
                 break
-            self.RAW_format_data_to_excel()
-            self.CLEAN_format_data_to_excel()
 
     '''
     --------------------------
@@ -282,35 +263,6 @@ class SkipthegamesScraper(ScraperPrototype):
                 ),
             )
 
-    def join_with_payment_methods(self, about_info, counter, description, link, services) -> int:
-        if self.check_for_payment_methods(description) and len(self.keywords) == len(set(self.keywords_found_in_post)):
-            self.append_data(about_info, counter, description, link, services)
-            screenshot_name = str(counter) + ".png"
-            self.capture_screenshot(screenshot_name)
-
-            return counter + 1
-        return counter
-
-    def join_inclusive(self, about_info, counter, description, link, services) -> int:
-        if len(self.keywords) == len(set(self.keywords_found_in_post)):
-            self.append_data(about_info, counter, description, link, services)
-
-            screenshot_name = str(counter) + ".png"
-            self.capture_screenshot(screenshot_name)
-
-            return counter + 1
-        return counter
-
-    def payment_methods_only(self, about_info, counter, description, link, services) -> int:
-
-        if self.check_for_payment_methods(description):
-            self.append_data(about_info, counter, description, link, services)
-            screenshot_name = str(counter) + ".png"
-            self.capture_screenshot(screenshot_name)
-
-            return counter + 1
-        return counter
-
     '''
     --------------------------
     Checking and Running Append
@@ -322,7 +274,8 @@ class SkipthegamesScraper(ScraperPrototype):
         self.check_and_append_keywords(description)
         self.check_and_append_keywords(link)
 
-    def check_for_payment_methods(self, description) -> bool:
+    @override
+    def check_for_payment_methods(self, description: str) -> bool:
         for payment in self.known_payment_methods:
             if payment in description.lower():
                 return True
@@ -346,16 +299,30 @@ class SkipthegamesScraper(ScraperPrototype):
                 social_media.append(social)
         return social_media
 
-    def check_keywords(self, data) -> bool:
-        for key in self.keywords:
-            if key in data:
-                return True
-        return False
-
-    def check_and_append_keywords(self, data) -> None:
+    @override
+    def check_and_append_keywords(self, data: str) -> None:
         for key in self.keywords:
             if key in data.lower():
                 self.keywords_found_in_post.append(key)
+
+    def _should_discard_post(self, description: str) -> bool:
+        if self.join_keywords:
+            # Discard posts that don't contain ALL keywords.
+            if len(set(self.keywords_found_in_post)) < len(self.keywords):
+                return True
+        elif not self.only_posts_with_payment_methods and len(self.keywords) > 0:
+            # Discard posts that don't contain ANY keywords, unless:
+            # 1. We're specifically looking for posts with payment methods, in
+            #    which case we keep *all* posts with payment methods.
+            # 2. No keywords were originally provided.
+            if len(self.keywords_found_in_post) == 0:
+                return True
+
+        if self.only_posts_with_payment_methods:
+            if not self.check_for_payment_methods(description):
+                return True
+
+        return False
 
     '''
     ---------------------------------
