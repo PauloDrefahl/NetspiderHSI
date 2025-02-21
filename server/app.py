@@ -327,7 +327,7 @@ def handle_error(e):
 
 
 
-#---------------------------------Auto Scraper---------------------------------
+#---------------------------------Auto Scraper Prototype---------------------------------
 #Example data
 # {
 #     "Test": {
@@ -345,6 +345,10 @@ def handle_error(e):
 #       "frequency": "daily",
 #       "duration": 5,
 #       "last_run": "none"
+#       "hour": 14,
+#       "minute": 17,
+#       "job_id": 0
+#        Did user scraper settings: true or false
 #     }
 #   }
 
@@ -359,15 +363,16 @@ def process_scraper(item_name, item_data):
     scraper_manager.wait_for_scraper_to_complete()
     print(f"{item_name} processing complete.")
 
+
+
+
+
+#------This job loads all the scrapers as their own jobs in background scheduler ------
+def load_autoscraper_jobs():
     
-
-
-
-#------function that will run if the schedule is due------
-def run_scheduled_scrapers():
-
-    file_path = "server/scheduled_scrapers.json" #need to add the path to the file
-    #if the file is not found (has been deleted), error out without crashing
+    # Path to schedules
+    file_path = "server/scheduled_scrapers.json"
+    
     try:
         with open(file_path, 'r') as file:
             config = json.load(file)
@@ -378,68 +383,124 @@ def run_scheduled_scrapers():
 
     print("Checking for scrapers to run...")
 
-    for item_name, item_data in config.items():
+    # Item name prints the name of each scraper preset
+    # Item data is the dictionary inside the scraper 
+    # That holds last_run(the scraper ran last), 
+    # duration(times the scraper must run)
+    # frequency (How often the scraper needs to run)
+    
+    # Need to add 
+    # The time the scraper runs at 
+    # Be able to scrap back in time
+    # What if scraper with same name replace a scraper that is loaded
+    # may need to add another variable based on whether the use has changed the json
+    # What happens if the user deletes the scraper
+    # What happens if a scraper runs, while it is supposed to be deleted
+    # What happens if two scraper jobs have to run at the same time
+    # What happens if the name gets changed but none of the data does
 
-        last_run = item_data['last_run']
-        duration = item_data['duration']
-        frequency = item_data['frequency']
+    for scraper_config_name, scraper_settings in config.items():
 
-        if last_run == "None":
-            print(f"{item_name} has not run yet. Running now.")
+        last_run = scraper_settings['last_run']
+        duration = scraper_settings ['duration']
+        frequency = scraper_settings['frequency']
+        hour_of_day = scraper_settings["hour"]
+        minute_of_day = scraper_settings["minute"]
+        
+        # Need a way to check that scraper is not already Scheduled
+        job = scheduler.add_job(run_scheduled_scraper, 'cron', hour = hour_of_day, minute = minute_of_day, args=[scraper_config_name])   
 
-            last_run = datetime.now().strftime('%Y-%m-%d %H:%M:%S')
+        config[scraper_config_name]['job_id'] = job.id
+        print(f"Scraper job_id loaded:{job.id}")
+        with open(file_path, 'w') as json_file:
+            json.dump(config, json_file, indent=4)
 
-            config[item_name]["last_run"] = last_run  # Updates last run time value
-            config[item_name]["duration"] = duration - 1  # Updates count of days/weeks left
-            print(config)
+
+#------ functions runs when scraper was scheduled to scrap ------
+def run_scheduled_scraper(scraper_config_name):
+    # Path to schedules
+    file_path = "schedules.json" 
+
+    try:
+        with open(file_path, 'r') as file:
+            config = json.load(file)
+    except FileNotFoundError:
+        print(f"File {file_path} not found. Ensure the file exists.")
+    except json.JSONDecodeError:
+        print(f"Error decoding JSON from {file_path}.")
+
+    print("Loading scraper to run...")
+    
+    if scraper_config_name in config:
+        scraper_settings = config[scraper_config_name]
+
+        last_run = scraper_settings['last_run']
+        duration =  scraper_settings['duration']
+        frequency = scraper_settings['frequency']
+
+        # Do stuff here
+        print(scraper_config_name, last_run, duration, frequency)
+        ###############
+        ###############
+        ###############
+
+        #Load scraper settings back in json
+        last_run = datetime.now().strftime('%Y-%m-%d %H:%M:%S')
+
+        scraper_settings["last_run"] = last_run  # Updates last run time value
+        scraper_settings["duration"] = duration - 1  # Updates count of days/weeks left
+        print(f"Scraper Finished{config}")
+        with open(file_path, 'w') as json_file:
+            json.dump(config, json_file, indent=4)
+    
+    
+    # Going to want to access the json from inside here to load last_run, duration, frequency
+    print("Scraper name")
+
+#------ function checks whether scrapers are due to be removed from schedule ------
+def delete_scheduled_scraper_job():
+    #Delete scraping jobs once the duration hits 0
+    print("Deleting Scraper")
+
+    # Path to schedules
+    file_path = "schedules.json" 
+
+    try:
+        with open(file_path, 'r') as file:
+            config = json.load(file)
+    except FileNotFoundError:
+        print(f"File {file_path} not found. Ensure the file exists.")
+    except json.JSONDecodeError:
+        print(f"Error decoding JSON from {file_path}.")
+
+    print("Checking for scrapers to delete...")
+    for scraper_config_name, scraper_settings in config.items():
+        
+        if scraper_settings['duration'] == 0:
+            print((f"Scraper deleted job_id:{scraper_settings['job_id']}"))
+            scheduler.remove_job(scraper_settings['job_id'])
+            
+            config[scraper_config_name]['job_id'] = 0
+            print((f"Scraper deleted"))
             with open(file_path, 'w') as json_file:
                 json.dump(config, json_file, indent=4)
-
-            process_scraper(item_name, item_data)
-
         
-        else:
-
-            last_run_date = datetime.strptime(last_run, '%Y-%m-%d %H:%M:%S')
-            now = datetime.now()
-
-            if frequency == "daily" and now - last_run_date >= timedelta(days=1):
-                print(f"{item_name} is scheduled for daily run. Running now.")
-                process_scraper(item_name, item_data)
-
-                last_run = datetime.now().strftime('%Y-%m-%d %H:%M:%S')
-
-                config[item_name]["last_run"] = last_run  # Updates last run time value
-                config[item_name]["duration"] = duration - 1  # Updates count of days/weeks left
-                print(config)
-                with open(file_path, 'w') as json_file:
-                    json.dump(config, json_file, indent=4)
-
-                
-
-            elif frequency == "weekly" and now - last_run_date >= timedelta(weeks=1):
-                print(f"{item_name} is scheduled for weekly run. Running now.")
-                process_scraper(item_name, item_data)
-
-                last_run = datetime.now().strftime('%Y-%m-%d %H:%M:%S')
-
-                config[item_name]["last_run"] = last_run  # Updates last run time value
-                config[item_name]["duration"] = duration - 1  # Updates count of days/weeks left
-                print(config)
-                with open(file_path, 'w') as json_file:
-                    json.dump(config, json_file, indent=4)
-
-            else:
-                print(f"{item_name} is not due to run yet.")
 
 
-#------End of Auto Scraper------
-
-# Initialize the scheduler
+    
+#Initialize the Scheduler
 scheduler = BackgroundScheduler()
-scheduler.add_job(run_scheduled_scrapers, 'cron', hour=2, minute=00) 
-scheduler.start()
 
+# Calls a the function load_autoscraper_jobs at 2 am everyday
+# Function loads each Scraper as its own job
+scheduler.add_job(load_autoscraper_jobs, "cron", hour=14, minute=15)
+
+# Call a delete_scheduled_scraper_job at 5 minutes after 2 am everyday
+# Function deletes scrapers from the scheduler, who's duration is 0
+scheduler.add_job(delete_scheduled_scraper_job, "cron", hour=14, minute = 19)
+
+
+scheduler.start()
 
 
 
