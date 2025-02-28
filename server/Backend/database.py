@@ -3,6 +3,8 @@ from typing import LiteralString, cast
 
 import psycopg
 
+from . import schema
+
 
 def open() -> psycopg.Connection:
     connection = _connect()
@@ -28,7 +30,7 @@ def _connect() -> psycopg.Connection:
 
 def _prepare(connection: psycopg.Connection) -> None:
     with connection.cursor() as cursor:
-        schema_v00_resource = resources.files() / "schema" / "v00.sql"
+        schema_v00_resource = resources.files(schema) / "v00.sql"
         schema_v00 = schema_v00_resource.read_text(encoding="utf-8")
         # WARNING: This type cast bypasses the SQL injection prevention, but
         # `schema_v00` comes from a trusted source (us!), so it's okay.
