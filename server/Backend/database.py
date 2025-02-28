@@ -129,7 +129,7 @@ def _migrate_to(cursor: psycopg.Cursor[NamedTuple], version: SchemaVersion) -> N
         cursor.execute(cast(LiteralString, commands))
         cursor.execute(
             """
-            insert into schema_versions (version_number, name, migrated_on, execution_time)
+            insert into migration.versions (version_number, name, migrated_on, execution_time)
             values (%s, %s, statement_timestamp(), statement_timestamp() - %s);
             """,
             (version.number, version.name, execution_begin_timestamp),
@@ -143,7 +143,8 @@ def _get_current_version(
     try:
         with connection.transaction():
             cursor.execute("""
-                create table schema_versions (
+                create schema if not exists migration;
+                create table migration.versions (
                     primary key (version_number),
                     version_number integer not null,
                     name text,
@@ -154,13 +155,13 @@ def _get_current_version(
                 );
             """)
     except psycopg.errors.DuplicateTable:
-        logger.debug("`schema_versions` already exists.")
+        logger.debug("`migration.versions` already exists.")
 
-    cursor.execute("select max(version_number) from schema_versions;")
+    cursor.execute("select max(version_number) from migration.versions;")
     record = cursor.fetchone()
     assert record is not None
     if record[0] is None:
-        logger.debug("`schema_versions` is empty.")
+        logger.debug("`migration.versions` is empty.")
         return None
     assert isinstance(record[0], int)
     return record[0]

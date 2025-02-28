@@ -111,24 +111,24 @@ transaction, so PostgreSQL will roll back any changes if an error occurs.
 Finally, when writing a schema file, keep in mind that you can't automatically
 revert to a previous version of the schema. If your file ran successfully, but
 didn't do what you want, you have to manually undo the changes and remove the
-corresponding row in the `schema_versions` table. Alternatively, you can drop
-the entire database and fix your file before running NetSpider again.
+corresponding row in the `migration.versions` table. A less tedious approach is
+to drop the entire database and fix your file before running NetSpider again.
 
 ## Implementation Details
 
 The `database` module tracks which files it has already run in an auxiliary
-table named `schema_versions`. Each row has a few attributes, but the key is
+table named `migration.versions`. Each row has a few attributes, but the key is
 the version number. When NetSpider connects to the database, it determines the
 current version by calling the `_get_current_version` function, which queries
-the `schema_versions` table for the *maximum* version number.
+the `migration.versions` table for the *maximum* version number.
 
 Then, the `_migrate` function calls `_migrate_to` for each file that NetSpider
 hasn't run yet, that is, each file corresponding to a *more recent* version.
-`_migrate_to` runs the file and inserts a row into the `schema_versions` table
-so that NetSpider doesn't run the same file again.
+`_migrate_to` runs a given file and inserts a row in the `migration.versions`
+table so that NetSpider doesn't run the same file again.
 
 For example, suppose that the `schema/` directory contains the files `v00.sql`
-and `v01.sql`. Then, assuming that the `schema_versions` table looks like:
+and `v01.sql`. Then, assuming that the `migration.versions` table looks like:
 
 ```
  version_number |          migrated_on          | execution_time
@@ -137,7 +137,7 @@ and `v01.sql`. Then, assuming that the `schema_versions` table looks like:
 ```
 
 When NetSpider connects to the database, it would run the SQL stored in
-`v01.sql`. As a result, the `schema_versions` table would look like:
+`v01.sql`. As a result, the `migration.versions` table would look like:
 
 ```
  version_number |          migrated_on          | execution_time
@@ -149,8 +149,8 @@ When NetSpider connects to the database, it would run the SQL stored in
 The next time NetSpider connects to the database, it'll find that the database
 is already at the latest version, so it won't run any schema files.
 
-If the `schema_versions` table didn't exist, NetSpider would know that it hadn't
-initialized the database yet, so it would've run `v00.sql` *and* `v01.sql`.
+If the `migration.versions` table didn't exist, NetSpider would know that it
+hadn't initialized the database, so it would've run `v00.sql` *and* `v01.sql`.
 
 ## Schema Files
 
