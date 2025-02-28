@@ -1,12 +1,13 @@
 from importlib import resources
-from typing import LiteralString, cast
+from typing import LiteralString, NamedTuple, cast
 
 import psycopg
+from psycopg.rows import namedtuple_row
 
 from . import schema
 
 
-def open() -> psycopg.Connection:
+def open() -> psycopg.Connection[NamedTuple]:
     connection = _connect()
     try:
         _prepare(connection)
@@ -17,9 +18,10 @@ def open() -> psycopg.Connection:
         return connection
 
 
-def _connect() -> psycopg.Connection:
-    return psycopg.connect(
+def _connect() -> psycopg.Connection[NamedTuple]:
+    return psycopg.Connection[NamedTuple].connect(
         autocommit=True,
+        row_factory=namedtuple_row,
         host="localhost",
         port=5432,
         dbname="netspider",
@@ -28,7 +30,7 @@ def _connect() -> psycopg.Connection:
     )
 
 
-def _prepare(connection: psycopg.Connection) -> None:
+def _prepare(connection: psycopg.Connection[NamedTuple]) -> None:
     with connection.cursor() as cursor:
         schema_v00_resource = resources.files(schema) / "v00.sql"
         schema_v00 = schema_v00_resource.read_text(encoding="utf-8")
