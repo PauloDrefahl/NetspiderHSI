@@ -1,5 +1,7 @@
 # Schema Migration
 
+## Introduction
+
 When coding for NetSpider, you may want to *change* the database's schema.
 Changes come in many forms, including, but not limited to:
 
@@ -31,6 +33,86 @@ the complete implementation in `Backend/database.py`. The initial schema is in
 `Backend/schema/v00.sql`. Later versions are stored in sequentially numbered
 files: `v01.sql`, `v02.sql`, `v03.sql`, and so on. NetSpider runs each file
 exactly once, in order, to change the database's schema.
+
+## Changing the Schema
+
+Begin by creating an SQL file in the [`Backend/schema/`](../Backend/schema)
+directory. You must name the file `vNN.sql` where `NN` is the *next* two-digit
+version number. For example, if `schema/` already contains `v00.sql`, `v01.sql`,
+and `v02.sql`, the next version number is three, so your file is `v03.sql`.
+
+Your schema file is **not** a *declarative* sequence of statements describing
+the state of the database. Instead, the code is an *imperative* sequence of
+commands describing *how* to change the database from its current state to its
+new state. The [`v01.sql`](../Backend/schema/v01.sql) schema file is a good
+example: it contains four commands to change the `provider_id` column's domain.
+Notice how it only modifies that column, leaving the rest untouched.
+
+> [!NOTE]
+> [`v00.sql`](../Backend/schema/v00.sql) is special because it represents the
+> *initial* schema. NetSpider only runs `v00.sql` if:
+>
+> 1. it just created the database, or
+> 2. if a previous version of NetSpider created the database, ran `v00.sql`,
+>    but didn't set the database version to zero. This is a historical accident
+>    that's only possible because of delays in development.
+>
+> In case 1, the database is empty, so there's nothing to modify; therefore,
+> `v00.sql` creates everything from scratch. In case 2, everything already
+> exists, but unfortunately, NetSpider runs `v00.sql` anyway. We work around
+> that by catching and/or preventing exceptions in `v00.sql`.
+
+Another example is: suppose that you want to rename the `raw_yesbackpage_posts`
+table to `yesbackpage_data`. You can create a schema file containing:
+
+```sql
+alter table raw_yesbackpage_posts
+rename to yesbackpage_data;
+```
+
+This works (even though the `clean_yesbackpage_view` references the
+`raw_yesbackpage_posts` table by name!). What if you want to ensure that the
+(non-null) strings in the `reply_to` column look like emails? You can try:
+
+```sql
+alter table raw_yesbackpage_posts
+add check (reply_to like '%@%'); -- '@' surrounded by characters
+```
+
+This won't work if some strings already violate the constraint. One way to
+resolve the issue is to delete the rows that contain those strings:
+
+```sql
+delete from raw_yesbackpage_posts
+where reply_to not like '%@%';
+
+alter table raw_yesbackpage_posts
+add check (reply_to like '%@%');
+```
+
+Another, less destructive strategy is to convert those strings to `NULL`:
+
+```sql
+update raw_yesbackpage_posts
+set reply_to = null
+where reply_to not like '%@%';
+
+alter table raw_yesbackpage_posts
+add check (reply_to like '%@%');
+```
+
+Notice that you don't need to use clauses like `or replace`, `if exists`, and
+`if not exists`. When writing a schema file, you can safely assume that all
+previous schema files ran successfully. NetSpider runs the schema files in a
+transaction, so PostgreSQL will roll back any changes if an error occurs.
+
+Finally, when writing a schema file, keep in mind that you can't automatically
+revert to a previous version of the schema. If your file ran successfully, but
+didn't do what you want, you have to manually undo the changes and remove the
+corresponding row in the `schema_versions` table. Alternatively, you can drop
+the entire database and fix your file before running NetSpider again.
+
+## Implementation Details
 
 The `database` module tracks which files it has already run in an auxiliary
 table named `schema_versions`. Each row has a few attributes, but the key is
