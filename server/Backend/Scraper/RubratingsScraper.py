@@ -314,12 +314,6 @@ class RubratingsScraper(ScraperPrototype):
             # PostgreSQL expects `last_activity` to contain the year, but
             # RubRatings only shows the month and day, e.g., 'Mon, 9 Dec'.
             last_activity += " " + str(datetime.now(tz=None).year)
-            # In the database, the provider ID is stored as an `integer`, so
-            # we must remove the '#' and cast `provider_id` to an `int`.
-            provider_id = provider_id.removeprefix("#")
-            # TODO(Daniel): Remove the check for "N/A" once the provider ID
-            # locator is fixed; every page should have a provider ID.
-            provider_id = None if provider_id == "N/A" else int(provider_id)
             cursor.execute(
                 """
                 insert into raw_rub_ratings_posts

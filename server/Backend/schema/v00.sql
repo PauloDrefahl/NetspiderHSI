@@ -147,8 +147,6 @@ create table if not exists raw_rub_ratings_posts (
     specified_location varchar(256) not null check (specified_location <> ''),
     last_activity date not null,
     poster_phone_number phone_number not null,
-    -- TODO(Daniel): Add a not-null constraint here once the provider ID locator
-    -- is fixed; every page should have a provider ID.
     provider_id integer,
     title varchar(1024) check (title <> ''),
     description varchar(4096) check (description <> ''),
