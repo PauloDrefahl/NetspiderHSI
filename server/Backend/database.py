@@ -1,5 +1,6 @@
 __all__ = ["SchemaError", "open"]
 
+import logging
 import re
 from contextlib import suppress
 from dataclasses import dataclass
@@ -15,6 +16,7 @@ from psycopg.rows import namedtuple_row
 from . import schema
 
 _DATABASE_NAME = "netspider"
+logger = logging.getLogger(__name__)
 
 
 @dataclass
@@ -24,6 +26,8 @@ class SchemaVersion:
 
 
 def open() -> psycopg.Connection[NamedTuple]:
+    logger.debug("Opening the database")
+
     try:
         # Eagerly attempt to connect to the NetSpider database.
         connection = _connect()
@@ -35,6 +39,8 @@ def open() -> psycopg.Connection[NamedTuple]:
         # Psycopg doesn't assign an error code for attempting to connect to a
         # nonexistent database, so we try to create the database and re-connect
         # in response to *any* operational error.
+        message = "The initial connection attempt raised an operational error:"
+        logger.debug(message, exc_info=True)
         _create_database()
         connection = _connect()
 
@@ -49,6 +55,8 @@ def open() -> psycopg.Connection[NamedTuple]:
 
 
 def _create_database() -> None:
+    logger.debug("Creating the '%s' database", DATABASE_NAME)
+
     # According to PostgreSQL's documentation, we should connect to the
     # `postgres` database to execute the `CREATE DATABASE` command.
     # Source: https://www.postgresql.org/docs/17/manage-ag-createdb.html
@@ -60,6 +68,7 @@ def _create_database() -> None:
 
 
 def _connect(*, dbname: str = _DATABASE_NAME) -> psycopg.Connection[NamedTuple]:
+    logger.debug("Connecting to the '%s' database", dbname)
     return psycopg.Connection[NamedTuple].connect(
         autocommit=True,
         row_factory=namedtuple_row,
@@ -77,15 +86,22 @@ def _connect(*, dbname: str = _DATABASE_NAME) -> psycopg.Connection[NamedTuple]:
 
 
 def _migrate(connection: psycopg.Connection[NamedTuple]) -> None:
+    logger.debug("Migrating the database")
     versions = _get_schema_versions()
+    logger.debug("Versions: %s", versions)
     with connection.cursor() as cursor, connection.transaction():
         current_version = _get_current_version(connection, cursor)
+        if current_version is None:
+            logger.debug("The database hasn't been initialized yet.")
+        else:
+            logger.debug("The database is at version %s.", current_version)
         next_version = 0 if current_version is None else current_version + 1
         for version in versions[next_version:]:
             _migrate_to(cursor, version)
 
 
 def _migrate_to(cursor: psycopg.Cursor[NamedTuple], version: SchemaVersion) -> None:
+    logger.debug("Migrating to version %s", version.number)
     commands = version.resource.read_text(encoding="utf-8")
     execution_begin_timestamp = datetime.now(UTC)
     # WARNING: This type cast bypasses the SQL injection prevention, but
@@ -117,12 +133,13 @@ def _get_current_version(
                 );
             """)
     except psycopg.errors.DuplicateTable:
-        pass
+        logger.debug("`schema_versions` already exists.")
 
     cursor.execute("select max(version_number) from schema_versions;")
     record = cursor.fetchone()
     assert record is not None
     if record[0] is None:
+        logger.debug("`schema_versions` is empty.")
         return None
     assert isinstance(record[0], int)
     return record[0]
@@ -141,8 +158,10 @@ def _get_schema_versions() -> list[SchemaVersion]:
     # Detect schema version files and parse version numbers.
     versions: list[SchemaVersion] = []
     for resource in schema_container.iterdir():
+        logger.debug("Resource: %s", resource)
         match = _VERSION_REGEX.fullmatch(resource.name)
         if not match:
+            logger.debug("Resource '%s' is not a schema version.", resource)
             continue
         number = int(match.group("number"))
         versions.append(SchemaVersion(number, resource))
