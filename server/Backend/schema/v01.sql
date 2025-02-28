@@ -5,7 +5,9 @@ drop view clean_rub_ratings_view;
 
 -- Remove `NULL` values before adding a `NOT NULL` constraint.
 update raw_rub_ratings_posts
-set provider_id = coalesce(provider_id, 0);
+set provider_id = coalesce(
+    provider_id, cast(trim(split_part(trim(link, '/'), '/', -1)) as integer)
+);
 
 -- Treating provider IDs as integers was a mistake. Although provider IDs
 -- are numbers, they're not "quantities", making most operations meaningless.
