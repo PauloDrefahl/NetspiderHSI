@@ -106,7 +106,7 @@ def _migrate(connection: psycopg.Connection[NamedTuple]) -> None:
     versions = _get_schema_versions()
     assert versions
     logger.debug("Versions: %s", versions)
-    with connection.cursor() as cursor, connection.transaction():
+    with connection.cursor() as cursor:
         current_version = _get_current_version(connection, cursor)
         if current_version is None:
             logger.debug("The database hasn't been initialized yet.")
@@ -123,16 +123,17 @@ def _migrate_to(cursor: psycopg.Cursor[NamedTuple], version: SchemaVersion) -> N
     logger.debug("Migrating to version %s", version.number)
     commands = version.resource.read_text(encoding="utf-8")
     execution_begin_timestamp = datetime.now(UTC)
-    # WARNING: This type cast bypasses the SQL injection prevention, but
-    # `commands` comes from a trusted source (us!), so it's okay.
-    cursor.execute(cast(LiteralString, commands))
-    cursor.execute(
-        """
-        insert into schema_versions (version_number, name, migrated_on, execution_time)
-        values (%s, %s, statement_timestamp(), statement_timestamp() - %s);
-        """,
-        (version.number, version.name, execution_begin_timestamp),
-    )
+    with cursor.connection.transaction():
+        # WARNING: This type cast bypasses the SQL injection prevention, but
+        # `commands` comes from a trusted source (us!), so it's okay.
+        cursor.execute(cast(LiteralString, commands))
+        cursor.execute(
+            """
+            insert into schema_versions (version_number, name, migrated_on, execution_time)
+            values (%s, %s, statement_timestamp(), statement_timestamp() - %s);
+            """,
+            (version.number, version.name, execution_begin_timestamp),
+        )
 
 
 def _get_current_version(
