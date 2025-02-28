@@ -6,7 +6,7 @@ to the NetSpider database, possibly raising a `SchemaError` if any SQL
 schema versions are missing or duplicated.
 """
 
-__all__ = ["SchemaError", "open"]
+__all__ = ["MigrationError", "SchemaError", "open"]
 
 import itertools
 import logging
@@ -26,6 +26,10 @@ from . import schema
 
 _DATABASE_NAME = "netspider"
 logger = logging.getLogger(__name__)
+
+
+class MigrationError(Exception):
+    pass
 
 
 @dataclass(frozen=True)
@@ -112,7 +116,14 @@ def _migrate(connection: psycopg.Connection[NamedTuple]) -> None:
         if current_version is None:
             logger.debug("The database hasn't been initialized yet.")
         else:
-            assert current_version <= versions[-1].number
+            if current_version > versions[-1].number:
+                message = "NetSpider is too out-of-date to open the database."
+                error = MigrationError(message)
+                error.add_note(
+                    f"The database is at version {current_version}, but the current"
+                    + f"NetSpider installation only supports version {versions[-1].number}."
+                )
+                raise MigrationError(message)
             logger.debug("The database is at version %s.", current_version)
         next_version = 0 if current_version is None else current_version + 1
         assert next_version <= len(versions)  # NOTE: Technically redundant
@@ -174,7 +185,7 @@ _VERSION_REGEX = re.compile(
 )
 
 
-class SchemaError(Exception):
+class SchemaError(MigrationError):
     """Raised when a schema version is missing or duplicated"""
 
 
