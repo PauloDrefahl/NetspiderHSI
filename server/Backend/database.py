@@ -184,18 +184,24 @@ def _get_schema_versions() -> list[SchemaVersion]:
     versions.sort(key=lambda version: version.number)
     # Check for missing versions.
     if not versions:
-        message = "No versions were found."
+        message = "Version 0 is missing."
         raise SchemaError(message)
     for i, version in enumerate(versions):
         if i != version.number:
             message = f"Version {i} is missing."
             error = SchemaError(message)
+            if i == version.number - 1:
+                skipped = f"version {i}"
+            else:
+                skipped = f"versions {i} through {version.number - 1}"
             error.add_note(
                 f"Version {version.number} was found, "
-                + "but version numbers begin at 0 and cannot be skipped.",
+                + f"but {skipped} cannot be skipped.",
             )
             raise error
         if version.resource.is_dir():
-            message = f"Resource '{version.resource.name}' is a directory."
-            raise SchemaError(message)
+            message = f"Version {i} is missing."
+            error = SchemaError(message)
+            error.add_note(f"Resource '{version.resource.name}' is a directory.")
+            raise error
     return versions
