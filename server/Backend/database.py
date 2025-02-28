@@ -1,3 +1,11 @@
+"""Database connection helper module
+
+The public interface consists entirely of the `open` function and the
+`SchemaError` exception subclass. The `open` function opens a connection
+to the NetSpider database, possibly raising a `SchemaError` if any SQL
+schema versions are missing.
+"""
+
 __all__ = ["SchemaError", "open"]
 
 import logging
@@ -26,6 +34,13 @@ class SchemaVersion:
 
 
 def open() -> psycopg.Connection[NamedTuple]:
+    """Connect to the NetSpider database.
+
+    This function wraps around `psycopg.connect` so that you don't have
+    to manually specify the correct connection parameters. Additionally,
+    it creates the NetSpider database if it doesn't already exist, and
+    it migrates the database to the latest version if necessary.
+    """
     logger.debug("Opening the database")
 
     try:
@@ -150,7 +165,7 @@ _VERSION_REGEX = re.compile(rf"v(?P<number>[0-9]{{{_VERSION_DIGITS}}})\.sql")
 
 
 class SchemaError(Exception):
-    pass
+    """Raised when a schema version is missing"""
 
 
 def _get_schema_versions() -> list[SchemaVersion]:
