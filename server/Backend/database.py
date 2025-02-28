@@ -104,14 +104,17 @@ def _connect(*, dbname: str = _DATABASE_NAME) -> psycopg.Connection[NamedTuple]:
 def _migrate(connection: psycopg.Connection[NamedTuple]) -> None:
     logger.debug("Migrating the database")
     versions = _get_schema_versions()
+    assert versions
     logger.debug("Versions: %s", versions)
     with connection.cursor() as cursor, connection.transaction():
         current_version = _get_current_version(connection, cursor)
         if current_version is None:
             logger.debug("The database hasn't been initialized yet.")
         else:
+            assert current_version <= versions[-1].number
             logger.debug("The database is at version %s.", current_version)
         next_version = 0 if current_version is None else current_version + 1
+        assert next_version <= len(versions)  # NOTE: Technically redundant
         for version in versions[next_version:]:
             _migrate_to(cursor, version)
 
