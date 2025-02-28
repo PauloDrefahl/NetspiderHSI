@@ -2,6 +2,7 @@ import os
 import time
 import urllib.parse
 from datetime import datetime
+from zoneinfo import ZoneInfo
 import pandas as pd
 from seleniumbase import Driver
 from selenium.common import NoSuchElementException
@@ -313,7 +314,10 @@ class RubratingsScraper(ScraperPrototype):
         with self.open_database() as connection, connection.cursor() as cursor:
             # PostgreSQL expects `last_activity` to contain the year, but
             # RubRatings only shows the month and day, e.g., 'Mon, 9 Dec'.
-            last_activity += " " + str(datetime.now(tz=None).year)
+            # And, as far as I can tell, RubRatings always uses Eastern Time
+            # regardless of the specified city or system time zone settings.
+            year = datetime.now(tz=ZoneInfo("America/New_York")).year
+            last_activity += " " + str(year)
             cursor.execute(
                 """
                 insert into raw_rub_ratings_posts

@@ -24,5 +24,6 @@ dependencies = [
   'selenium',
   'seleniumbase',
   'typing-extensions',
+  'tzdata',
   'watchdog',
 ]
