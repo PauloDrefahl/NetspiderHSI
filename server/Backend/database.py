@@ -3,11 +3,12 @@
 The public interface consists entirely of the `open` function and the
 `SchemaError` exception subclass. The `open` function opens a connection
 to the NetSpider database, possibly raising a `SchemaError` if any SQL
-schema versions are missing.
+schema versions are missing or duplicated.
 """
 
 __all__ = ["SchemaError", "open"]
 
+import itertools
 import logging
 import re
 from contextlib import suppress
@@ -27,7 +28,7 @@ _DATABASE_NAME = "netspider"
 logger = logging.getLogger(__name__)
 
 
-@dataclass
+@dataclass(frozen=True)
 class SchemaVersion:
     number: int
     name: str | None
@@ -174,7 +175,7 @@ _VERSION_REGEX = re.compile(
 
 
 class SchemaError(Exception):
-    """Raised when a schema version is missing"""
+    """Raised when a schema version is missing or duplicated"""
 
 
 def _get_schema_versions() -> list[SchemaVersion]:
@@ -191,6 +192,16 @@ def _get_schema_versions() -> list[SchemaVersion]:
         versions.append(SchemaVersion(int(number), name, resource))
     # Put versions in ascending order.
     versions.sort(key=lambda version: version.number)
+    # Check for duplicate versions.
+    for pair in itertools.pairwise(versions):
+        if pair[0].number == pair[1].number:
+            message = f"Version {pair[0].number} is duplicated."
+            error = SchemaError(message)
+            error.add_note(
+                f"Resources {pair[0].resource.name} and {pair[1].resource.name} "
+                + "have the same number."
+            )
+            raise error
     # Check for missing versions.
     if not versions:
         message = "Version 0 is missing."
