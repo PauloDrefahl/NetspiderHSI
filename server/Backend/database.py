@@ -30,6 +30,7 @@ logger = logging.getLogger(__name__)
 @dataclass
 class SchemaVersion:
     number: int
+    name: str | None
     resource: Traversable
 
 
@@ -124,10 +125,10 @@ def _migrate_to(cursor: psycopg.Cursor[NamedTuple], version: SchemaVersion) -> N
     cursor.execute(cast(LiteralString, commands))
     cursor.execute(
         """
-        insert into schema_versions (version_number, migrated_on, execution_time)
-        values (%s, statement_timestamp(), statement_timestamp() - %s);
+        insert into schema_versions (version_number, name, migrated_on, execution_time)
+        values (%s, %s, statement_timestamp(), statement_timestamp() - %s);
         """,
-        (version.number, execution_begin_timestamp),
+        (version.number, version.name, execution_begin_timestamp),
     )
 
 
@@ -141,6 +142,7 @@ def _get_current_version(
                 create table schema_versions (
                     primary key (version_number),
                     version_number integer not null,
+                    name text,
                     migrated_on timestamptz not null,
                     execution_time interval second not null,
                     check (version_number >= 0),
@@ -161,7 +163,9 @@ def _get_current_version(
 
 
 _VERSION_DIGITS: int = 2
-_VERSION_REGEX = re.compile(rf"v(?P<number>[0-9]{{{_VERSION_DIGITS}}})\.sql")
+_VERSION_REGEX = re.compile(
+    rf"v(?P<number>[0-9]{{{_VERSION_DIGITS}}})(?:_(?P<name>[a-zA-Z0-9_]+))?\.sql"
+)
 
 
 class SchemaError(Exception):
@@ -178,8 +182,8 @@ def _get_schema_versions() -> list[SchemaVersion]:
         if not match:
             logger.debug("Resource '%s' is not a schema version.", resource)
             continue
-        number = int(match.group("number"))
-        versions.append(SchemaVersion(number, resource))
+        number, name = match.group("number", "name")
+        versions.append(SchemaVersion(int(number), name, resource))
     # Put versions in ascending order.
     versions.sort(key=lambda version: version.number)
     # Check for missing versions.

@@ -37,9 +37,11 @@ exactly once, in order, to change the database's schema.
 ## Changing the Schema
 
 Begin by creating an SQL file in the [`Backend/schema/`](../Backend/schema)
-directory. You must name the file `vNN.sql` where `NN` is the *next* two-digit
-version number. For example, if `schema/` already contains `v00.sql`, `v01.sql`,
-and `v02.sql`, the next version number is three, so your file is `v03.sql`.
+directory. You must name the file `v<number>.sql` where `<number>` is the
+*next* two-digit version number. For example, if `schema/` already contains
+`v00.sql`, `v01.sql`, and `v02.sql`, the next version number is three, so
+your file is `v03.sql`. Optionally, you can append a name by naming the file
+`v<number>_<name>.sql`, where `<name>` is a summary of the file.
 
 Your schema file is **not** a *declarative* sequence of statements describing
 the state of the database. Instead, the code is an *imperative* sequence of
@@ -155,9 +157,11 @@ initialized the database yet, so it would've run `v00.sql` *and* `v01.sql`.
 The `database` module enforces particular requirements on the `schema/`
 directory. The requirements, as implemented by `_get_schema_versions`, are:
 
-1. Schema files MUST be named `vNN.sql`, where `NN` represents any two-digit
-   number. Leading zeros MUST be included so that there are exactly two digits.
-   NetSpider ignores files that aren't named `vNN.sql`.
+1. Schema files MUST be named `v<number>.sql` or `v<number>_<name>.sql`, where
+   `<number>` is a two-digit number, and `<name>` is an optional name consisting
+   of ASCII letters, digits, and underscores. Leading zeros MUST be included
+   so that there are exactly two digits. NetSpider silently ignores non-schema
+   files in the `schema/` directory.
 
 2. There MUST be at least one schema file.
 
