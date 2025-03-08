@@ -3,15 +3,18 @@
 __all__ = ["connect"]
 
 from importlib import resources
-from typing import LiteralString, NamedTuple, cast
+from typing import LiteralString, NamedTuple, TypeAlias, cast
 
 import psycopg
 from psycopg.rows import namedtuple_row
 
 from . import schema
 
+Connection: TypeAlias = psycopg.Connection[NamedTuple]
+Cursor: TypeAlias = psycopg.Cursor[NamedTuple]
 
-def connect() -> psycopg.Connection[NamedTuple]:
+
+def connect() -> Connection:
     """Connect to the database."""
     connection = _open_connection()
     try:
@@ -23,9 +26,9 @@ def connect() -> psycopg.Connection[NamedTuple]:
         return connection
 
 
-def _open_connection() -> psycopg.Connection[NamedTuple]:
+def _open_connection() -> Connection:
     """Open a connection to a database using preset parameters."""
-    return psycopg.Connection[NamedTuple].connect(
+    return Connection.connect(
         autocommit=True,
         row_factory=namedtuple_row,
         host="localhost",
@@ -39,7 +42,7 @@ def _open_connection() -> psycopg.Connection[NamedTuple]:
     )
 
 
-def _set_up(connection: psycopg.Connection[NamedTuple]) -> None:
+def _set_up(connection: Connection) -> None:
     """Create data types and objects according to the schema."""
     with connection.cursor() as cursor:
         schema_v00_resource = resources.files(schema) / "v00.sql"
