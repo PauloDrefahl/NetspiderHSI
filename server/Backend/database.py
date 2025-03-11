@@ -7,10 +7,10 @@ from psycopg.rows import namedtuple_row
 from . import schema
 
 
-def open() -> psycopg.Connection[NamedTuple]:
-    connection = _connect()
+def connect() -> psycopg.Connection[NamedTuple]:
+    connection = _open_connection()
     try:
-        _prepare(connection)
+        _set_up(connection)
     except:
         connection.close()
         raise
@@ -18,7 +18,7 @@ def open() -> psycopg.Connection[NamedTuple]:
         return connection
 
 
-def _connect() -> psycopg.Connection[NamedTuple]:
+def _open_connection() -> psycopg.Connection[NamedTuple]:
     return psycopg.Connection[NamedTuple].connect(
         autocommit=True,
         row_factory=namedtuple_row,
@@ -33,7 +33,7 @@ def _connect() -> psycopg.Connection[NamedTuple]:
     )
 
 
-def _prepare(connection: psycopg.Connection[NamedTuple]) -> None:
+def _set_up(connection: psycopg.Connection[NamedTuple]) -> None:
     with connection.cursor() as cursor:
         schema_v00_resource = resources.files(schema) / "v00.sql"
         schema_v00 = schema_v00_resource.read_text(encoding="utf-8")
