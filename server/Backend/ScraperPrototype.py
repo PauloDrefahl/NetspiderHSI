@@ -47,4 +47,5 @@ class ScraperPrototype(ABC):
 
     @staticmethod
     def open_database() -> psycopg.Connection[NamedTuple]:
+        """Open a connection to the database."""
         return database.connect()
