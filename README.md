@@ -1,5 +1,5 @@
 # Netspider: Web Scraping Tool for Cybercrime Investigation
-NetSpider is a web scraping tool designed to assist in the investigation of cybercrimes by automating the process of data collection from various websites. The tool helps investigators by extracting relevant information and saving it for later analysis, making it easier to track and gather evidence. 
+NetSpider is a web scraping tool designed to assist in the investigation of cybercrimes by automating the process of data collection from various websites. The tool helps investigators by extracting relevant information and saving it for later analysis, making it easier to track and gather leads. 
 
 [![HSI Web Scraper](https://github.com/dfgrisales5078/HSI-Web-Scraper/actions/workflows/python-app.yml/badge.svg?branch=main)](https://github.com/dfgrisales5078/HSI-Web-Scraper/actions/workflows/python-app.yml)
 [![License: MIT](https://img.shields.io/badge/License-MIT-yellow.svg)](https://opensource.org/licenses/MIT)
