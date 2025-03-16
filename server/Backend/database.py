@@ -18,31 +18,53 @@ Cursor: TypeAlias = psycopg.Cursor[NamedTuple]
 
 _DATABASE_NAME = "netspider"
 
+# WARNING: To save users from frequently entering passwords, we use a hardcoded
+# password. NetSpider is intended to run *locally*, so we don't really need
+# proper authentication or secrets management.
+_DEFAULT_USER = "postgres"  # Bootstrap superuser
+_DEFAULT_PASSWORD = "password"  # noqa: S105
+_READ_ONLY_USER = "netspider_read_only"
+_READ_ONLY_PASSWORD = "password"  # noqa: S105
 
-def connect() -> Connection:
-    """Connect to the database."""
+
+def connect(*, read_only: bool = False) -> Connection:
+    """Connect to the database, optionally in read-only mode.
+
+    Do NOT rely on read-only mode to protect the database from malicious
+    queries. Query execution is not completely sandboxed, and although
+    unlikely, privilege escalation may be possible.
+    """
     with contextlib.ExitStack() as stack:
         connection = stack.enter_context(_create_and_connect())
         # Set up the database before returning the connection.
         _set_up(connection)
+        if read_only:
+            _create_read_only_user(connection)
+            return _open_connection(user=_READ_ONLY_USER, password=_READ_ONLY_PASSWORD)
         # Don't close the connection.
         stack.pop_all()
         return connection
 
 
-def _open_connection(*, dbname: str = _DATABASE_NAME) -> Connection:
-    """Open a connection to a database using preset parameters."""
+def _open_connection(
+    *,
+    dbname: str = _DATABASE_NAME,
+    user: str = _DEFAULT_USER,
+    password: str = _DEFAULT_PASSWORD,
+) -> Connection:
+    """Open a connection to a database using preset parameters.
+
+    The caller can override the database name, user, and password, but
+    the remaining connection parameters are hardcoded.
+    """
     return Connection.connect(
         autocommit=True,
         row_factory=namedtuple_row,
         host="localhost",
         port=5432,
         dbname=dbname,
-        user="postgres",
-        # WARNING: To save users from frequently entering passwords, we use
-        # a hardcoded password. NetSpider is intended to run *locally*, so we
-        # don't really need proper authentication or secrets management.
-        password="password",  # noqa: S106
+        user=user,
+        password=password,
         client_encoding="UTF8",
         application_name="NetSpider",
     )
@@ -73,6 +95,20 @@ def _create() -> None:
         command = sql.SQL("create database {} template template0 encoding 'UTF8';")
         with suppress(psycopg.errors.DuplicateDatabase):
             connection.execute(command.format(name))
+
+
+def _create_read_only_user(connection: Connection) -> None:
+    """Create a read-only database user."""
+    user = sql.Identifier(_READ_ONLY_USER)
+    # PostgreSQL requires the password to be embedded in the command.
+    password = sql.Literal(_READ_ONLY_PASSWORD)
+    with suppress(psycopg.errors.DuplicateObject):
+        # The read-only user only needs the public privileges granted to everyone
+        # (https://www.postgresql.org/docs/17/ddl-priv.html#DDL-PRIV-DEFAULT)
+        # *and* the necessary privileges to access schemas and read from the
+        # database (https://www.postgresql.org/docs/17/predefined-roles.html).
+        command = sql.SQL("create user {} password {} in role pg_read_all_data;")
+        connection.execute(command.format(user, password))
 
 
 def _set_up(connection: Connection) -> None:
