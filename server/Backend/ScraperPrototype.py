@@ -1,6 +1,4 @@
 from abc import ABC, abstractmethod
-from typing import NamedTuple
-import psycopg
 from . import database
 
 
@@ -46,6 +44,6 @@ class ScraperPrototype(ABC):
         pass
 
     @staticmethod
-    def open_database() -> psycopg.Connection[NamedTuple]:
+    def open_database() -> database.Connection:
         """Open a connection to the database."""
         return database.connect()
