@@ -204,7 +204,7 @@ def initialize_folder_appender(result_dir):
 
 
 # Connection Manager Sockets
-@socketio.on('connection')
+@socketio.on("connect")
 def connected():
     print("connected")
 
