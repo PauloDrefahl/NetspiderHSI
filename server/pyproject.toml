@@ -6,6 +6,7 @@ requires-python = '>=3.11'
 # reference, list dependent packages next to desired optional dependencies.
 dependencies = [
   'apscheduler',
+  'deep-translator',
   'Flask',
   'Flask-Cors',
   'Flask-SocketIO',
