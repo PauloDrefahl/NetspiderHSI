@@ -2,6 +2,7 @@
 
 __all__ = ["connect"]
 
+import contextlib
 from importlib import resources
 from typing import LiteralString, NamedTuple, TypeAlias, cast
 
@@ -16,13 +17,12 @@ Cursor: TypeAlias = psycopg.Cursor[NamedTuple]
 
 def connect() -> Connection:
     """Connect to the database."""
-    connection = _open_connection()
-    try:
+    with contextlib.ExitStack() as stack:
+        connection = stack.enter_context(_open_connection())
+        # Set up the database before returning the connection.
         _set_up(connection)
-    except:
-        connection.close()
-        raise
-    else:
+        # Don't close the connection.
+        stack.pop_all()
         return connection
 
 
