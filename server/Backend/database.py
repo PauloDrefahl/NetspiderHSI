@@ -26,7 +26,10 @@ def _connect() -> psycopg.Connection[NamedTuple]:
         port=5432,
         dbname="netspider",
         user="postgres",
-        password="password",
+        # WARNING: To save users from frequently entering passwords, we use
+        # a hardcoded password. NetSpider is intended to run *locally*, so we
+        # don't really need proper authentication or secrets management.
+        password="password",  # noqa: S106
     )
 
 
