@@ -547,6 +547,49 @@ scheduler.start()
 
 
 
+<<<<<<< HEAD
+=======
+#-------------------------------Translator functions---------------------------------
+
+#translate keywords function v0, current discussion topic is to move keywords/sets to a DB instead of a file.
+#current state of this function is dormant, need to make changes to front end and determine keyword handling method for the future.
+
+#2 - Function is called by socket.io translate and is passed language to translate the keywords file to
+def translate_keywords(language):
+    
+    print("Opening keyword file")
+    with open('keywords.txt', 'r') as file:
+        keywords = file.read().splitlines()
+
+    print("Calling Google Translate")
+
+    translated_keywords = []
+
+    #will need to restructure loop, goal will be to take list of english words and return translated list in following format:
+    #original word 1, language 1 translated word 1, language 2 translated word 1, original word 2, language 1 translated word 2, language 2 translated word 2, etc.
+    for word in keywords:
+        if word.strip():
+            safe_word = str(word) #if we go DB route, I imagine a lot of my error handling will be obsolete but TBD
+            print(f"Translating: {safe_word}")
+            translated_keywords.append(GoogleTranslator(source="auto", target=language).translate(safe_word))
+
+    #print all translated words
+    for translated_word in translated_keywords:
+        print(translated_word)
+
+    #translator works, gets all the keywords from the file and translates them. 
+
+
+#1 - When translate button is hit on front end, this function is called and data is passed to it
+@socketio.on('translator')
+def translator(language):
+    print(f"translate_keywords({language}) called...")
+    translate_keywords(language)
+
+#-------------------------------Translator End---------------------------------
+
+
+>>>>>>> 5800dde (Init translator code, very early stage)
 '''
     ---------------------------------
     Finding ports

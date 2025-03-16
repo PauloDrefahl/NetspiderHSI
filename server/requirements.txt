@@ -15,6 +15,7 @@ contourpy
 cssselect
 cycler
 Deprecated
+deep_translator
 et-xmlfile
 exceptiongroup
 execnet
