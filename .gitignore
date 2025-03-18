@@ -3,6 +3,9 @@
 # '[Dd]esktop.ini', '.DS_Store', or '.vscode', put those in your global
 # .gitignore file or in /path/to/repository/.git/info/exclude. Thanks!
 
+/client/open_ports.txt
+/server/open_ports.txt
+
 # Cached bytecode and DLLs
 __pycache__/
 *.py[cd]
