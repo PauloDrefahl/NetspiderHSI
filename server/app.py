@@ -492,31 +492,22 @@ def translator(language):
 '''
 
 
-def write_open_ports(ports: list[int]) -> None:
-    with open("open_ports.txt", "w") as file:
-        file.write("\n".join(map(str, ports)) + "\n")
+def write_open_port(port: int) -> None:
+    with open("open_port.txt", "w") as file:
+        file.write(str(port) + "\n")
 
 
-def find_open_ports(count: int) -> list[int]:
-    open_ports: list[int] = []
-    for _ in range(count):
-        with socket.socket(socket.AF_INET, socket.SOCK_STREAM) as s:
-            s.bind(("127.0.0.1", 0))
-            open_ports.append(s.getsockname()[1])
-    return open_ports
+def find_open_port() -> int:
+    with socket.socket(socket.AF_INET, socket.SOCK_STREAM) as s:
+        s.bind(("127.0.0.1", 0))
+        return s.getsockname()[1]
 
 
 if __name__ == "__main__":
-    print("active threads: ", list_threads())
+    print("Active Thread Count:", list_threads())
 
-    num_ports = 1  # Change this to the desired number of open ports
-    open_ports = find_open_ports(num_ports)
+    open_port = find_open_port()
+    write_open_port(open_port)
+    print("Server Port:", open_port)
 
-    write_open_ports(open_ports)
-
-    print("Open Ports:", open_ports)
-
-    # Use the open ports as needed in the rest of your program
-    # Note: You may want to handle the case where `open_ports` is an empty list.
-    socketio.run(app, host='127.0.0.1', port=open_ports[0], allow_unsafe_werkzeug=True)
-    
+    socketio.run(app, host="127.0.0.1", port=open_port, allow_unsafe_werkzeug=True)

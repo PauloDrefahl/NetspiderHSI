@@ -10,8 +10,8 @@ const path = require('path');
 
 
 // Read the port from a text file;
-const portFilePath = 'open_ports.txt';
-const port = parseInt(fs.readFileSync(portFilePath, 'utf-8').trim());
+const portFilePath = 'open_port.txt';
+const port = Number.parseInt(fs.readFileSync(portFilePath, 'utf-8').trim());
 
 // Create a new socket connection with the dynamic port
 const socket = io.connect(`http://127.0.0.1:${port}`);
