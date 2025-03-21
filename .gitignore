@@ -5,6 +5,8 @@
 
 /client/open_ports.txt
 /server/open_ports.txt
+/client/open_port.txt
+/server/open_port.txt
 
 # Cached bytecode and DLLs
 __pycache__/
