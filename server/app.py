@@ -486,7 +486,7 @@ def translator(language):
 
 
 # ---------------------------------
-# Find an open port, and run the server.
+# Run the server on a randomly chosen port.
 # ---------------------------------
 
 
@@ -495,17 +495,27 @@ def write_open_port(port: int) -> None:
         file.write(str(port) + "\n")
 
 
-def find_open_port() -> int:
-    with socket.socket(socket.AF_INET, socket.SOCK_STREAM) as s:
-        s.bind(("127.0.0.1", 0))
-        return s.getsockname()[1]
-
-
 if __name__ == "__main__":
     print("Active Thread Count:", list_threads())
 
-    open_port = find_open_port()
+    # Based on: https://github.com/miguelgrinberg/Flask-SocketIO/blob/78dda9b64b/src/flask_socketio/__init__.py#L563
+    # Mostly: https://github.com/miguelgrinberg/Flask-SocketIO/blob/78dda9b64b/src/flask_socketio/__init__.py#L695-L726
+    # The maintainer of Flask-SocketIO says that pulling code out is the
+    # standard way to determine the port: https://stackoverflow.com/q/76334774
+    assert socketio.server.eio.async_mode == "gevent"
+
+    from gevent import pywsgi
+    from geventwebsocket.handler import WebSocketHandler
+
+    socketio.wsgi_server = pywsgi.WSGIServer(
+        ("127.0.0.1", 0), app, handler_class=WebSocketHandler, log=None
+    )
+    socketio.wsgi_server.start()
+
+    open_port = socketio.wsgi_server.server_port
+    assert isinstance(open_port, int)
+    assert open_port != 0
     write_open_port(open_port)
     print("Server Port:", open_port)
 
-    socketio.run(app, host="127.0.0.1", port=open_port, allow_unsafe_werkzeug=True)
+    socketio.wsgi_server.serve_forever()
