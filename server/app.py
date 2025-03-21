@@ -497,13 +497,13 @@ def write_open_ports(ports: list[int]) -> None:
         file.write("\n".join(map(str, ports)) + "\n")
 
 
-def find_open_ports(num):
-    open_ports_list = []
-    for _ in range(num):
+def find_open_ports(count: int) -> list[int]:
+    open_ports: list[int] = []
+    for _ in range(count):
         with socket.socket(socket.AF_INET, socket.SOCK_STREAM) as s:
-            s.bind(('127.0.0.1', 0))
-            open_ports_list.append(s.getsockname()[1])
-    return open_ports_list
+            s.bind(("127.0.0.1", 0))
+            open_ports.append(s.getsockname()[1])
+    return open_ports
 
 
 if __name__ == "__main__":
