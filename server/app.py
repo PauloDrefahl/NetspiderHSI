@@ -492,10 +492,9 @@ def translator(language):
 '''
 
 
-def write_open_ports(ports):
-    with open('open_ports.txt', 'w') as file:
-        for port in ports:
-            file.write(str(port) + '\n')
+def write_open_ports(ports: list[int]) -> None:
+    with open("open_ports.txt", "w") as file:
+        file.write("\n".join(map(str, ports)) + "\n")
 
 
 def find_open_port():
