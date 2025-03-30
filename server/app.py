@@ -8,9 +8,11 @@ from datetime import datetime, timedelta
 import gevent.monkey
 gevent.monkey.patch_all()
 
+import psycopg2
 from flask import Flask, jsonify
 from flask_socketio import SocketIO
 from flask_cors import CORS
+from deep_translator import GoogleTranslator
 from PyQt5.QtWidgets import QFileDialog, QApplication
 from engineio.async_drivers import gevent
 from watchdog.observers import Observer
@@ -327,7 +329,148 @@ def handle_error(e):
     response = {"error": str(e)}
     return response, 500
 
+#---------------------------------Database Connection---------------------------------
+#Not much here, use psycopg2 library to handle postgresql connection. Once connected, 
+#can just pass around cursor for functions to interact with DB.
 
+#At time of writting, DB is hosted in docker and is located at localhost:5432 (AKA 127.0.0.1:5432)
+#keywords and scraper data are currently located in the same 'netspider' DB
+conn = psycopg2.connect(
+    host="localhost",
+    port="5432",
+    user="postgres",
+    password="password",
+    database="netspider"
+)
+conn.autocommit = True
+cursor = conn.cursor()
+
+
+#--------------------------------Get data--------------------------------
+#On page load, frontend will call get_data function for backend to query DB and return data in JSON format. 
+
+#In the future, will have to make it so that backend changes to the DB call this same 
+# function to automatically keep the frontend data updated
+@socketio.on('get_data')
+def handle_get_data():
+    print('get_data')
+    try:
+
+        cursor.execute("select id, keyword from keywords")
+        keywords = [dict(id=row[0], keyword=row[1]) for row in cursor.fetchall()]
+
+        cursor.execute("select id, item_name, keywords from keysets")
+        
+        keysets = [
+            dict(id=row[0], item_name=row[1], keywords=row[2] if isinstance(row[2], list) else json.loads(row[2]))
+            for row in cursor.fetchall()
+        ]
+
+        socketio.emit('data_response', {"keywords": keywords, "keysets": keysets})
+    
+    except Exception as e:
+        print(f'message: {str(e)}')
+        socketio.emit('error', {'message': str(e)})
+
+
+#---------------------------------Keyword Sockets---------------------------------
+#Keyword sockets and functions serve as communication method for database manipulation from the frontend. 
+#Requires standard add, mod, del functions for selected entries. 
+
+#socket and function to add a given keyword
+@socketio.on('add_keyword')
+def handle_add_keyword(data):
+    print('add_keyword')
+    
+    try:
+        cursor.execute(
+            "insert into keywords (keyword) values (%s) returning id, keyword",
+            (data['keyword'],) #only need keyword, DB handles ID assign
+        )
+        
+        result = cursor.fetchone()
+        socketio.emit('keyword_added', {"id": result[0], "keyword": result[1]}, broadcast=True)
+    
+    except Exception as e:
+        print(f'message: {str(e)}')
+        socketio.emit('error', {'message': str(e)})
+
+#socket and function to update a given keyword
+@socketio.on('update_keyword')
+def handle_update_keyword(data):
+    print('update_keyword')
+    
+    try:
+        cursor.execute(
+            "update keywords set keyword = %s where id = %s returning id, keyword",
+            (data['keyword'], data['id'])
+        )
+        
+        result = cursor.fetchone()
+        socketio.emit('keyword_updated', {"id": result[0], "keyword": result[1]}, broadcast=True)
+    
+    except Exception as e:
+        print(f'message: {str(e)}')
+        socketio.emit('error', {'message': str(e)})
+
+#socket and function to delete a given keyword
+@socketio.on('delete_keyword')
+def handle_delete_keyword(data):
+    print('delete_keyword')
+    
+    try:
+        cursor.execute("delete from keywords where id = %s", (data['id'],))
+        socketio.emit('keyword_deleted', {"id": data['id']}, broadcast=True) #only need ID to delete
+    
+    except Exception as e:
+        print(f'message: {str(e)}')
+        socketio.emit('error', {'message': str(e)})
+
+#---------------------------------Keywords End---------------------------------
+
+
+#---------------------------------Keysets Sockets---------------------------------
+#Will be home for Keyset sockets and functions, suspect current method for keyset management is 'incorrect'
+#so will need to be updated. By this, I mean it should probably be a relational table that pulls keywords from 'keywords'
+#and can keep keywords AND their translations together in a set. Plus just lumping them in JSON was very lazy of me :(
+
+#As far as code goes, imagine it will be similar, if not the same, as the keywords code.
+
+#---------------------------------Keysets End---------------------------------
+
+
+
+
+#--------------------------------Translate function--------------------------------
+#(Current) goal of translator is to wait for call from front to translate all keywords
+#Needs:
+# - only translate a word once (will need some kind of additional column in DB)
+# - needs to signal the front to update once translations have finished so it can display up to date data
+
+def translate_keywords(word):
+
+    #get all keywords from DB
+    cursor.execute("SELECT id, keyword FROM keywords")
+
+    #place in a list
+    keywords = [dict(id=row[0], keyword=row[1]) for row in cursor.fetchall()]
+
+    #loop the list and translate words ('if not already translated' in the works)
+    for word in keywords:
+        translated = GoogleTranslator(source='auto', target='es').translate(word['keyword']) 
+        print(translated)
+        #handle_add_keyword(translated) #just insert into DB for now(?)
+    
+    #requires some additional logic, if translator is called and updates DB content, there is not a
+    #frontend trigger for refresh at the moment. 
+
+#1 - When translate button is hit on front end, this function is called and data is passed to it
+@socketio.on('translator')
+def translator(language):
+    print(f"translate_keywords({language}) called...")
+    translate_keywords(language)
+
+#-------------------------------Translator End---------------------------------
 
 
 #---------------------------------Auto Scraper---------------------------------
@@ -443,46 +586,6 @@ scheduler = BackgroundScheduler()
 scheduler.add_job(run_scheduled_scrapers, 'cron', hour=2, minute=00) 
 scheduler.start()
 
-
-
-#-------------------------------Translator functions---------------------------------
-
-#translate keywords function v0, current discussion topic is to move keywords/sets to a DB instead of a file.
-#current state of this function is dormant, need to make changes to front end and determine keyword handling method for the future.
-
-#2 - Function is called by socket.io translate and is passed language to translate the keywords file to
-def translate_keywords(language):
-    
-    print("Opening keyword file")
-    with open('keywords.txt', 'r') as file:
-        keywords = file.read().splitlines()
-
-    print("Calling Google Translate")
-
-    translated_keywords = []
-
-    #will need to restructure loop, goal will be to take list of english words and return translated list in following format:
-    #original word 1, language 1 translated word 1, language 2 translated word 1, original word 2, language 1 translated word 2, language 2 translated word 2, etc.
-    for word in keywords:
-        if word.strip():
-            safe_word = str(word) #if we go DB route, I imagine a lot of my error handling will be obsolete but TBD
-            print(f"Translating: {safe_word}")
-            translated_keywords.append(GoogleTranslator(source="auto", target=language).translate(safe_word))
-
-    #print all translated words
-    for translated_word in translated_keywords:
-        print(translated_word)
-
-    #translator works, gets all the keywords from the file and translates them. 
-
-
-#1 - When translate button is hit on front end, this function is called and data is passed to it
-@socketio.on('translator')
-def translator(language):
-    print(f"translate_keywords({language}) called...")
-    translate_keywords(language)
-
-#-------------------------------Translator End---------------------------------
 
 
 
