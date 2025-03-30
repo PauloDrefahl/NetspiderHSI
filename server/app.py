@@ -1,34 +1,34 @@
-import gevent.monkey
-
+#standard library imports
+import os
 import json
+import threading
+from datetime import datetime, timedelta
 
+#third-party imports
+import gevent.monkey
 gevent.monkey.patch_all()
 
-import threading
-import socket
 from flask import Flask, jsonify
 from flask_socketio import SocketIO
 from flask_cors import CORS
-from Backend.Scraper import MegapersonalsScraper, SkipthegamesScraper, YesbackpageScraper, EscortalligatorScraper, \
-    ErosScraper, RubratingsScraper
-from Backend.resultManager.appendResults import FolderAppender, FolderAppender
-from Backend.resultManager.resultManager import ResultManager
 from PyQt5.QtWidgets import QFileDialog, QApplication
 from engineio.async_drivers import gevent
-import subprocess
-import sys
-import os
-import webbrowser
 from watchdog.observers import Observer
 from watchdog.events import FileSystemEventHandler
 from apscheduler.schedulers.background import BackgroundScheduler
 
-import time
-import json
-from datetime import datetime, timedelta
+#local imports
+from Backend.Scraper import (
+    MegapersonalsScraper,
+    SkipthegamesScraper,
+    YesbackpageScraper,
+    EscortalligatorScraper,
+    ErosScraper,
+    RubratingsScraper
+)
+from Backend.resultManager.appendResults import FolderAppender
+from Backend.resultManager.resultManager import ResultManager
 
-#Translator dependencies
-from deep_translator import GoogleTranslator
 
 app = Flask(__name__)
 qt_app = QApplication([])
