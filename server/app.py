@@ -623,14 +623,5 @@ def find_open_ports(num):
 if __name__ == "__main__":
     print("active threads: ", list_threads())
 
-    num_ports = 1  # Change this to the desired number of open ports
-    open_ports = find_open_ports(num_ports)
-
-    write_open_ports(open_ports)
-
-    print("Open Ports:", open_ports)
-
-    # Use the open ports as needed in the rest of your program
-    # Note: You may want to handle the case where `open_ports` is an empty list.
-    socketio.run(app, host='127.0.0.1', port=open_ports[0], allow_unsafe_werkzeug=True)
+    socketio.run(app, host='127.0.0.1', port=5173, allow_unsafe_werkzeug=True)
     
