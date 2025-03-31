@@ -172,6 +172,7 @@ Please read our [Contributing Guidelines](link-to-contributing-guidelines) for m
 
 ## Netspider 24-25 Team
 
+* **William Murphy** - Full Stack Developer
 * **Caleb Newman** - Full Stack Developer
 * **William Ward** - Full Stack Developer
 
