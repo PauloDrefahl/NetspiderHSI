@@ -122,7 +122,7 @@ class RubratingsScraper(ScraperPrototype):
             # Override the default mode (headless mode) on Linux.
             headed=not self.search_mode,
             # Use a fixed window size in headless mode.
-            window_size="1920,1080" if self.search_mode else None,
+            # window_size="1920,1080" if self.search_mode else None,
         )
 
         # Open Webpage with URL
