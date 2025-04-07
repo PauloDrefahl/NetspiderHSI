@@ -16,6 +16,8 @@ from engineio.async_drivers import gevent
 from watchdog.observers import Observer
 from watchdog.events import FileSystemEventHandler
 from apscheduler.schedulers.background import BackgroundScheduler
+from apscheduler.executors.pool import ThreadPoolExecutor
+from apscheduler.triggers.cron import CronTrigger
 
 #local imports
 from Backend.Scraper import (
@@ -330,7 +332,13 @@ def handle_error(e):
 
 
 
-#---------------------------------Auto Scraper---------------------------------
+'''
+    ---------------------------------
+    Auto Scraper 
+    ---------------------------------
+'''
+
+#---------------------------------Auto Scraper Prototype---------------------------------
 #Example data
 # {
 #     "Test": {
@@ -345,102 +353,198 @@ def handle_error(e):
 #         "inclusive_search": false,
 #         "path": "result"
 #       },
-#       "frequency": "daily",
-#       "duration": 5,
-#       "last_run": "none"
+#        "weekly": false,                       bool
+#        "daily": true,                         bool
+#       "runs_left": 1,                         int
+#        "last_run": "2025-03-28 18:22:00",     string
+#        "day_to_run": "",                      string(Mon, Tue, Wed, Thu, Fri, Sat, Sun)(recommend) or int(1-7 would be Monday to Sunday) 
+#        "hour": "*",                           int
+#        "minute": "*/1",                       int
+#        "job_id": ""                           make empty string if user modifies json
 #     }
 #   }
 
+# Info related to scraper 03/30/2025
+# Was rebuilt using APSchedular 3.11.0.
+# Need to add 
+    # The time the scraper runs at (done)
+    # Be able to scrap back in time
+    # What if scraper with same name replace a scraper that is loaded (when user does this json must make job_id empty string)
+    # What happens if the user deletes the scraper (done)
+    # What happens if a scraper runs, while it is supposed to be deleted (scraper won't run if json as been modified but it is still scheduled)
+    # What happens if the name gets changed but none of the data does (job_ id empty string needed)
+    # If the scheduler restarts none of the jobs will be okay if they arent said in a job scheduler
 
-#------function that will be called if the schedule is due------
-def process_scraper(item_name, item_data):
-    print(f"Processing {item_name}")
-    # Start the scraper
-    start_scraper(item_data['data'])
-    
-    # Wait for the scraper to complete
-    scraper_manager.wait_for_scraper_to_complete()
-    print(f"{item_name} processing complete.")
-
-    
-
-
-
-#------function that will run if the schedule is due------
-def run_scheduled_scrapers():
-
-    file_path = "server/scheduled_scrapers.json" #need to add the path to the file
-    #if the file is not found (has been deleted), error out without crashing
+#------function called to load automatic scrapers from json------
+def load_json(file_path):
     try:
         with open(file_path, 'r') as file:
             config = json.load(file)
+        return config
     except FileNotFoundError:
         print(f"File {file_path} not found. Ensure the file exists.")
     except json.JSONDecodeError:
         print(f"Error decoding JSON from {file_path}.")
 
-    print("Checking for scrapers to run...")
+#------function called to save scraper updates after run------
+def save_json(config, file_path):
+    with open(file_path, 'w') as json_file:
+        json.dump(config, json_file, indent=4)
 
-    for item_name, item_data in config.items():
+def process_scraper(scraper_name, scraper_settings):
+        print(f"Processing {scraper_name}")
+        # Start the scraper
+        start_scraper(scraper_settings['data'])
+        # Wait for the scraper to complete
+        scraper_manager.wait_for_scraper_to_complete()
+        print(f"{scraper_name} processing complete.")
 
-        last_run = item_data['last_run']
-        duration = item_data['duration']
-        frequency = item_data['frequency']
-
-        if last_run == "None":
-            print(f"{item_name} has not run yet. Running now.")
-
-            last_run = datetime.now().strftime('%Y-%m-%d %H:%M:%S')
-
-            config[item_name]["last_run"] = last_run  # Updates last run time value
-            config[item_name]["duration"] = duration - 1  # Updates count of days/weeks left
-            print(config)
-            with open(file_path, 'w') as json_file:
-                json.dump(config, json_file, indent=4)
-
-            process_scraper(item_name, item_data)
-
+def load_autoscraper_jobs():
+        # Gets autoscrapers configurations from json file
+        file_path = "server/scheduled_scrapers.json"
+        config = load_json(file_path)
         
-        else:
+        # Gives any schedule scraper 2 hours to start from start time before terminating and not running
+        scraper_grace_period = 7200 # time in seconds
+        
+        print("Checking for autoscraper to load")
 
-            last_run_date = datetime.strptime(last_run, '%Y-%m-%d %H:%M:%S')
-            now = datetime.now()
+        for scraper_config_name, scraper_settings in config.items():
 
-            if frequency == "daily" and now - last_run_date >= timedelta(days=1):
-                print(f"{item_name} is scheduled for daily run. Running now.")
-                process_scraper(item_name, item_data)
+            run_weekly = scraper_settings["weekly"]
+            run_daily  = scraper_settings["daily"]
+            job_id = scraper_settings["job_id"]
+            runs_left = scraper_settings["runs_left"]
+            
+            # If the scraper doesn't have a job id and needs to be ran
+            if job_id == "" and runs_left > 0:
+                if run_weekly:
+                    weekly_cron_trigger = CronTrigger(day=scraper_settings["day_to_run"], hour=scraper_settings["hour"], minute=scraper_settings["minute"])
+                    job_object = scheduler.add_job(run_scheduled_scraper, weekly_cron_trigger, misfire_grace_time= scraper_grace_period, args=[scraper_config_name, "scrap"] )
+                    print(f"Scraper Loaded: {scraper_config_name}, Scraper ID: {job_object.id}")
+                    config[scraper_config_name]["job_id"] = job_object.id
+                    save_json(config, file_path)
 
-                last_run = datetime.now().strftime('%Y-%m-%d %H:%M:%S')
+                elif run_daily:
+                    daily_cron_trigger = CronTrigger(hour=scraper_settings["hour"], minute=scraper_settings["minute"])
+                    job_object = scheduler.add_job(run_scheduled_scraper, trigger=daily_cron_trigger, misfire_grace_time= scraper_grace_period, args=[scraper_config_name, "scrap"] )
+                    print(f"Scraper Loaded: {scraper_config_name}, Scraper ID: {job_object.id}")
+                    config[scraper_config_name]["job_id"] = job_object.id
+                    save_json(config, file_path)
 
-                config[item_name]["last_run"] = last_run  # Updates last run time value
-                config[item_name]["duration"] = duration - 1  # Updates count of days/weeks left
-                print(config)
-                with open(file_path, 'w') as json_file:
-                    json.dump(config, json_file, indent=4)
+def delete_autoscraper_jobs():
+    file_path = "server/scheduled_scrapers.json" 
+    config = load_json(file_path)
 
+    for scraper_config_name, scraper_settings in config.items():
+        runs_left = scraper_settings["runs_left"]
+        scraper_id = scraper_settings["job_id"]
+        
+        # Deletes job from scraper if it has no runs left
+        if runs_left <= 0 and scraper_id != "":
+            print("Deleting due to scraper finishing all runs")
+            job_id = scraper_settings["job_id"]
+            scheduler.remove_job(job_id)
+            
+            scraper_settings["job_id"] = ""
+            scraper_settings["runs_left"] = 0
+        
+            save_json(config, file_path)
+
+    # Deletes scrapers if they have be rename,deleted, modified
+    current_schedules = scheduler.get_jobs()
+    for job in current_schedules:
+        job_id, scraper_args  = job.id, job.args
+        # Only deleting the scraper
+        # Need to check logic
+        try: 
+            if scraper_args[1] == "scrap":
+                scraper_name = scraper_args[0]
                 
+                if scraper_name in config:
+                    #Modified
+                    # deleting from scheduler because the user has modified the exist scheduler's json
+                    if job_id != config[scraper_name]["job_id"]:
+                        print("Deleting due to scraper being data being modified by user")
+                        scheduler.remove_job(job_id)
+                # Rename/Deleted
+                # Deleting from scheduler because the scraper in not in the json
+                else:
+                    print("Deleting due to scraper not being listed in json")
+                    scheduler.remove_job(job_id)
+        except:
+            print("Job is not a scraper")
 
-            elif frequency == "weekly" and now - last_run_date >= timedelta(weeks=1):
-                print(f"{item_name} is scheduled for weekly run. Running now.")
-                process_scraper(item_name, item_data)
+#################Task Section for ApScheduler#########################
+#------function called to manage_scrapers------
+# manage scraper is called by our scheduler at the start up
+# it will delete scrapers if they are modified, delete, or renamed
+# it will also assign new scrapers or reassign modified scraper to the scheduler
+def manage_scraper():
+    count = 0
+    print("Before management:")
+    for job in scheduler.get_jobs():
+        count += 1
+        print(f"{count})Job ID:{job.id}\n Job function: {job.func}\n Job argments: {job.args}\n")
+    delete_autoscraper_jobs()
+    load_autoscraper_jobs()
+    count = 0
+    print("After management:")
+    for job in scheduler.get_jobs():
+        count += 1
+        print(f"{count})Job ID:{job.id}\n Job function: {job.func}\n Job argments: {job.args}\n")
 
-                last_run = datetime.now().strftime('%Y-%m-%d %H:%M:%S')
+#------function called to run scraper------
+def run_scheduled_scraper(scraper_name, function_name):
+    
+    file_path = "server/scheduled_scrapers.json" 
+    config = load_json(file_path)
 
-                config[item_name]["last_run"] = last_run  # Updates last run time value
-                config[item_name]["duration"] = duration - 1  # Updates count of days/weeks left
-                print(config)
-                with open(file_path, 'w') as json_file:
-                    json.dump(config, json_file, indent=4)
+    print(f"Checking for scraper: {scraper_name}\nTask:{function_name}")
+    if scraper_name in config:
+        print(f"Running Scraper:{scraper_name}")
+        scraper_config = config[scraper_name]
+        runs_left = scraper_config["runs_left"]
 
-            else:
-                print(f"{item_name} is not due to run yet.")
+        # if a scraper was to run before getting deleted by the manager
+        # The if statement would stop it
+        if runs_left > 0:
+            
+            last_run = datetime.now().strftime('%Y-%m-%d %H:%M:%S')
+            scraper_config["last_run"] = last_run  # Updates last run time value
+            scraper_config["runs_left"] -= 1  # Updates count of days/weeks left
 
+            #Scraper does things
+            print(f"Scraper running:{scraper_name}\n Last time scraper ran: {scraper_config['last_run']} \n Runs left:{scraper_config['runs_left']}\n Scraper Id:{scraper_config['job_id']}")
+            process_scraper(scraper_name, scraper_config)
+            
+            print(f"Scraper Finished: {scraper_name}")
+            save_json(config, file_path)  
+    
+# Start of main code
+# Test for later(Will put process on multiple cpus):
+#       -processpool: ProcessPoolExecutor(2)
+#                     ThreadPoolExecutor(1)
+executors = {
+    # Assign to Background Scheduler so it only has 1 thread to use
+    'default': ThreadPoolExecutor(1)
+}
 
-#------End of Auto Scraper------
+# declartion of background scheduler class
+scheduler = BackgroundScheduler(executors=executors)
 
-# Initialize the scheduler
-scheduler = BackgroundScheduler()
-scheduler.add_job(run_scheduled_scrapers, 'cron', hour=2, minute=00) 
+# Assign to manage_scheduler job
+# "*/15"
+manage_schedule_trigger = CronTrigger(minute="*/2")
+
+# Adds manage_scraper job to the scheduler
+# Triggers every 15 minutes
+# Uses default executor
+# misfire_grace_time = lets thread exist for 15 minutes without firing
+# if two manage_scraper job exist in queue, coalesce will make it fire only once for multiple instances
+scheduler.add_job(manage_scraper, manage_schedule_trigger, executor="default", misfire_grace_time=900, coalesce=True)
+
+# start scheduler
 scheduler.start()
 
 
