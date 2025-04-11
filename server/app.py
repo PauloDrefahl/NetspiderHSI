@@ -535,7 +535,7 @@ scheduler = BackgroundScheduler(executors=executors)
 
 # Assign to manage_scheduler job
 # "*/15"
-manage_schedule_trigger = CronTrigger(minute="*/2")
+manage_schedule_trigger = CronTrigger(minute="*/15")
 
 # Adds manage_scraper job to the scheduler
 # Triggers every 15 minutes
