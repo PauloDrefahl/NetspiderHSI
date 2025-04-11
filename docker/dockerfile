@@ -1,9 +1,0 @@
-FROM postgres:latest
-
-COPY import_csv.sh /docker-entrypoint-initdb.d/
-COPY v00.sql /docker-entrypoint-initdb.d/
-COPY data/ /data/
-
-RUN chmod +x /docker-entrypoint-initdb.d/import_csv.sh
-
-RUN ls -l /docker-entrypoint-initdb.d/

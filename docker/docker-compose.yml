@@ -1,17 +1,14 @@
 services:
-  postgres:
+  db:
     container_name: netspider_postgres_db
-    build: .
-    image: netspider_postgres:latest
-    restart: always
+    image: postgres:latest
+    ports:
+      - "5432:5432"
     environment:
       POSTGRES_USER: postgres
       POSTGRES_PASSWORD: password
       POSTGRES_DB: netspider
-    ports:
-      - "5432:5432"
     volumes:
-      - pgdata:/var/lib/postgresql/data
-
-volumes:
-  pgdata:
+      - ./docker/init:/docker-entrypoint-initdb.d:ro
+    #uncomment to always restart the container
+    #restart: always
