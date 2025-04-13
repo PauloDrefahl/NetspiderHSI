@@ -17,7 +17,7 @@ document.addEventListener("DOMContentLoaded", function () {
         const keysets = data.keysets || [];
 
 
-        // Store for lookup
+        // Store the keysets into an array for lookup
         window.dbKeysets = {};
         keysets.forEach(set => {
             window.dbKeysets[set.item_name] = set.keywords;
