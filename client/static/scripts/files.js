@@ -1,3 +1,163 @@
+let resultFolder = '';
+let folderList = '';
+
+window.resultManager = undefined;
+window.electronAPI = undefined;
+
+document.addEventListener("DOMContentLoaded", function () {
+    const openResultsFolderButton = document.getElementById('open-results-folder-btn');
+    const resultsFolderButton = document.getElementById('folder-input-btn');
+    const listElement = document.getElementById('list');
+
+    // Load keyword/keyset data from DB
+    window.socket.emit('get_data');
+
+    window.socket.on('data_response', function (data) {
+        const keywords = data.keywords || [];
+        const keysets = data.keysets || [];
+
+
+        // Store for lookup
+        window.dbKeysets = {};
+        keysets.forEach(set => {
+            window.dbKeysets[set.item_name] = set.keywords;
+        });
+
+        // Populate keyword list selections
+        ['itemList', 'itemListKeywords'].forEach(id => {
+            const list = document.getElementById(id);
+            if (list) {
+                list.innerHTML = '';
+                keywords.forEach(k => {
+                    const option = document.createElement('option');
+                    option.textContent = k.keyword;
+                    option.value = k.id;
+                    list.appendChild(option);
+                });
+            }
+        });
+
+        // Populate keyset select
+        const itemListSet = document.getElementById('itemListSet');
+        if (itemListSet) {
+            itemListSet.innerHTML = '';
+            keysets.forEach(set => {
+                const option = document.createElement('option');
+                option.textContent = set.item_name;
+                option.value = set.id;
+                itemListSet.appendChild(option);
+            });
+        }
+
+        // Populate dropdown keyset list
+        const dropdownContainer = document.querySelector('.dropdown-content-keyset');
+        if (dropdownContainer) {
+            dropdownContainer.innerHTML = '';
+            keysets.forEach(set => {
+                addOptionKeyset(set.item_name);
+            });
+        }
+    });
+
+    // Result folder selection logic
+    openResultsFolderButton.addEventListener('click', function () {
+        window.editFile.openResults(resultFolder);
+    });
+
+    resultsFolderButton.addEventListener('click', function () {
+        window.socket.emit('set_result_dir');
+    });
+
+    window.socket.on('result_folder_selected', (data) => {
+        if (data.error) {
+            listElement.innerHTML = `<li>Error: ${data.error}</li>`;
+            return;
+        }
+
+        if (data.file_explorer_opened) {
+            listElement.innerHTML = '<li>No directory selected.</li>';
+            return;
+        }
+
+        if (data.result_dir) {
+            resultFolder = data.result_dir;
+        }
+
+        folderList = data.folders;
+
+        if (Array.isArray(folderList) && folderList.length > 0) {
+            listElement.innerHTML = '';
+            folderList.forEach(item => {
+                const listItem = document.createElement('li');
+                listItem.textContent = item;
+                listElement.appendChild(listItem);
+
+                listItem.addEventListener('click', function () {
+                    const previouslySelected = document.querySelector('#list li.selected');
+                    if (previouslySelected) {
+                        previouslySelected.classList.remove('selected');
+                    }
+                    this.classList.add('selected');
+                    console.log("Selected Folder:", this.textContent);
+                });
+            });
+        } else {
+            listElement.innerHTML = '<li>No folders found.</li>';
+        }
+    });
+
+    window.socket.on('result_list_refreshed', (data) => {
+        if (data.error) {
+            listElement.innerHTML = `<li>Error: ${data.error}</li>`;
+            return;
+        }
+
+        folderList = data.folders;
+        if (Array.isArray(folderList) && folderList.length > 0) {
+            listElement.innerHTML = '';
+            folderList.forEach(item => {
+                const listItem = document.createElement('li');
+                listItem.textContent = item;
+                listElement.appendChild(listItem);
+
+                listItem.addEventListener('click', function () {
+                    const previouslySelected = document.querySelector('#list li.selected');
+                    if (previouslySelected) {
+                        previouslySelected.classList.remove('selected');
+                    }
+                    this.classList.add('selected');
+                    console.log("Selected Folder:", this.textContent);
+                });
+            });
+        } else {
+            listElement.innerHTML = '<li>No folders found.</li>';
+        }
+    });
+});
+
+// Dropdown creation function
+function addOptionKeyset(keysetName) {
+    const option2 = document.createElement('a');
+    option2.href = '#';
+    option2.textContent = keysetName;
+    option2.classList.add('dropdown-item-keyset');
+
+    option2.addEventListener('click', function () {
+        const selectKeyset = document.querySelector('.dropdown-item-keyset');
+        if (selectKeyset) {
+            selectKeyset.textContent = keysetName;
+        }
+
+        document.querySelectorAll('.dropdown-item-keyset').forEach(opt => {
+            opt.classList.remove('selected');
+        });
+
+        option2.classList.add('selected');
+    });
+
+    document.querySelector('.dropdown-content-keyset').appendChild(option2);
+}
+
 /* Original file path logic
 let keywordsFile = ''
 let keywordsSetFile = ''
@@ -238,163 +398,3 @@ document.addEventListener("DOMContentLoaded", function () {
     });
 });
 */
-
-let resultFolder = '';
-let folderList = '';
-
-window.resultManager = undefined;
-window.electronAPI = undefined;
-
-document.addEventListener("DOMContentLoaded", function () {
-    const openResultsFolderButton = document.getElementById('open-results-folder-btn');
-    const resultsFolderButton = document.getElementById('folder-input-btn');
-    const listElement = document.getElementById('list');
-
-    // Load keyword/keyset data from DB
-    window.socket.emit('get_data');
-
-    window.socket.on('data_response', function (data) {
-        const keywords = data.keywords || [];
-        const keysets = data.keysets || [];
-
-
-        // Store for lookup
-        window.dbKeysets = {};
-        keysets.forEach(set => {
-            window.dbKeysets[set.item_name] = set.keywords;
-        });
-
-        // Populate keyword list selections
-        ['itemList', 'itemListKeywords'].forEach(id => {
-            const list = document.getElementById(id);
-            if (list) {
-                list.innerHTML = '';
-                keywords.forEach(k => {
-                    const option = document.createElement('option');
-                    option.textContent = k.keyword;
-                    option.value = k.id;
-                    list.appendChild(option);
-                });
-            }
-        });
-
-        // Populate keyset select
-        const itemListSet = document.getElementById('itemListSet');
-        if (itemListSet) {
-            itemListSet.innerHTML = '';
-            keysets.forEach(set => {
-                const option = document.createElement('option');
-                option.textContent = set.item_name;
-                option.value = set.id;
-                itemListSet.appendChild(option);
-            });
-        }
-
-        // Populate dropdown keyset list
-        const dropdownContainer = document.querySelector('.dropdown-content-keyset');
-        if (dropdownContainer) {
-            dropdownContainer.innerHTML = '';
-            keysets.forEach(set => {
-                addOptionKeyset(set.item_name);
-            });
-        }
-    });
-
-    // Result folder selection logic
-    openResultsFolderButton.addEventListener('click', function () {
-        window.editFile.openResults(resultFolder);
-    });
-
-    resultsFolderButton.addEventListener('click', function () {
-        window.socket.emit('set_result_dir');
-    });
-
-    window.socket.on('result_folder_selected', (data) => {
-        if (data.error) {
-            listElement.innerHTML = `<li>Error: ${data.error}</li>`;
-            return;
-        }
-
-        if (data.file_explorer_opened) {
-            listElement.innerHTML = '<li>No directory selected.</li>';
-            return;
-        }
-
-        if (data.result_dir) {
-            resultFolder = data.result_dir;
-        }
-
-        folderList = data.folders;
-
-        if (Array.isArray(folderList) && folderList.length > 0) {
-            listElement.innerHTML = '';
-            folderList.forEach(item => {
-                const listItem = document.createElement('li');
-                listItem.textContent = item;
-                listElement.appendChild(listItem);
-
-                listItem.addEventListener('click', function () {
-                    const previouslySelected = document.querySelector('#list li.selected');
-                    if (previouslySelected) {
-                        previouslySelected.classList.remove('selected');
-                    }
-                    this.classList.add('selected');
-                    console.log("Selected Folder:", this.textContent);
-                });
-            });
-        } else {
-            listElement.innerHTML = '<li>No folders found.</li>';
-        }
-    });
-
-    window.socket.on('result_list_refreshed', (data) => {
-        if (data.error) {
-            listElement.innerHTML = `<li>Error: ${data.error}</li>`;
-            return;
-        }
-
-        folderList = data.folders;
-        if (Array.isArray(folderList) && folderList.length > 0) {
-            listElement.innerHTML = '';
-            folderList.forEach(item => {
-                const listItem = document.createElement('li');
-                listItem.textContent = item;
-                listElement.appendChild(listItem);
-
-                listItem.addEventListener('click', function () {
-                    const previouslySelected = document.querySelector('#list li.selected');
-                    if (previouslySelected) {
-                        previouslySelected.classList.remove('selected');
-                    }
-                    this.classList.add('selected');
-                    console.log("Selected Folder:", this.textContent);
-                });
-            });
-        } else {
-            listElement.innerHTML = '<li>No folders found.</li>';
-        }
-    });
-});
-
-// Dropdown creation function
-function addOptionKeyset(keysetName) {
-    const option2 = document.createElement('a');
-    option2.href = '#';
-    option2.textContent = keysetName;
-    option2.classList.add('dropdown-item-keyset');
-
-    option2.addEventListener('click', function () {
-        const selectKeyset = document.querySelector('.dropdown-item-keyset');
-        if (selectKeyset) {
-            selectKeyset.textContent = keysetName;
-        }
-
-        document.querySelectorAll('.dropdown-item-keyset').forEach(opt => {
-            opt.classList.remove('selected');
-        });
-
-        option2.classList.add('selected');
-    });
-
-    document.querySelector('.dropdown-content-keyset').appendChild(option2);
-}
