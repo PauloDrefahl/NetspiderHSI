@@ -264,10 +264,9 @@ if __name__ == "__main__":
     #Headless mode allows for scraping without displaying the browser window. 
     #set if you want no window (true) or window (false)
     headless_mode = True
-
-    test_MegapersonalsScraper(headless_mode) 
-    test_SkipthegamesScraper(headless_mode)
-    test_YesbackpageScraper(headless_mode)
-    test_ErosScraper(headless_mode)
     test_RubratingsScraper(headless_mode)
     test_EscortalligatorScraper(headless_mode)
+    test_SkipthegamesScraper(headless_mode)
+    test_MegapersonalsScraper(headless_mode) 
+    test_YesbackpageScraper(headless_mode)
+    test_ErosScraper(headless_mode)
