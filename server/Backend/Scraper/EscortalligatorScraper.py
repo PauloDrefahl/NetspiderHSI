@@ -489,8 +489,11 @@ class EscortalligatorScraper(ScraperPrototype):
         return location, age
 
     def capture_screenshot(self, screenshot_name) -> None:
-        self.driver.save_screenshot(f'{self.screenshot_directory}/{screenshot_name}')
-        self.create_pdf()
+        try:
+            self.driver.save_screenshot(f'{self.screenshot_directory}/{screenshot_name}')
+            self.create_pdf()
+        except Exception as e:
+            print(f"Error capturing screenshot: {e}")
 
     def create_pdf(self) -> None:
         screenshot_files = [

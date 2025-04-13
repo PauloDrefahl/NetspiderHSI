@@ -585,8 +585,11 @@ class YesbackpageScraper(ScraperPrototype):
         return email if "@" in email else "N/A"
 
     def capture_screenshot(self, screenshot_name) -> None:
-        self.driver.save_screenshot(f'{self.screenshot_directory}/{screenshot_name}')
-        self.create_pdf()
+        try:
+            self.driver.save_screenshot(f'{self.screenshot_directory}/{screenshot_name}')
+            self.create_pdf()
+        except Exception as e:
+            print(f"Error capturing screenshot: {e}")
 
     def create_pdf(self) -> None:
         screenshot_files = [os.path.join(self.screenshot_directory, filename) for filename in os.listdir(self.screenshot_directory) if filename.endswith('.png')]
