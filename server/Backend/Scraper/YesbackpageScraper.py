@@ -154,16 +154,10 @@ class YesbackpageScraper(ScraperPrototype):
         self.screenshot_directory = f'{self.scraper_directory}/screenshots'
         self.pdf_filename = f'{self.screenshot_directory}/yesbackpage-{self.city}-{self.date_time}.pdf'
         os.mkdir(self.screenshot_directory)
-        print("number of threads while running: ", threading.active_count())
-        print("keywords inside scraper:", self.keywords)
         self.get_data(links)
-        print("get data done")
         self.close_webpage()
-        print("closed webpage")
         self.reset_variables()
-        print("reset variables")
         self.completed = True
-        print("done scraping")
 
     def stop_scraper(self) -> None:
         self.completed = True
@@ -195,9 +189,10 @@ class YesbackpageScraper(ScraperPrototype):
         self.url = self.cities.get(self.city)
 
     def get_data(self, links) -> None:
-        counter = 0
+        counter = 1
 
         for link in links:
+            print(f"Processing link {counter}/{len(links)}: {link}")
             if not self.completed:
                 self.driver.implicitly_wait(10)
                 self.driver.get(link)
@@ -573,11 +568,6 @@ class YesbackpageScraper(ScraperPrototype):
                 reply_to = reply_to.strip()
             else:
                 expires_on = second_half.strip()
-
-        print(f"Posted on: {posted_on}")
-        print(f"Updated on: {updated_on if updated_on != 'N/A' else 'No update info'}")
-        print(f"Expires on: {expires_on}")
-        print(f"Reply to: {reply_to if reply_to != 'N/A' else 'No reply info'}")
 
         return posted_on, expires_on, reply_to
 

@@ -139,15 +139,10 @@ class RubratingsScraper(ScraperPrototype):
         self.screenshot_directory = f'{self.scraper_directory}/screenshots'
         self.pdf_filename = f'{self.screenshot_directory}/rubratings-{self.city}-{self.date_time}.pdf'
         os.mkdir(self.screenshot_directory)
-        print("keywords inside scraper:", self.keywords)
         self.get_data(links)
-        print("get data done")
         self.close_webpage()
-        print("closed webpage")
         self.reset_variables()
-        print("reset variables")
         self.completed = True
-        print("done scraping")
 
     def stop_scraper(self) -> None:
         self.completed = True
@@ -194,10 +189,10 @@ class RubratingsScraper(ScraperPrototype):
         self.url = self.cities.get(self.city)
 
     def get_data(self, links: list[str]) -> None:
-        counter = 0
+        counter = 1
 
         for link in links:
-
+            print(f"Processing link {counter}/{len(links)}: {link}")
             if not self.completed:
                 self.driver.implicitly_wait(10)
                 self.driver.get(link)
@@ -218,7 +213,6 @@ class RubratingsScraper(ScraperPrototype):
                                                                             '1]/div/div/div/div[2]/div[3]/div[1]/ul/li['
                                                                             '1]/a')
                     phone_number = phone_number_element.get_attribute('data-replace')
-                    print("phone number: ", phone_number)
                 except NoSuchElementException:
                     phone_number = 'N/A'
 
@@ -265,9 +259,7 @@ class RubratingsScraper(ScraperPrototype):
                     # Concatenate the descriptions into a single string
                     description = ' '.join(description_texts)
 
-                    print("Concatenated Description:", description)
                 except NoSuchElementException:
-                    print("Description elements not found")
                     description = 'N/A'
 
                 # reassign variables for each post

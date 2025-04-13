@@ -183,9 +183,10 @@ class ErosScraper(ScraperPrototype):
         self.url = self.cities.get(self.city)
 
     def get_data(self, links) -> None:
-        counter = 0
+        counter = 1
 
         for link in links:
+            print(f"Processing link {counter}/{len(links)}: {link}")
             if not self.completed:
                 self.driver.implicitly_wait(10)
                 self.driver.get(link)

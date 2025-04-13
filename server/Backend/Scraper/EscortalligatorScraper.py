@@ -192,9 +192,10 @@ class EscortalligatorScraper(ScraperPrototype):
 
     def get_data(self, links) -> None:
         links = set(links)
-        counter = 0
+        counter = 1
 
         for link in links:
+            print(f"Processing link {counter}/{len(links)}: {link}")
             try:
                 if not self.completed:
                     self.driver.get(link)
@@ -449,7 +450,6 @@ class EscortalligatorScraper(ScraperPrototype):
                 keywords = worksheet["K" + str(i)].value  # set the keywords var to each keyword in the cell
                 for flagged_keyword in self.flagged_keywords:
                     if flagged_keyword in keywords:
-                        print("flagging keyword: ", flagged_keyword)
                         worksheet["K" + str(i)].fill = PatternFill(
                             fill_type='solid',
                             start_color='ff0000',
