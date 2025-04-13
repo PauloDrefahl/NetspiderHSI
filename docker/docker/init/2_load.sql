@@ -1,9 +1,5 @@
 
-COPY raw_eros_posts (
-    link, city_or_region, profile_header, about_info,
-    info_details, contact_details, payment_methods,
-    social_media_accounts, keywords
-)
+/* COPY raw_eros_posts 
 FROM '/docker-entrypoint-initdb.d/data/raw_eros_posts.csv'
 DELIMITER ','
 CSV HEADER;
@@ -31,7 +27,7 @@ CSV HEADER;
 COPY raw_yesbackpage_posts
 FROM '/docker-entrypoint-initdb.d/data/raw_yesbackpage_posts.csv'
 DELIMITER ','
-CSV HEADER;
+CSV HEADER; */
 
 
 COPY keywords (keyword)
@@ -39,6 +35,7 @@ FROM '/docker-entrypoint-initdb.d/data/keywords.txt'
 DELIMITER E'\t'
 CSV HEADER;
 
+/* 
 --must loop JSON rather than copy all :(
 DO $$
 DECLARE
@@ -53,4 +50,4 @@ BEGIN
         INSERT INTO keysets (item_name, keywords) VALUES (key, value::jsonb);
     END LOOP;
 END;
-$$;
+$$; */
