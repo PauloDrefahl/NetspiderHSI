@@ -1,4 +1,5 @@
 import os
+import time
 from datetime import datetime
 import pandas as pd
 from seleniumbase import Driver
@@ -184,6 +185,8 @@ class SkipthegamesScraper(ScraperPrototype):
         for link in links:
 
             if not self.completed:
+                self.driver.get(link)
+                time.sleep(1)
                 self.driver.get(link)
                 assert "Page not found" not in self.driver.page_source
                 try:

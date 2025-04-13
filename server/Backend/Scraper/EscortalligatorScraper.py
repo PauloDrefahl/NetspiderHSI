@@ -1,4 +1,5 @@
 import os
+import time
 import re
 from datetime import datetime
 import pandas as pd
@@ -196,6 +197,8 @@ class EscortalligatorScraper(ScraperPrototype):
         for link in links:
             try:
                 if not self.completed:
+                    self.driver.get(link)
+                    time.sleep(1)
                     self.driver.get(link)
                     assert "Page not found" not in self.driver.page_source
 

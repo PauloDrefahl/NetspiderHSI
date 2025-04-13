@@ -5,6 +5,7 @@ from selenium.common import NoSuchElementException
 from selenium.webdriver.common.by import By
 import pandas as pd
 import os
+import time
 import img2pdf
 from openpyxl.styles import PatternFill
 from typing_extensions import override
@@ -187,6 +188,8 @@ class ErosScraper(ScraperPrototype):
         for link in links:
             if not self.completed:
                 self.driver.implicitly_wait(10)
+                self.driver.get(link)
+                time.sleep(1)
                 self.driver.get(link)
                 assert "Page not found" not in self.driver.page_source
 
