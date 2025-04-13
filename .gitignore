@@ -33,3 +33,7 @@ node_modules/
 
 # SeleniumBase
 downloaded_files/
+
+# Results folder
+result/
+results/
