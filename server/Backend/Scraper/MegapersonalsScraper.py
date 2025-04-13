@@ -197,10 +197,10 @@ class MegapersonalsScraper(ScraperPrototype):
         self.url = self.cities.get(self.city)
 
     def get_data(self, links) -> None:
-        counter = 0
+        counter = 1
 
         for link in links:
-
+            print(f"Processing link {counter}/{len(links)}: {link}")
             if not self.completed:
                 self.driver.get(link)
                 assert "Page not found" not in self.driver.page_source
@@ -246,7 +246,6 @@ class MegapersonalsScraper(ScraperPrototype):
 
                 # Save the data we collected about the post.
                 self.append_data(city, counter, description, link, location, name, phone_number)
-                print("Appending data - " + str(counter) + " - " + link + f"\n {city, counter, description, link, location, name, phone_number}")
                 screenshot_name = str(counter) + ".png"
                 self.capture_screenshot(screenshot_name)
                 counter += 1
@@ -276,27 +275,30 @@ class MegapersonalsScraper(ScraperPrototype):
         self.number_of_keywords_found.append(len(self.keywords_found_in_post) or "N/A")
         social_media = self.get_social_media(description)
         self.social_media_found.append("\n".join(social_media) or "N/A")
-        with self.open_database() as connection, connection.cursor() as cursor:
-            cursor.execute(
-                """
-                insert into raw_mega_personals_posts
-                values (%s, %s, %s, %s, %s, %s, %s, %s, %s, %s)
-                on conflict do nothing;
-                """,
-                (
-                    link,
-                    self.city,
-                    city,
-                    location,
-                    phone_number,
-                    name,
-                    description,
-                    payment_methods,
-                    social_media,
-                    list(self.keywords_found_in_post),
-                ),
-            )
-
+        try:
+            with self.open_database() as connection, connection.cursor() as cursor:
+                cursor.execute(
+                    """
+                    insert into raw_mega_personals_posts
+                    values (%s, %s, %s, %s, %s, %s, %s, %s, %s, %s)
+                    on conflict do nothing;
+                    """,
+                    (
+                        link,
+                        self.city,
+                        city,
+                        location,
+                        phone_number,
+                        name,
+                        description,
+                        payment_methods,
+                        social_media,
+                        list(self.keywords_found_in_post),
+                    ),
+                )
+            print("Insert successful")
+        except Exception as e:
+            print(f"Database write failed: {e}") 
     '''
     --------------------------
     Checking and Running Append
@@ -470,13 +472,19 @@ class MegapersonalsScraper(ScraperPrototype):
                     col[0].column_letter].width = adjusted_width
 
     def capture_screenshot(self, screenshot_name) -> None:
-        self.driver.save_screenshot(f'{self.screenshot_directory}/{screenshot_name}')
-        self.create_pdf()
+        try:
+            self.driver.save_screenshot(f'{self.screenshot_directory}/{screenshot_name}')
+            self.create_pdf()
+        except Exception as e:
+            print(f"Error capturing screenshot: {e}")
 
     def create_pdf(self) -> None:
-        screenshot_files = [os.path.join(self.screenshot_directory, filename) for filename in os.listdir(self.screenshot_directory) if filename.endswith('.png')]
-        with open(self.pdf_filename, "wb") as f:
-            f.write(img2pdf.convert(screenshot_files))
+        try:
+            screenshot_files = [os.path.join(self.screenshot_directory, filename) for filename in os.listdir(self.screenshot_directory) if filename.endswith('.png')]
+            with open(self.pdf_filename, "wb") as f:
+                f.write(img2pdf.convert(screenshot_files))
+        except Exception as e:
+            print(f"Error creating PDF: {e}")
 
     def reset_variables(self) -> None:
         self.description = []

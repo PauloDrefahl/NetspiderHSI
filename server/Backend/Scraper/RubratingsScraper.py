@@ -195,10 +195,10 @@ class RubratingsScraper(ScraperPrototype):
         self.url = self.cities.get(self.city)
 
     def get_data(self, links: list[str]) -> None:
-        counter = 0
+        counter = 1
 
         for link in links:
-
+            print(f"Processing link {counter}/{len(links)}: {link}")
             if not self.completed:
                 self.driver.implicitly_wait(10)
                 self.driver.get(link)
@@ -280,7 +280,6 @@ class RubratingsScraper(ScraperPrototype):
 
                 # Save the data we collected about the post.
                 self.append_data(counter, link, last_activity, phone_number, location, provider_id, post_title, description)
-                print("Appending data - " + str(counter) + " - " + link + f"\n {counter, link, last_activity, phone_number, location, provider_id, post_title, description}")
                 screenshot_name = str(counter) + ".png"
                 self.capture_screenshot(screenshot_name)
                 counter += 1
@@ -312,37 +311,40 @@ class RubratingsScraper(ScraperPrototype):
         social_media = self.get_social_media(description)
         self.social_media_found.append("\n".join(social_media) or "N/A")
         # Store information about the post in the database.
-        with self.open_database() as connection, connection.cursor() as cursor:
-            # PostgreSQL expects `last_activity` to contain the year, but
-            # RubRatings only shows the month and day, e.g., 'Mon, 9 Dec'.
-            last_activity += " " + str(datetime.now(tz=None).year)
-            # In the database, the provider ID is stored as an `integer`, so
-            # we must remove the '#' and cast `provider_id` to an `int`.
-            provider_id = provider_id.removeprefix("#")
-            # TODO(Daniel): Remove the check for "N/A" once the provider ID
-            # locator is fixed; every page should have a provider ID.
-            provider_id = None if provider_id == "N/A" else int(provider_id)
-            cursor.execute(
-                """
-                insert into raw_rub_ratings_posts
-                values (%s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s)
-                on conflict do nothing;
-                """,
-                (
-                    link,
-                    self.city,
-                    location,
-                    last_activity,
-                    phone_number,
-                    provider_id,
-                    post_title or None,
-                    description or None,
-                    payment_methods,
-                    social_media,
-                    list(self.keywords_found_in_post),
-                ),
-            )
-
+        try:
+            with self.open_database() as connection, connection.cursor() as cursor:
+                # PostgreSQL expects `last_activity` to contain the year, but
+                # RubRatings only shows the month and day, e.g., 'Mon, 9 Dec'.
+                last_activity += " " + str(datetime.now(tz=None).year)
+                # In the database, the provider ID is stored as an `integer`, so
+                # we must remove the '#' and cast `provider_id` to an `int`.
+                provider_id = provider_id.removeprefix("#")
+                # TODO(Daniel): Remove the check for "N/A" once the provider ID
+                # locator is fixed; every page should have a provider ID.
+                provider_id = None if provider_id == "N/A" else int(provider_id)
+                cursor.execute(
+                    """
+                    insert into raw_rub_ratings_posts
+                    values (%s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s)
+                    on conflict do nothing;
+                    """,
+                    (
+                        link,
+                        self.city,
+                        location,
+                        last_activity,
+                        phone_number,
+                        provider_id,
+                        post_title or None,
+                        description or None,
+                        payment_methods,
+                        social_media,
+                        list(self.keywords_found_in_post),
+                    ),
+                )
+            print("Insert successful")
+        except Exception as e:
+            print(f"Database write failed: {e}") 
     '''
     --------------------------
     Checking and Running Append
@@ -535,10 +537,12 @@ class RubratingsScraper(ScraperPrototype):
             print(f"Error capturing screenshot: {e}")
 
     def create_pdf(self) -> None:
-        screenshot_files = [os.path.join(self.screenshot_directory, filename) for filename in
-                            os.listdir(self.screenshot_directory) if filename.endswith('.png')]
-        with open(self.pdf_filename, "wb") as f:
-            f.write(img2pdf.convert(screenshot_files))
+        try:
+            screenshot_files = [os.path.join(self.screenshot_directory, filename) for filename in os.listdir(self.screenshot_directory) if filename.endswith('.png')]
+            with open(self.pdf_filename, "wb") as f:
+                f.write(img2pdf.convert(screenshot_files))
+        except Exception as e:
+            print(f"Error creating PDF: {e}")
 
     def reset_variables(self) -> None:
         self.last_activity = []

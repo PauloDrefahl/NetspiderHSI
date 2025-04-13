@@ -187,9 +187,10 @@ class ErosScraper(ScraperPrototype):
         self.url = self.cities.get(self.city)
 
     def get_data(self, links) -> None:
-        counter = 0
+        counter = 1
 
         for link in links:
+            print(f"Processing link {counter}/{len(links)}: {link}")
             if not self.completed:
                 self.driver.implicitly_wait(10)
                 self.driver.get(link)
@@ -230,7 +231,6 @@ class ErosScraper(ScraperPrototype):
 
                 # Save the data we collected about the post.
                 self.append_data(contact_details, counter, description, info_details, link, profile_header)
-                print("Appending data - " + str(counter) + " - " + link + f"\n {contact_details, counter, description, info_details, link, profile_header}")
                 screenshot_name = str(counter) + ".png"
                 self.capture_screenshot(screenshot_name)
                 counter += 1
@@ -260,25 +260,29 @@ class ErosScraper(ScraperPrototype):
         self.keywords_found.append(', '.join(self.keywords_found_in_post) or 'N/A')
         self.number_of_keywords_found.append(len(self.keywords_found_in_post) or "N/A")
         # Store information about the post in the database.
-        with self.open_database() as connection, connection.cursor() as cursor:
-            cursor.execute(
-                """
-                insert into raw_eros_posts
-                values (%s, %s, %s, %s, %s, %s, %s, %s, %s)
-                on conflict do nothing;
-                """,
-                (
-                    link,
-                    self.city,
-                    profile_header,
-                    description,
-                    info_details,
-                    contact_details,
-                    payment_methods,
-                    social_media,
-                    list(self.keywords_found_in_post),
-                ),
-            )
+        try:
+            with self.open_database() as connection, connection.cursor() as cursor:
+                cursor.execute(
+                    """
+                    insert into raw_eros_posts
+                    values (%s, %s, %s, %s, %s, %s, %s, %s, %s)
+                    on conflict do nothing;
+                    """,
+                    (
+                        link,
+                        self.city,
+                        profile_header,
+                        description,
+                        info_details,
+                        contact_details,
+                        payment_methods,
+                        social_media,
+                        list(self.keywords_found_in_post),
+                    ),
+                )
+            print("Insert successful")
+        except Exception as e:
+            print(f"Database write failed: {e}") 
 
     '''
     --------------------------
@@ -453,14 +457,19 @@ class ErosScraper(ScraperPrototype):
 
 
     def capture_screenshot(self, screenshot_name) -> None:
-        self.driver.save_screenshot(f'{self.screenshot_directory}/{screenshot_name}')
-        self.create_pdf()
+        try:
+            self.driver.save_screenshot(f'{self.screenshot_directory}/{screenshot_name}')
+            self.create_pdf()
+        except Exception as e:
+            print(f"Error capturing screenshot: {e}")
 
     def create_pdf(self) -> None:
-        screenshot_files = [
-            os.path.join(self.screenshot_directory, filename) for filename in os.listdir(self.screenshot_directory) if filename.endswith('.png')]
-        with open(self.pdf_filename, "wb") as f:
-            f.write(img2pdf.convert(screenshot_files))
+        try:
+            screenshot_files = [os.path.join(self.screenshot_directory, filename) for filename in os.listdir(self.screenshot_directory) if filename.endswith('.png')]
+            with open(self.pdf_filename, "wb") as f:
+                f.write(img2pdf.convert(screenshot_files))
+        except Exception as e:
+            print(f"Error creating PDF: {e}")
 
     def reset_variables(self) -> None:
         self.post_identifier = []
