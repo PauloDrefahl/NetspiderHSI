@@ -312,36 +312,39 @@ class RubratingsScraper(ScraperPrototype):
         social_media = self.get_social_media(description)
         self.social_media_found.append("\n".join(social_media) or "N/A")
         # Store information about the post in the database.
-        with self.open_database() as connection, connection.cursor() as cursor:
-            # PostgreSQL expects `last_activity` to contain the year, but
-            # RubRatings only shows the month and day, e.g., 'Mon, 9 Dec'.
-            last_activity += " " + str(datetime.now(tz=None).year)
-            # In the database, the provider ID is stored as an `integer`, so
-            # we must remove the '#' and cast `provider_id` to an `int`.
-            provider_id = provider_id.removeprefix("#")
-            # TODO(Daniel): Remove the check for "N/A" once the provider ID
-            # locator is fixed; every page should have a provider ID.
-            provider_id = None if provider_id == "N/A" else int(provider_id)
-            cursor.execute(
-                """
-                insert into raw_rub_ratings_posts
-                values (%s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s)
-                on conflict do nothing;
-                """,
-                (
-                    link,
-                    self.city,
-                    location,
-                    last_activity,
-                    phone_number,
-                    provider_id,
-                    post_title or None,
-                    description or None,
-                    payment_methods,
-                    social_media,
-                    list(self.keywords_found_in_post),
-                ),
-            )
+        try:
+            with self.open_database() as connection, connection.cursor() as cursor:
+                # PostgreSQL expects `last_activity` to contain the year, but
+                # RubRatings only shows the month and day, e.g., 'Mon, 9 Dec'.
+                last_activity += " " + str(datetime.now(tz=None).year)
+                # In the database, the provider ID is stored as an `integer`, so
+                # we must remove the '#' and cast `provider_id` to an `int`.
+                provider_id = provider_id.removeprefix("#")
+                # TODO(Daniel): Remove the check for "N/A" once the provider ID
+                # locator is fixed; every page should have a provider ID.
+                provider_id = None if provider_id == "N/A" else int(provider_id)
+                cursor.execute(
+                    """
+                    insert into raw_rub_ratings_posts
+                    values (%s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s)
+                    on conflict do nothing;
+                    """,
+                    (
+                        link,
+                        self.city,
+                        location,
+                        last_activity,
+                        phone_number,
+                        provider_id,
+                        post_title or None,
+                        description or None,
+                        payment_methods,
+                        social_media,
+                        list(self.keywords_found_in_post),
+                    ),
+                )
+        except Exception as e:
+            print(f"Database write failed: {e}")
 
     '''
     --------------------------

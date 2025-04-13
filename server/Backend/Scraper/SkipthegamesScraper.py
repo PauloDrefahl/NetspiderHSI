@@ -247,24 +247,27 @@ class SkipthegamesScraper(ScraperPrototype):
         social_media = self.get_social_media(description)
         self.social_media_found.append("\n".join(social_media) or "N/A")
         # Store information about the post in the database.
-        with self.open_database() as connection, connection.cursor() as cursor:
-            cursor.execute(
-                """
-                insert into raw_skipthegames_posts
-                values (%s, %s, %s, %s, %s, %s, %s, %s)
-                on conflict do nothing;
-                """,
-                (
-                    link,
-                    self.city,
-                    about_info,
-                    description,
-                    services,
-                    payment_methods,
-                    social_media,
-                    list(self.keywords_found_in_post),
-                ),
-            )
+        try:
+            with self.open_database() as connection, connection.cursor() as cursor:
+                cursor.execute(
+                    """
+                    insert into raw_skipthegames_posts
+                    values (%s, %s, %s, %s, %s, %s, %s, %s)
+                    on conflict do nothing;
+                    """,
+                    (
+                        link,
+                        self.city,
+                        about_info,
+                        description,
+                        services,
+                        payment_methods,
+                        social_media,
+                        list(self.keywords_found_in_post),
+                    ),
+                )
+        except Exception as e:
+            print(f"Database write failed: {e}") 
 
     '''
     --------------------------

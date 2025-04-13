@@ -271,29 +271,32 @@ class EscortalligatorScraper(ScraperPrototype):
         self.social_media_found.append("\n".join(social_media) or "N/A")
         self.timestamps.append(timestamp)
         # Store information about the post in the database.
-        with self.open_database() as connection, connection.cursor() as cursor:
-            # Escort Alligator displays timestamps in 24-hour notation, but
-            # still includes 'AM' and 'PM', which confuses PostgreSQL.
-            timestamp = re.sub("AM|PM", "", timestamp)
-            cursor.execute(
-                """
-                insert into raw_escort_alligator_posts
-                values (%s, %s, %s, %s, %s, %s, %s, %s, %s, %s)
-                on conflict do nothing;
-                """,
-                (
-                    link,
-                    self.city,
-                    location,
-                    timestamp,
-                    phone_number,
-                    age,
-                    description,
-                    payment_methods,
-                    social_media,
-                    list(self.keywords_found_in_post),
-                ),
-            )
+        try:
+            with self.open_database() as connection, connection.cursor() as cursor:
+                # Escort Alligator displays timestamps in 24-hour notation, but
+                # still includes 'AM' and 'PM', which confuses PostgreSQL.
+                timestamp = re.sub("AM|PM", "", timestamp)
+                cursor.execute(
+                    """
+                    insert into raw_escort_alligator_posts
+                    values (%s, %s, %s, %s, %s, %s, %s, %s, %s, %s)
+                    on conflict do nothing;
+                    """,
+                    (
+                        link,
+                        self.city,
+                        location,
+                        timestamp,
+                        phone_number,
+                        age,
+                        description,
+                        payment_methods,
+                        social_media,
+                        list(self.keywords_found_in_post),
+                    ),
+                )
+        except Exception as e:
+            print(f"Database write failed: {e}") 
 
     '''
     --------------------------

@@ -257,25 +257,28 @@ class ErosScraper(ScraperPrototype):
         self.keywords_found.append(', '.join(self.keywords_found_in_post) or 'N/A')
         self.number_of_keywords_found.append(len(self.keywords_found_in_post) or "N/A")
         # Store information about the post in the database.
-        with self.open_database() as connection, connection.cursor() as cursor:
-            cursor.execute(
-                """
-                insert into raw_eros_posts
-                values (%s, %s, %s, %s, %s, %s, %s, %s, %s)
-                on conflict do nothing;
-                """,
-                (
-                    link,
-                    self.city,
-                    profile_header,
-                    description,
-                    info_details,
-                    contact_details,
-                    payment_methods,
-                    social_media,
-                    list(self.keywords_found_in_post),
-                ),
-            )
+        try:
+            with self.open_database() as connection, connection.cursor() as cursor:
+                cursor.execute(
+                    """
+                    insert into raw_eros_posts
+                    values (%s, %s, %s, %s, %s, %s, %s, %s, %s)
+                    on conflict do nothing;
+                    """,
+                    (
+                        link,
+                        self.city,
+                        profile_header,
+                        description,
+                        info_details,
+                        contact_details,
+                        payment_methods,
+                        social_media,
+                        list(self.keywords_found_in_post),
+                    ),
+                )
+        except Exception as e:
+            print(f"Database write failed: {e}") 
 
     '''
     --------------------------
