@@ -1,4 +1,5 @@
 import os
+import time
 from collections import defaultdict
 from datetime import datetime
 import pandas as pd
@@ -146,7 +147,7 @@ class YesbackpageScraper(ScraperPrototype):
 
         # Find links of posts
         links = self.get_links()
-        print(f"Found {len(links)} links...")
+        print(f"links = self.get_links() Found {len(links)} links...")
 
         # Create directory for search data
         self.scraper_directory = f'{self.path}/yesbackpage-{self.city}-{self.date_time}'
@@ -198,8 +199,10 @@ class YesbackpageScraper(ScraperPrototype):
         for link in links:
             print(f"Processing link {counter}/{len(links)}: {link}")
             if not self.completed:
-                self.driver.implicitly_wait(10)
                 self.driver.get(link)
+                time.sleep(1)
+                self.driver.get(link)
+
                 assert "Page not found" not in self.driver.page_source
 
                 try:
@@ -207,6 +210,7 @@ class YesbackpageScraper(ScraperPrototype):
                         By.XPATH, '/html/body/div[3]/div/div[1]/table/tbody/tr[1]/td/table[2]/tbody/'
                                 'tr/td/div/p[2]').text
                 except NoSuchElementException:
+                    print("No description found")
                     description = 'N/A'
 
                 try:
@@ -215,17 +219,20 @@ class YesbackpageScraper(ScraperPrototype):
                                 'tr/td/div[3]/div[1]').text
                     posted_on, expires_on, reply_to = self.parse_timestamp(timestamp)
                 except NoSuchElementException:
+                    print("No timestamp found")
                     posted_on = 'N/A'
                     expires_on = 'N/A'
                     reply_to = 'N/A'
 
                 # check if page contains "col-sm-6 offset-sm-3" which is the table that contains name, phone number, etc.
                 if self.driver.find_elements(By.XPATH, '//*[@id="mainCellWrapper"]/div[1]/table/tbody/tr[1]/td/div[1]/div'):
+                    print("Page contains 'col-sm-6 offset-sm-3'")
                     try:
                         name = self.driver.find_element(
                             By.XPATH, '/html/body/div[3]/div/div[1]/table/tbody/tr[1]/td/div[1]/div/table/'
                                     'tbody/tr[1]/td[2]').text[2:]
                     except NoSuchElementException:
+                        print("No name found")
                         name = 'N/A'
 
                     try:
@@ -233,6 +240,7 @@ class YesbackpageScraper(ScraperPrototype):
                             By.XPATH, '/html/body/div[3]/div/div[1]/table/tbody/tr[1]/td/div[1]/div/table/'
                                     'tbody/tr[2]/td[2]').text[2:]
                     except NoSuchElementException:
+                        print("No sex found")
                         sex = 'N/A'
 
                     try:
@@ -240,6 +248,7 @@ class YesbackpageScraper(ScraperPrototype):
                             By.XPATH, '/html/body/div[3]/div/div[1]/table/tbody/tr[1]/td/div[1]/div/table/'
                                     'tbody/tr[6]/td[2]').text[2:]
                     except NoSuchElementException:
+                        print("No phone number found")
                         phone_number = 'NA'
 
                     try:
@@ -248,6 +257,7 @@ class YesbackpageScraper(ScraperPrototype):
                                     'tbody/tr[8]/td[2]').text[2:]
                         # email = self.validate_email(email)
                     except NoSuchElementException:
+                        print("No email found")
                         email = 'N/A'
 
                     try:
@@ -255,6 +265,7 @@ class YesbackpageScraper(ScraperPrototype):
                             By.XPATH, '/html/body/div[3]/div/div[1]/table/tbody/tr[1]/td/div[1]/div/table/'
                                     'tbody/tr[9]/td[2]').text[2:]
                     except NoSuchElementException:
+                        print("No location found")
                         location = 'N/A'
 
                     try:
@@ -262,8 +273,10 @@ class YesbackpageScraper(ScraperPrototype):
                             By.XPATH, '//*[@id="mainCellWrapper"]/div/table/tbody/tr/td/div[1]/div/table/'
                                     'tbody/tr[5]/td[2]').text[2:]
                     except NoSuchElementException:
+                        print("No services found")
                         services = 'N/A'
                 else:
+                    print("No information found, page does not contain 'col-sm-6 offset-sm-3'")
                     posted_on = 'N/A'
                     expires_on = 'N/A'
                     reply_to = 'N/A'

@@ -8,7 +8,7 @@ import os
 import img2pdf
 from openpyxl.styles import PatternFill
 from typing_extensions import override
-
+import time
 
 class ErosScraper(ScraperPrototype):
     def __init__(self):
@@ -193,6 +193,8 @@ class ErosScraper(ScraperPrototype):
             print(f"Processing link {counter}/{len(links)}: {link}")
             if not self.completed:
                 self.driver.implicitly_wait(10)
+                self.driver.get(link)
+                time.sleep(1)
                 self.driver.get(link)
                 assert "Page not found" not in self.driver.page_source
 

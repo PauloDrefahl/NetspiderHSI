@@ -202,6 +202,8 @@ class RubratingsScraper(ScraperPrototype):
             if not self.completed:
                 self.driver.implicitly_wait(10)
                 self.driver.get(link)
+                time.sleep(1)
+                self.driver.get(link)
                 assert "Page not found" not in self.driver.page_source
                 try:
                     label = "Latest Activity: "

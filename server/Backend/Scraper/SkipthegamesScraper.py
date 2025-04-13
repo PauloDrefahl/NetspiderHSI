@@ -8,7 +8,7 @@ from typing_extensions import override
 from Backend.ScraperPrototype import ScraperPrototype
 import img2pdf
 from openpyxl.styles import PatternFill
-
+import time
 
 class SkipthegamesScraper(ScraperPrototype):
     def __init__(self):
@@ -189,6 +189,8 @@ class SkipthegamesScraper(ScraperPrototype):
         for link in links:
             print(f"Processing link {counter}/{len(links)}: {link}")
             if not self.completed:
+                self.driver.get(link)
+                time.sleep(1)
                 self.driver.get(link)
                 assert "Page not found" not in self.driver.page_source
                 try:

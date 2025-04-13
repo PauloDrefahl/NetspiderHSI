@@ -1,5 +1,6 @@
 import os
 import re
+import time
 from datetime import datetime
 import pandas as pd
 from seleniumbase import Driver
@@ -202,6 +203,8 @@ class EscortalligatorScraper(ScraperPrototype):
             print(f"Processing link {counter}/{len(links)}: {link}")
             try:
                 if not self.completed:
+                    self.driver.get(link)
+                    time.sleep(1)
                     self.driver.get(link)
                     assert "Page not found" not in self.driver.page_source
 
