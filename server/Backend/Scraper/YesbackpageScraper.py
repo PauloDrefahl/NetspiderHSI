@@ -121,6 +121,7 @@ class YesbackpageScraper(ScraperPrototype):
     ---------------------------------------
     '''
     def initialize(self) -> None:
+        print("---------------------------------------Initializing Yesbackpage Scraper---------------------------------------")
         # set up directories to save screenshots and Excel file.
         self.date_time = str(datetime.today())[0:19].replace(' ', '_').replace(':', '-')
 
@@ -141,9 +142,11 @@ class YesbackpageScraper(ScraperPrototype):
 
         # Open Webpage with URL
         self.open_webpage()
+        print(f"Opening {self.url}...")
 
         # Find links of posts
         links = self.get_links()
+        print(f"Found {len(links)} links...")
 
         # Create directory for search data
         self.scraper_directory = f'{self.path}/yesbackpage-{self.city}-{self.date_time}'
@@ -153,16 +156,12 @@ class YesbackpageScraper(ScraperPrototype):
         self.screenshot_directory = f'{self.scraper_directory}/screenshots'
         self.pdf_filename = f'{self.screenshot_directory}/yesbackpage-{self.city}-{self.date_time}.pdf'
         os.mkdir(self.screenshot_directory)
-        print("number of threads while running: ", threading.active_count())
-        print("keywords inside scraper:", self.keywords)
+        print(f"Getting data from {len(links)} links...")
         self.get_data(links)
-        print("get data done")
+        print(f"Data collection completed for {self.city}.")
         self.close_webpage()
-        print("closed webpage")
         self.reset_variables()
-        print("reset variables")
         self.completed = True
-        print("done scraping")
 
     def stop_scraper(self) -> None:
         self.completed = True
@@ -285,6 +284,7 @@ class YesbackpageScraper(ScraperPrototype):
 
                 # Save the data we collected about the post.
                 self.append_data(counter, description, email, link, location, name, phone_number, services, sex, posted_on, expires_on, reply_to)
+                print("Appending data - " + str(counter) + " - " + link + f"\n {counter, description, email, link, location, name, phone_number, services, sex, posted_on, expires_on, reply_to}")
                 screenshot_name = str(counter) + ".png"
                 self.capture_screenshot(screenshot_name)
                 counter += 1

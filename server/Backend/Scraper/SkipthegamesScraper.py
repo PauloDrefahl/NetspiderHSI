@@ -108,6 +108,7 @@ class SkipthegamesScraper(ScraperPrototype):
     ---------------------------------------
     '''
     def initialize(self) -> None:
+        print("---------------------------------------Initializing Skipthegames Scraper---------------------------------------")
         # set up directories to save screenshots and excel file.
         self.date_time = str(datetime.today())[0:19].replace(' ', '_').replace(':', '-')
 
@@ -128,9 +129,11 @@ class SkipthegamesScraper(ScraperPrototype):
 
         # Open Webpage with URL
         self.open_webpage()
+        print(f"Opening {self.url}...")
 
         # Find links of posts
         links = self.get_links()
+        print(f"Found {len(links)} links...")
 
         # create directories for screenshot and excel
         self.scraper_directory = f'{self.path}/skipthegames-{self.city}-{self.date_time}'
@@ -139,7 +142,9 @@ class SkipthegamesScraper(ScraperPrototype):
         self.pdf_filename = f'{self.screenshot_directory}/skipthegames-{self.city}-{self.date_time}.pdf'
         os.mkdir(self.screenshot_directory)
 
+        print(f"Getting data from {len(links)} links...")
         self.get_data(links)
+        print(f"Data collection completed for {self.city}.")
         self.close_webpage()
         self.reset_variables()
         self.completed = True
@@ -216,6 +221,7 @@ class SkipthegamesScraper(ScraperPrototype):
 
                 # Save the data we collected about the post.
                 self.append_data(about_info, counter, description, link, services)
+                print("Appending data - " + str(counter) + " - " + link + f"\n {about_info, counter, description, link, services}")
                 screenshot_name = str(counter) + ".png"
                 self.capture_screenshot(screenshot_name)
                 counter += 1

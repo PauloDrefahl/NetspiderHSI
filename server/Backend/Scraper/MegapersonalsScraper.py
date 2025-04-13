@@ -112,6 +112,7 @@ class MegapersonalsScraper(ScraperPrototype):
     ---------------------------------------
     '''
     def initialize(self) -> None:
+        print("---------------------------------------Initializing Megapersonals Scraper---------------------------------------")
         # format date
         self.date_time = str(datetime.today())[0:19].replace(' ', '_').replace(':', '-')
 
@@ -129,6 +130,7 @@ class MegapersonalsScraper(ScraperPrototype):
 
         # Open Webpage with URL
         self.open_webpage()
+        print(f"Opening {self.url}...")
 
         # Format website URL based on state and city
         self.get_formatted_url()
@@ -136,6 +138,7 @@ class MegapersonalsScraper(ScraperPrototype):
 
         # Find links of posts
         links = self.get_links()
+        print(f"Found {len(links)} links...")
 
         # create directories for screenshot and excel
         self.scraper_directory = f'{self.path}/megapersonals-{self.city}-{self.date_time}'
@@ -145,7 +148,9 @@ class MegapersonalsScraper(ScraperPrototype):
         self.pdf_filename = f'{self.screenshot_directory}/megapersonals-{self.city}-{self.date_time}.pdf'
         os.mkdir(self.screenshot_directory)
 
+        print(f"Getting data from {len(links)} links...")
         self.get_data(links)
+        print(f"Data collection completed for {self.city}.")
         self.close_webpage()
         self.reset_variables()
         self.completed = True
@@ -241,6 +246,7 @@ class MegapersonalsScraper(ScraperPrototype):
 
                 # Save the data we collected about the post.
                 self.append_data(city, counter, description, link, location, name, phone_number)
+                print("Appending data - " + str(counter) + " - " + link + f"\n {city, counter, description, link, location, name, phone_number}")
                 screenshot_name = str(counter) + ".png"
                 self.capture_screenshot(screenshot_name)
                 counter += 1

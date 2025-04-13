@@ -95,6 +95,7 @@ class ErosScraper(ScraperPrototype):
     ---------------------------------------
     '''
     def initialize(self) -> None:
+        print(f"---------------------------------------Initializing Eros Scraper---------------------------------------")
         # Date and time of search
         self.date_time = str(datetime.today())[0:19].replace(' ', '_').replace(':', '-')
 
@@ -115,9 +116,11 @@ class ErosScraper(ScraperPrototype):
 
         # Open Webpage with URL
         self.open_webpage()
+        print(f"Opening {self.url}...")
 
         # Find links of posts
         links = self.get_links()
+        print(f"Found {len(links)} links...")
 
         # Create directory for search data
         self.scraper_directory = f'{self.path}/eros-{self.city}-{self.date_time}'
@@ -129,7 +132,9 @@ class ErosScraper(ScraperPrototype):
         os.mkdir(self.screenshot_directory)
 
         # Get data from posts
+        print(f"Getting data from {len(links)} links...")
         self.get_data(links)
+        print(f"Data collection completed for {self.city}.")
         self.close_webpage()
         self.reset_variables()
         self.completed = True
@@ -225,6 +230,7 @@ class ErosScraper(ScraperPrototype):
 
                 # Save the data we collected about the post.
                 self.append_data(contact_details, counter, description, info_details, link, profile_header)
+                print("Appending data - " + str(counter) + " - " + link + f"\n {contact_details, counter, description, info_details, link, profile_header}")
                 screenshot_name = str(counter) + ".png"
                 self.capture_screenshot(screenshot_name)
                 counter += 1
