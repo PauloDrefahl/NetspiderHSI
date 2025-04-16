@@ -2,7 +2,7 @@
 #Goal is to test the scrapers quickly and efficiently. Just here for dev and testing.
 
 #In the future, would be cool if could specify # pages to scrape before moving on?
-
+import os
 from Backend.Scraper import (
     MegapersonalsScraper,
     SkipthegamesScraper,
@@ -11,6 +11,10 @@ from Backend.Scraper import (
     ErosScraper,
     RubratingsScraper
 )
+
+directory = 'result'
+if not os.path.exists(directory):
+    os.makedirs(directory)
 
 #--------------------------------Test MegapersonalsScraper--------------------------------
 def test_MegapersonalsScraper(headless_mode):
@@ -25,7 +29,7 @@ def test_MegapersonalsScraper(headless_mode):
               'search_text': '', 
               'payment_methods_only': False, 
               'inclusive_search': False, 
-              'path': 'NetspiderHSI/result'
+              'path': directory
             }
     
     # Set path and city
@@ -66,7 +70,7 @@ def test_SkipthegamesScraper(headless_mode):
               'search_text': '', 
               'payment_methods_only': False, 
               'inclusive_search': False, 
-              'path': 'NetspiderHSI/result'
+              'path': directory
             }
     
     # Set path and city
@@ -108,7 +112,7 @@ def test_YesbackpageScraper(headless_mode):
         'search_text': '', 
         'payment_methods_only': False, 
         'inclusive_search': False, 
-        'path': 'NetspiderHSI/result'
+        'path': directory
     }
     
     # Set path and city
@@ -150,7 +154,7 @@ def test_EscortalligatorScraper(headless_mode):
         'search_text': '',
         'payment_methods_only': False,
         'inclusive_search': False,
-        'path': 'NetspiderHSI/result'
+        'path': directory
     }
 
     # Set path and city
@@ -192,7 +196,7 @@ def test_ErosScraper(headless_mode):
         'search_text': '', 
         'payment_methods_only': False, 
         'inclusive_search': False, 
-        'path': 'NetspiderHSI/result'
+        'path': directory
     }
 
     # Set path and city
@@ -233,7 +237,7 @@ def test_RubratingsScraper(headless_mode):
         'search_text': '', 
         'payment_methods_only': False, 
         'inclusive_search': False, 
-        'path': 'NetspiderHSI/result'
+        'path': directory
     }
 
     # Set path and city
