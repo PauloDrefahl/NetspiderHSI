@@ -134,6 +134,8 @@ class MegapersonalsScraper(ScraperPrototype):
         # Format website URL based on state and city
         self.get_formatted_url()
         self.driver.get(self.url)
+        time.sleep(1)
+        self.driver.get(self.url)
 
         # Find links of posts
         links = self.get_links()
