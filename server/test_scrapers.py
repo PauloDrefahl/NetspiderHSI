@@ -25,7 +25,7 @@ def test_MegapersonalsScraper(headless_mode):
               'search_text': '', 
               'payment_methods_only': False, 
               'inclusive_search': False, 
-              'path': '/Users/wcward/code/NetspiderHSI/result'
+              'path': 'NetspiderHSI/result'
             }
     
     # Set path and city
@@ -66,7 +66,7 @@ def test_SkipthegamesScraper(headless_mode):
               'search_text': '', 
               'payment_methods_only': False, 
               'inclusive_search': False, 
-              'path': '/Users/wcward/code/NetspiderHSI/result'
+              'path': 'NetspiderHSI/result'
             }
     
     # Set path and city
@@ -108,7 +108,7 @@ def test_YesbackpageScraper(headless_mode):
         'search_text': '', 
         'payment_methods_only': False, 
         'inclusive_search': False, 
-        'path': '/Users/wcward/code/NetspiderHSI/result'
+        'path': 'NetspiderHSI/result'
     }
     
     # Set path and city
@@ -150,7 +150,7 @@ def test_EscortalligatorScraper(headless_mode):
         'search_text': '',
         'payment_methods_only': False,
         'inclusive_search': False,
-        'path': '/Users/wcward/code/NetspiderHSI/result'
+        'path': 'NetspiderHSI/result'
     }
 
     # Set path and city
@@ -192,7 +192,7 @@ def test_ErosScraper(headless_mode):
         'search_text': '', 
         'payment_methods_only': False, 
         'inclusive_search': False, 
-        'path': '/Users/wcward/code/NetspiderHSI/result'
+        'path': 'NetspiderHSI/result'
     }
 
     # Set path and city
@@ -233,7 +233,7 @@ def test_RubratingsScraper(headless_mode):
         'search_text': '', 
         'payment_methods_only': False, 
         'inclusive_search': False, 
-        'path': '/Users/wcward/code/NetspiderHSI/result'
+        'path': 'NetspiderHSI/result'
     }
 
     # Set path and city
@@ -269,9 +269,10 @@ if __name__ == "__main__":
     #Headless mode allows for scraping without displaying the browser window. 
     #set if you want no window (true) or window (false)
     headless_mode = True
+    
+    test_MegapersonalsScraper(headless_mode) 
     test_RubratingsScraper(headless_mode)
     test_EscortalligatorScraper(headless_mode)
     test_SkipthegamesScraper(headless_mode)
-    test_MegapersonalsScraper(headless_mode) 
     test_YesbackpageScraper(headless_mode)
     test_ErosScraper(headless_mode)
