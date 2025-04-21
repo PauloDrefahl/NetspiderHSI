@@ -151,6 +151,9 @@ class SkipthegamesScraper(ScraperPrototype):
     def open_webpage(self) -> None:
         self.driver.implicitly_wait(10)
         self.driver.get(self.url)
+        time.sleep(1)
+        self.driver.get(self.url)
+        
         # NOTE: Maximizing the window in headless mode makes it too big:
         # https://chromium.googlesource.com/chromium/src.git/+/f2bdeab65/ui/views/win/hwnd_message_handler_headless.cc#264
         if not self.search_mode:
