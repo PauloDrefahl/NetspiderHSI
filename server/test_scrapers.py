@@ -11,6 +11,11 @@ from Backend.Scraper import (
     ErosScraper,
     RubratingsScraper
 )
+import os
+
+directory = 'results'
+if not os.path.exists(directory):
+    os.makedirs(directory)
 
 #--------------------------------Test MegapersonalsScraper--------------------------------
 def test_MegapersonalsScraper(headless_mode):
@@ -25,7 +30,11 @@ def test_MegapersonalsScraper(headless_mode):
               'search_text': '', 
               'payment_methods_only': False, 
               'inclusive_search': False, 
+<<<<<<< HEAD
               'path': 'NetspiderHSI/result'
+=======
+              'path': directory
+>>>>>>> 3634d538bb1ecf2cf7ac0fe3c04cb88758353943
             }
     
     # Set path and city
@@ -66,7 +75,11 @@ def test_SkipthegamesScraper(headless_mode):
               'search_text': '', 
               'payment_methods_only': False, 
               'inclusive_search': False, 
+<<<<<<< HEAD
               'path': 'NetspiderHSI/result'
+=======
+              'path': directory
+>>>>>>> 3634d538bb1ecf2cf7ac0fe3c04cb88758353943
             }
     
     # Set path and city
@@ -108,7 +121,11 @@ def test_YesbackpageScraper(headless_mode):
         'search_text': '', 
         'payment_methods_only': False, 
         'inclusive_search': False, 
+<<<<<<< HEAD
         'path': 'NetspiderHSI/result'
+=======
+        'path': directory
+>>>>>>> 3634d538bb1ecf2cf7ac0fe3c04cb88758353943
     }
     
     # Set path and city
@@ -150,7 +167,11 @@ def test_EscortalligatorScraper(headless_mode):
         'search_text': '',
         'payment_methods_only': False,
         'inclusive_search': False,
+<<<<<<< HEAD
         'path': 'NetspiderHSI/result'
+=======
+        'path': directory
+>>>>>>> 3634d538bb1ecf2cf7ac0fe3c04cb88758353943
     }
 
     # Set path and city
@@ -192,7 +213,11 @@ def test_ErosScraper(headless_mode):
         'search_text': '', 
         'payment_methods_only': False, 
         'inclusive_search': False, 
+<<<<<<< HEAD
         'path': 'NetspiderHSI/result'
+=======
+        'path': directory
+>>>>>>> 3634d538bb1ecf2cf7ac0fe3c04cb88758353943
     }
 
     # Set path and city
@@ -233,7 +258,11 @@ def test_RubratingsScraper(headless_mode):
         'search_text': '', 
         'payment_methods_only': False, 
         'inclusive_search': False, 
+<<<<<<< HEAD
         'path': 'NetspiderHSI/result'
+=======
+        'path': directory
+>>>>>>> 3634d538bb1ecf2cf7ac0fe3c04cb88758353943
     }
 
     # Set path and city
