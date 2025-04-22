@@ -16,7 +16,7 @@
     <link rel="stylesheet" href="../static/css/selectKeywords.css">
     <link rel="stylesheet" href="../static/css/resultManager.css">
 
-
+    <script src="../static/scripts/databaseResults.js" defer></script>
     <script src="../static/scripts/files.js" defer></script>
     <script src="../static/scripts/keywords.js" defer></script>
     <script src="../static/scripts/nav.js" defer></script>
@@ -272,6 +272,38 @@
                     <button id="viewCleanDataButton" class="button-result-ops">View CLEAN Data</button>
                     <button id="viewDiagramButton" class="button-result-ops">View Diagram Directory</button>
 <!--                    <button id="generateKeywordsButton" class="button-hp">Generate New Keywords</button>-->
+                </div>
+            </div>
+        </div>
+
+        <div id="big-box-3">
+            <div id="box-header-2">
+                <h2 style="color: #09558B;">Database Results</h2>
+            </div>
+            <div class="database-controls">
+                <select id="tableSelector" class="filter-dropdown">
+                    <option value="raw_escort_alligator_posts">Escort Alligator</option>
+                    <option value="raw_eros_posts">Eros</option>
+                    <option value="raw_mega_personals_posts">Mega Personals</option>
+                    <option value="raw_rub_ratings_posts">Rub Ratings</option>
+                    <option value="raw_skipthegames_posts">Skip the Games</option>
+                    <option value="raw_yesbackpage_posts">Yes Back Page</option>
+                </select>
+                <button id="refreshDatabaseResults" class="button-app-sub">Refresh Results</button>
+                <select id="locationFilter" class="filter-dropdown">
+                    <option value="">All Locations</option>
+                </select>
+            </div>
+            <div class="table-wrapper">
+                <div class="table-scroll">
+                    <table id="scrape-results-table">
+                        <thead>
+                            <!-- Table headers will be dynamically populated -->
+                        </thead>
+                        <tbody>
+                            <!-- Table content will be dynamically populated -->
+                        </tbody>
+                    </table>
                 </div>
             </div>
         </div>

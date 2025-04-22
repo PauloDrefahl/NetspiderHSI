@@ -6,6 +6,8 @@ from datetime import datetime, timedelta
 
 #third-party imports
 import gevent.monkey
+import psycopg2
+from psycopg2.extras import RealDictCursor
 gevent.monkey.patch_all()
 
 from flask import Flask, jsonify
@@ -30,6 +32,22 @@ from Backend.Scraper import (
 )
 from Backend.resultManager.appendResults import FolderAppender
 from Backend.resultManager.resultManager import ResultManager
+
+DB_CONFIG = {
+    'host': '127.0.0.1',
+    'port': 5432,
+    'database': 'netspider',
+    'user': 'postgres',
+    'password': 'password'
+}
+
+def get_db_connection():
+    try:
+        conn = psycopg2.connect(**DB_CONFIG)
+        return conn
+    except Exception as e:
+        print(f"Error connecting to database: {e}")
+        return None
 
 
 app = Flask(__name__)
@@ -329,7 +347,35 @@ def handle_error(e):
     response = {"error": str(e)}
     return response, 500
 
+@socketio.on('get_database_results')
+def handle_database_results(data):
+    print("server received get_database_results with data: " + str(data))
+    conn = get_db_connection()
+    if not conn:
+        socketio.emit('database_results', {'error': 'Could not connect to database'})
+        return
 
+    try:
+        with conn.cursor(cursor_factory=RealDictCursor) as cursor:
+            table_name = data.get('tableName')
+            cursor.execute(f'SELECT * FROM {table_name}')
+            results = cursor.fetchall()
+
+            # Convert datetime objects to strings in the results
+            serializable_results = []
+            for row in results:
+                row_dict = dict(row)
+                if 'posted_on' in row_dict and row_dict['posted_on'] is not None:
+                    row_dict['posted_on'] = row_dict['posted_on'].isoformat()
+                serializable_results.append(row_dict)
+
+            socketio.emit('database_results', {'data': serializable_results})
+    except Exception as e:
+        print(f"Database error: {str(e)}")
+        socketio.emit('database_results', {'error': str(e)})
+    finally:
+        if conn:
+            conn.close()
 
 
 '''
