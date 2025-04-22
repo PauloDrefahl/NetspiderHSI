@@ -380,6 +380,21 @@ body {
     gap: 20px;
 }
 
+.database-refresh {
+    width: 100%;
+    display: flex;
+    flex-direction: column;
+    margin: 20px auto;
+    gap: 20px;
+}
+
+.database-refresh button {
+    padding: 10px 20px;
+    font-size: 16px;
+    width: 300px;
+    margin: 0 auto;
+}
+
 .filter-dropdown {
     padding: 8px 12px;
     font-size: 16px;

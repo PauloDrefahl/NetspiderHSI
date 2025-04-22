@@ -280,6 +280,9 @@
             <div id="box-header-2">
                 <h2 style="color: #09558B;">Database Results</h2>
             </div>
+            <div class="database-refresh">
+                <button id="refreshDatabaseResults" class="button-app-sub">Refresh Results</button>
+            </div>
             <div class="database-controls">
                 <select id="tableSelector" class="filter-dropdown">
                     <option value="raw_escort_alligator_posts">Escort Alligator</option>
@@ -289,7 +292,6 @@
                     <option value="raw_skipthegames_posts">Skip the Games</option>
                     <option value="raw_yesbackpage_posts">Yes Back Page</option>
                 </select>
-                <button id="refreshDatabaseResults" class="button-app-sub">Refresh Results</button>
                 <select id="locationFilter" class="filter-dropdown">
                     <option value="">All Locations</option>
                 </select>
@@ -298,10 +300,10 @@
                 <div class="table-scroll">
                     <table id="scrape-results-table">
                         <thead>
-                            <!-- Table headers will be dynamically populated -->
+                            <!-- table headers are dynamically populated -->
                         </thead>
                         <tbody>
-                            <!-- Table content will be dynamically populated -->
+                            <!-- table rows are dynamically populated-->
                         </tbody>
                     </table>
                 </div>
