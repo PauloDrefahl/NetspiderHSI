@@ -116,15 +116,12 @@ class SkipthegamesScraper(ScraperPrototype):
         self.get_formatted_url()
 
         self.driver = Driver(
-            # Download the latest ChromeDriver for the current major version.
             driver_version="mlatest",
             undetectable=True,
             uc_subprocess=True,
             headless=self.search_mode,
-            # Override the default mode (headless mode) on Linux.
             headed=not self.search_mode,
-            # Use a fixed window size in headless mode.
-            # window_size="1920,1080" if self.search_mode else None,
+            chromium_arg=["--disable-extensions", "--incognito", "--disable-component-extensions-with-background-pages"]
         )
 
         # Open Webpage with URL
@@ -151,8 +148,7 @@ class SkipthegamesScraper(ScraperPrototype):
     def open_webpage(self) -> None:
         self.driver.implicitly_wait(10)
         self.driver.get(self.url)
-        time.sleep(1)
-        self.driver.get(self.url)
+        print(self.driver.current_url)
         
         # NOTE: Maximizing the window in headless mode makes it too big:
         # https://chromium.googlesource.com/chromium/src.git/+/f2bdeab65/ui/views/win/hwnd_message_handler_headless.cc#264
@@ -189,8 +185,8 @@ class SkipthegamesScraper(ScraperPrototype):
             print(f"Processing link {counter}/{len(links)}: {link}")
             if not self.completed:
                 self.driver.get(link)
-                time.sleep(1)
-                self.driver.get(link)
+                print(self.driver.current_url)
+
                 assert "Page not found" not in self.driver.page_source
                 try:
                     about_info = self.driver.wait_for_element(
