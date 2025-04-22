@@ -6,10 +6,11 @@ from datetime import datetime, timedelta
 
 #third-party imports
 import gevent.monkey
-import psycopg2
-from psycopg2.extras import RealDictCursor
 gevent.monkey.patch_all()
 
+import psycopg
+from psycopg import sql
+from psycopg.rows import dict_row
 from flask import Flask, jsonify
 from flask_socketio import SocketIO
 from flask_cors import CORS
@@ -30,24 +31,9 @@ from Backend.Scraper import (
     ErosScraper,
     RubratingsScraper
 )
+from Backend import database
 from Backend.resultManager.appendResults import FolderAppender
 from Backend.resultManager.resultManager import ResultManager
-
-DB_CONFIG = {
-    'host': '127.0.0.1',
-    'port': 5432,
-    'database': 'netspider',
-    'user': 'postgres',
-    'password': 'password'
-}
-
-def get_db_connection():
-    try:
-        conn = psycopg2.connect(**DB_CONFIG)
-        return conn
-    except Exception as e:
-        print(f"Error connecting to database: {e}")
-        return None
 
 
 app = Flask(__name__)
@@ -350,28 +336,28 @@ def handle_error(e):
 @socketio.on('get_database_results')
 def handle_database_results(data):
     print("server received get_database_results with data: " + str(data))
-    conn = get_db_connection()
-    if not conn:
+    try:
+        conn = database.connect(read_only=True)
+    except psycopg.Error:
         socketio.emit('database_results', {'error': 'Could not connect to database'})
         return
 
     try:
-        with conn.cursor(cursor_factory=RealDictCursor) as cursor:
+        with conn.cursor(row_factory=dict_row) as cursor:
             table_name = data.get('tableName')
-            cursor.execute(f'SELECT * FROM {table_name}')
+            cursor.execute(sql.SQL('SELECT * FROM {}').format(sql.Identifier(table_name)))
             results = cursor.fetchall()
 
             # Convert datetime objects to strings in the results
             serializable_results = []
             for row in results:
-                row_dict = dict(row)
-                if 'posted_on' in row_dict and row_dict['posted_on'] is not None:
-                    row_dict['posted_on'] = row_dict['posted_on'].isoformat()
-                if 'last_activity' in row_dict and row_dict['last_activity'] is not None:
-                    row_dict['last_activity'] = row_dict['last_activity'].isoformat()
-                if 'expires_on' in row_dict and row_dict['expires_on'] is not None:
-                    row_dict['expires_on'] = row_dict['expires_on'].isoformat()
-                serializable_results.append(row_dict)
+                if 'posted_on' in row and row['posted_on'] is not None:
+                    row['posted_on'] = row['posted_on'].isoformat()
+                if 'last_activity' in row and row['last_activity'] is not None:
+                    row['last_activity'] = row['last_activity'].isoformat()
+                if 'expires_on' in row and row['expires_on'] is not None:
+                    row['expires_on'] = row['expires_on'].isoformat()
+                serializable_results.append(row)
 
             socketio.emit('database_results', {'data': serializable_results})
     except Exception as e:
