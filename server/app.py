@@ -367,6 +367,10 @@ def handle_database_results(data):
                 row_dict = dict(row)
                 if 'posted_on' in row_dict and row_dict['posted_on'] is not None:
                     row_dict['posted_on'] = row_dict['posted_on'].isoformat()
+                if 'last_activity' in row_dict and row_dict['last_activity'] is not None:
+                    row_dict['last_activity'] = row_dict['last_activity'].isoformat()
+                if 'expires_on' in row_dict and row_dict['expires_on'] is not None:
+                    row_dict['expires_on'] = row_dict['expires_on'].isoformat()
                 serializable_results.append(row_dict)
 
             socketio.emit('database_results', {'data': serializable_results})
