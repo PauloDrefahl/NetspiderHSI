@@ -1,7 +1,7 @@
 const { app, BrowserWindow, Menu} = require('electron');
 const path = require('path');
 const { execFile, exec } = require('child_process');
-
+const os = require('os');
 
 
 // Specify the path to your Flask executable
@@ -47,7 +47,12 @@ const createWindow = () => {
         icon: 'download-removebg-preview.ico'
     });
 
-    mainWindow.setIcon(path.join(__dirname, 'download-removebg-preview.ico'));
+    //Set icon only if running Windows (fix to run on MacOS and Linux)
+    
+    if (process.platform === 'win32') {
+        mainWindow.setIcon(path.join(__dirname, 'download-removebg-preview.ico'));
+    }
+
 
     // and load the index.html of the app.
     mainWindow.loadFile(path.join(__dirname, 'index.html')).then(r => r);

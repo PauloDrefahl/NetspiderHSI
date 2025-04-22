@@ -11,6 +11,11 @@ from Backend.Scraper import (
     ErosScraper,
     RubratingsScraper
 )
+import os
+
+directory = 'results'
+if not os.path.exists(directory):
+    os.makedirs(directory)
 
 directory = 'result'
 if not os.path.exists(directory):
