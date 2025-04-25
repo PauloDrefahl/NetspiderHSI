@@ -8,6 +8,9 @@ from datetime import datetime, timedelta
 import gevent.monkey
 gevent.monkey.patch_all()
 
+import psycopg
+from psycopg import sql
+from psycopg.rows import dict_row
 from flask import Flask, jsonify
 from flask_socketio import SocketIO
 from flask_cors import CORS
@@ -28,6 +31,7 @@ from Backend.Scraper import (
     ErosScraper,
     RubratingsScraper
 )
+from Backend import database
 from Backend.resultManager.appendResults import FolderAppender
 from Backend.resultManager.resultManager import ResultManager
 
@@ -329,7 +333,39 @@ def handle_error(e):
     response = {"error": str(e)}
     return response, 500
 
+@socketio.on('get_database_results')
+def handle_database_results(data):
+    print("server received get_database_results with data: " + str(data))
+    try:
+        conn = database.connect(read_only=True)
+    except psycopg.Error:
+        socketio.emit('database_results', {'error': 'Could not connect to database'})
+        return
 
+    try:
+        with conn.cursor(row_factory=dict_row) as cursor:
+            table_name = data.get('tableName')
+            cursor.execute(sql.SQL('SELECT * FROM {}').format(sql.Identifier(table_name)))
+            results = cursor.fetchall()
+
+            # Convert datetime objects to strings in the results
+            serializable_results = []
+            for row in results:
+                if 'posted_on' in row and row['posted_on'] is not None:
+                    row['posted_on'] = row['posted_on'].isoformat()
+                if 'last_activity' in row and row['last_activity'] is not None:
+                    row['last_activity'] = row['last_activity'].isoformat()
+                if 'expires_on' in row and row['expires_on'] is not None:
+                    row['expires_on'] = row['expires_on'].isoformat()
+                serializable_results.append(row)
+
+            socketio.emit('database_results', {'data': serializable_results})
+    except Exception as e:
+        print(f"Database error: {str(e)}")
+        socketio.emit('database_results', {'error': str(e)})
+    finally:
+        if conn:
+            conn.close()
 
 
 '''
