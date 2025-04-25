@@ -1,10 +1,12 @@
 import os
 import time
+from collections import defaultdict
 from datetime import datetime
 import pandas as pd
-import undetected_chromedriver as uc
+from seleniumbase import Driver
 from selenium.common import NoSuchElementException
 from selenium.webdriver.common.by import By
+from typing_extensions import override
 from Backend.ScraperPrototype import ScraperPrototype
 import img2pdf
 from openpyxl.styles import PatternFill
@@ -55,14 +57,13 @@ class YesbackpageScraper(ScraperPrototype):
         self.screenshot_directory = None
         self.pdf_filename = None
         self.pdf = None
-        self.keywords = set()
-        self.flagged_keywords = set()
+        self.keywords: set[str] = set()
+        self.flagged_keywords: set[str] = set()
         self.search_mode = False
         self.completed = False
 
         self.join_keywords = False
-        self.number_of_keywords_in_post = 0
-        self.keywords_found_in_post = []
+        self.keywords_found_in_post: set[str] = set()
 
         self.only_posts_with_payment_methods = False
 
@@ -109,10 +110,10 @@ class YesbackpageScraper(ScraperPrototype):
     def set_search_mode(self, search_mode) -> None:
         self.search_mode = search_mode
 
-    def set_flagged_keywords(self, flagged_keywords) -> None:
+    def set_flagged_keywords(self, flagged_keywords: set[str]) -> None:
         self.flagged_keywords = flagged_keywords
 
-    def set_keywords(self, keywords) -> None:
+    def set_keywords(self, keywords: set[str]) -> None:
         self.keywords = keywords
 
     '''
@@ -121,19 +122,20 @@ class YesbackpageScraper(ScraperPrototype):
     ---------------------------------------
     '''
     def initialize(self) -> None:
-        # set keywords value
-        # self.keywords = keywords
         # set up directories to save screenshots and Excel file.
         self.date_time = str(datetime.today())[0:19].replace(' ', '_').replace(':', '-')
 
         # Format website URL based on state and city
         self.get_formatted_url()
-        # self.set_search_mode(self.search_mode)
-        options = uc.ChromeOptions()
-        # TODO - uncomment this line to run headless
-        # options.add_argument('--headless')
-        options.headless = self.search_mode  # This determines if you program runs headless or not
-        self.driver = uc.Chrome(subprocress=True, options=options)
+
+        self.driver = Driver(
+            driver_version="mlatest",
+            undetectable=True,
+            uc_subprocess=True,
+            headless=self.search_mode,
+            headed=not self.search_mode,
+            chromium_arg=["--disable-extensions", "--incognito", "--disable-component-extensions-with-background-pages"]
+        )
 
         # Open Webpage with URL
         self.open_webpage()
@@ -149,30 +151,27 @@ class YesbackpageScraper(ScraperPrototype):
         self.screenshot_directory = f'{self.scraper_directory}/screenshots'
         self.pdf_filename = f'{self.screenshot_directory}/yesbackpage-{self.city}-{self.date_time}.pdf'
         os.mkdir(self.screenshot_directory)
-        print("number of threads while running: ", threading.active_count())
-        print("keywords inside scraper:", self.keywords)
         self.get_data(links)
-        print("get data done")
-        # time.sleep(5)
-        self.stop_scraper()
-        print("closed webpage")
+        self.close_webpage()
         self.reset_variables()
-        print("reset variables")
         self.completed = True
-        print("done scraping")
 
     def stop_scraper(self) -> None:
-        self.driver.close()
-        self.driver.quit()
+        self.completed = True
 
     def open_webpage(self) -> None:
         self.driver.implicitly_wait(10)
         self.driver.get(self.url)
-        self.driver.maximize_window()
+        print(self.driver.current_url)
+
+        # NOTE: Maximizing the window in headless mode makes it too big:
+        # https://chromium.googlesource.com/chromium/src.git/+/f2bdeab65/ui/views/win/hwnd_message_handler_headless.cc#264
+        if not self.search_mode:
+            self.driver.maximize_window()
         assert "Page not found" not in self.driver.page_source
 
     def close_webpage(self) -> None:
-        self.driver.close()
+        self.driver.quit()
 
     '''
     ---------------------------------------
@@ -189,137 +188,110 @@ class YesbackpageScraper(ScraperPrototype):
         self.url = self.cities.get(self.city)
 
     def get_data(self, links) -> None:
-        links = links
-
-        counter = 0
+        counter = 1
 
         for link in links:
-            self.driver.implicitly_wait(10)
-            self.driver.get(link)
-            assert "Page not found" not in self.driver.page_source
+            print(f"Processing link {counter}/{len(links)}: {link}")
+            if not self.completed:
+                self.driver.implicitly_wait(10)
+                self.driver.get(link)
+                print(self.driver.current_url)
 
-            try:
-                description = self.driver.find_element(
-                    By.XPATH, '/html/body/div[3]/div/div[1]/table/tbody/tr[1]/td/table[2]/tbody/'
-                              'tr/td/div/p[2]').text
-            except NoSuchElementException:
-                description = 'N/A'
 
-            try:
-                timestamp = self.driver.find_element(
-                    By.XPATH, '/html/body/div[3]/div/div[1]/table/tbody/tr[1]/td/table[1]/tbody/'
-                              'tr/td/div[3]/div[1]').text
-                posted_on, expires_on, reply_to = self.parse_timestamp(timestamp)
-            except NoSuchElementException:
-                posted_on = 'N/A'
-                expires_on = 'N/A'
-                reply_to = 'N/A'
-
-            # check if page contains "col-sm-6 offset-sm-3" which is the table that contains name, phone number, etc.
-            if self.driver.find_elements(By.XPATH, '//*[@id="mainCellWrapper"]/div[1]/table/tbody/tr[1]/td/div[1]/div'):
-                try:
-                    name = self.driver.find_element(
-                        By.XPATH, '/html/body/div[3]/div/div[1]/table/tbody/tr[1]/td/div[1]/div/table/'
-                                  'tbody/tr[1]/td[2]').text[2:]
-                except NoSuchElementException:
-                    name = 'N/A'
+                assert "Page not found" not in self.driver.page_source
 
                 try:
-                    sex = self.driver.find_element(
-                        By.XPATH, '/html/body/div[3]/div/div[1]/table/tbody/tr[1]/td/div[1]/div/table/'
-                                  'tbody/tr[2]/td[2]').text[2:]
+                    description = self.driver.find_element(
+                        By.XPATH, '/html/body/div[3]/div/div[1]/table/tbody/tr[1]/td/table[2]/tbody/'
+                                'tr/td/div/p[2]').text
                 except NoSuchElementException:
-                    sex = 'N/A'
+                    description = 'N/A'
 
                 try:
-                    phone_number = self.driver.find_element(
-                        By.XPATH, '/html/body/div[3]/div/div[1]/table/tbody/tr[1]/td/div[1]/div/table/'
-                                  'tbody/tr[6]/td[2]').text[2:]
+                    timestamp = self.driver.find_element(
+                        By.XPATH, '/html/body/div[3]/div/div[1]/table/tbody/tr[1]/td/table[1]/tbody/'
+                                'tr/td/div[3]/div[1]').text
+                    posted_on, expires_on, reply_to = self.parse_timestamp(timestamp)
                 except NoSuchElementException:
-                    phone_number = 'NA'
+                    posted_on = 'N/A'
+                    expires_on = 'N/A'
+                    reply_to = 'N/A'
 
-                try:
-                    email = self.driver.find_element(
-                        By.XPATH, '/html/body/div[3]/div/div[1]/table/tbody/tr[1]/td/div[1]/div/table/'
-                                  'tbody/tr[8]/td[2]').text[2:]
-                    # email = self.validate_email(email)
-                except NoSuchElementException:
-                    email = 'N/A'
+                # check if page contains "col-sm-6 offset-sm-3" which is the table that contains name, phone number, etc.
+                if self.driver.find_elements(By.XPATH, '//*[@id="mainCellWrapper"]/div[1]/table/tbody/tr[1]/td/div[1]/div'):
+                    try:
+                        name = self.driver.find_element(
+                            By.XPATH, '/html/body/div[3]/div/div[1]/table/tbody/tr[1]/td/div[1]/div/table/'
+                                    'tbody/tr[1]/td[2]').text[2:]
+                    except NoSuchElementException:
+                        name = 'N/A'
 
-                try:
-                    location = self.driver.find_element(
-                        By.XPATH, '/html/body/div[3]/div/div[1]/table/tbody/tr[1]/td/div[1]/div/table/'
-                                  'tbody/tr[9]/td[2]').text[2:]
-                except NoSuchElementException:
-                    location = 'N/A'
+                    try:
+                        sex = self.driver.find_element(
+                            By.XPATH, '/html/body/div[3]/div/div[1]/table/tbody/tr[1]/td/div[1]/div/table/'
+                                    'tbody/tr[2]/td[2]').text[2:]
+                    except NoSuchElementException:
+                        sex = 'N/A'
 
-                try:
-                    services = self.driver.find_element(
-                        By.XPATH, '//*[@id="mainCellWrapper"]/div/table/tbody/tr/td/div[1]/div/table/'
-                                  'tbody/tr[5]/td[2]').text[2:]
-                except NoSuchElementException:
-                    services = 'N/A'
-            else:
-                posted_on = 'N/A'
-                expires_on = 'N/A'
-                reply_to = 'N/A'
-                name = 'N/A'
-                sex = 'N/A'
-                phone_number = 'N/A'
-                email = 'N/A'
-                location = 'N/A'
-                services = 'N/A'
+                    try:
+                        phone_number = self.driver.find_element(
+                            By.XPATH, '/html/body/div[3]/div/div[1]/table/tbody/tr[1]/td/div[1]/div/table/'
+                                    'tbody/tr[6]/td[2]').text[2:]
+                    except NoSuchElementException:
+                        phone_number = 'NA'
 
-            # reassign variables for each post
-            self.number_of_keywords_in_post = 0
-            self.keywords_found_in_post = []
+                    try:
+                        email = self.driver.find_element(
+                            By.XPATH, '/html/body/div[3]/div/div[1]/table/tbody/tr[1]/td/div[1]/div/table/'
+                                    'tbody/tr[8]/td[2]').text[2:]
+                        # email = self.validate_email(email)
+                    except NoSuchElementException:
+                        email = 'N/A'
 
-            if self.join_keywords and self.only_posts_with_payment_methods:
-                if self.check_keywords(description) or self.check_keywords(name) or self.check_keywords(sex) \
-                        or self.check_keywords(phone_number) or self.check_keywords(email) \
-                        or self.check_keywords(location) or self.check_keywords(services):
-                    self.check_keywords_found(description, name, sex, phone_number, email, location, services, link)
-                    counter = self.join_with_payment_methods(counter, description, email, link, location, name,
-                                                             phone_number, services, sex, posted_on, expires_on, reply_to)
+                    try:
+                        location = self.driver.find_element(
+                            By.XPATH, '/html/body/div[3]/div/div[1]/table/tbody/tr[1]/td/div[1]/div/table/'
+                                    'tbody/tr[9]/td[2]').text[2:]
+                    except NoSuchElementException:
+                        location = 'N/A'
 
-            elif self.join_keywords or self.only_posts_with_payment_methods:
-                if self.join_keywords:
-                    if self.check_keywords(description) or self.check_keywords(name) or self.check_keywords(sex) \
-                            or self.check_keywords(phone_number) or self.check_keywords(email) \
-                            or self.check_keywords(location) or self.check_keywords(services):
-                        self.check_keywords_found(description, name, sex, phone_number, email, location, services, link)
-                        counter = self.join_inclusive(counter, description, email, link, location, name, phone_number,
-                                                      services, sex, posted_on, expires_on, reply_to)
-
-                elif self.only_posts_with_payment_methods:
-                    if len(self.keywords) > 0:
-                        if self.check_keywords(description) or self.check_keywords(name) or self.check_keywords(sex) \
-                                or self.check_keywords(phone_number) or self.check_keywords(email) \
-                                or self.check_keywords(location) or self.check_keywords(services):
-                            self.check_keywords_found(description, name, sex, phone_number, email, location, services, link)
-
-                    counter = self.payment_methods_only(counter, description, email, link, location, name,
-                                                        phone_number, services, sex, posted_on, expires_on, reply_to)
-            else:
-                # run if keywords
-                if len(self.keywords) > 0:
-                    if self.check_keywords(description) or self.check_keywords(name) or self.check_keywords(sex) \
-                            or self.check_keywords(phone_number) or self.check_keywords(email) \
-                            or self.check_keywords(location) or self.check_keywords(services):
-                        self.check_keywords_found(description, name, sex, phone_number, email, location, services, link)
-                        self.append_data(counter, description, email, link, location, name, phone_number, services,
-                                         sex, posted_on, expires_on, reply_to)
-                        screenshot_name = str(counter) + ".png"
-                        self.capture_screenshot(screenshot_name)
-                        counter += 1
+                    try:
+                        services = self.driver.find_element(
+                            By.XPATH, '//*[@id="mainCellWrapper"]/div/table/tbody/tr/td/div[1]/div/table/'
+                                    'tbody/tr[5]/td[2]').text[2:]
+                    except NoSuchElementException:
+                        services = 'N/A'
                 else:
-                    self.append_data(counter, description, email, link, location, name, phone_number, services,
-                                     sex, posted_on, expires_on, reply_to)
-                    screenshot_name = str(counter) + ".png"
-                    self.capture_screenshot(screenshot_name)
-                    counter += 1
-            self.RAW_format_data_to_excel()
-            self.CLEAN_format_data_to_excel()
+                    posted_on = 'N/A'
+                    expires_on = 'N/A'
+                    reply_to = 'N/A'
+                    name = 'N/A'
+                    sex = 'N/A'
+                    phone_number = 'N/A'
+                    email = 'N/A'
+                    location = 'N/A'
+                    services = 'N/A'
+
+                # reassign variables for each post
+                self.keywords_found_in_post.clear()
+
+                # Search the post's contents for keywords.
+                self.check_keywords_found(description, name, sex, phone_number, email, location, services, link)
+
+                if self._should_discard_post(description):
+                    continue
+
+                # Save the data we collected about the post.
+                self.append_data(counter, description, email, link, location, name, phone_number, services, sex, posted_on, expires_on, reply_to)
+                screenshot_name = str(counter) + ".png"
+                self.capture_screenshot(screenshot_name)
+                counter += 1
+
+                self.RAW_format_data_to_excel()
+                self.CLEAN_format_data_to_excel()
+            # Breaks the links loop for fast closing time once user presses stop scraper
+            else:
+                break
 
     '''
     --------------------------
@@ -338,44 +310,49 @@ class YesbackpageScraper(ScraperPrototype):
         self.phone_number.append(phone_number)
         self.email.append(email)
         self.location.append(location)
-        self.check_and_append_payment_methods(description)
+        payment_methods = self.get_payment_methods(description)
+        self.payment_methods_found.append("\n".join(payment_methods) or "N/A")
         self.services.append(services)
         self.keywords_found.append(', '.join(self.keywords_found_in_post) or 'N/A')
-        self.number_of_keywords_found.append(self.number_of_keywords_in_post or 'N/A')
-        self.check_for_social_media(description)
-
-    def join_with_payment_methods(self, counter, description, email, link, location, name, phone_number,
-                                  services, sex, posted_on, expires_on, reply_to) -> int:
-        if self.check_for_payment_methods(description) and len(self.keywords) == len(set(self.keywords_found_in_post)):
-            self.append_data(counter, description, email, link, location, name, phone_number, services,
-                             sex, posted_on, expires_on, reply_to)
-            screenshot_name = str(counter) + ".png"
-            self.capture_screenshot(screenshot_name)
-
-            return counter + 1
-        return counter
-
-    def join_inclusive(self, counter, description, email, link, location, name, phone_number, services, sex, posted_on, expires_on, reply_to) -> int:
-        if len(self.keywords) == len(set(self.keywords_found_in_post)):
-            self.append_data(counter, description, email, link, location, name, phone_number, services,
-                             sex, posted_on, expires_on, reply_to)
-            screenshot_name = str(counter) + ".png"
-            self.capture_screenshot(screenshot_name)
-
-            return counter + 1
-        return counter
-
-    def payment_methods_only(self, counter, description, email, link, location, name, phone_number,
-                             services, sex, posted_on, expires_on, reply_to) -> int:
-
-        if self.check_for_payment_methods(description):
-            self.append_data(counter, description, email, link, location, name, phone_number, services,
-                             sex, posted_on, expires_on, reply_to)
-            screenshot_name = str(counter) + ".png"
-            self.capture_screenshot(screenshot_name)
-
-            return counter + 1
-        return counter
+        self.number_of_keywords_found.append(len(self.keywords_found_in_post) or "N/A")
+        social_media = self.get_social_media(description)
+        self.social_media_found.append("\n".join(social_media) or "N/A")
+        # Store information about the post in the database.
+        try:
+            with self.open_database() as connection, connection.cursor() as cursor:
+                # Map strings to their corresponding enum labels.
+                sex_enum_map = defaultdict(
+                    lambda: "Other", {"Male": "Male", "Female": "Female"}
+                )
+                # Convert missing timestamps to `None`.
+                posted_on = None if posted_on == "N/A" else posted_on
+                expires_on = None if expires_on == "N/A" else expires_on
+                cursor.execute(
+                    """
+                    insert into raw_yesbackpage_posts
+                    values (%s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s)
+                    on conflict do nothing;
+                    """,
+                    (
+                        link,
+                        self.city,
+                        location,
+                        posted_on,
+                        expires_on,
+                        phone_number,
+                        email,
+                        name,
+                        sex_enum_map[sex],
+                        reply_to,
+                        description,
+                        services,
+                        payment_methods,
+                        social_media,
+                        list(self.keywords_found_in_post),
+                    ),
+                )
+        except Exception as e:
+            print(f"Database write failed: {e}") 
 
     '''
     --------------------------
@@ -392,45 +369,55 @@ class YesbackpageScraper(ScraperPrototype):
         self.check_and_append_keywords(services)
         self.check_and_append_keywords(link)
 
-    def check_for_payment_methods(self, description) -> bool:
+    @override
+    def check_for_payment_methods(self, description: str) -> bool:
         for payment in self.known_payment_methods:
             if payment in description.lower():
                 return True
         return False
 
-    def check_and_append_payment_methods(self, description) -> None:
-        payments = ''
-        for payment in self.known_payment_methods:
-            if payment in description.lower():
-                payments += payment + '\n'
+    def get_payment_methods(self, description: str) -> list[str]:
+        # Normalize the case of the description.
+        description = description.lower()
+        payment_methods: list[str] = []
+        for payment_method in self.known_payment_methods:
+            if payment_method in description:
+                payment_methods.append(payment_method)
+        return payment_methods
 
-        if payments != '':
-            self.payment_methods_found.append(payments)
-        else:
-            self.payment_methods_found.append('N/A')
-
-    def check_for_social_media(self, description) -> None:
-        social_media = ''
+    def get_social_media(self, description: str) -> list[str]:
+        # Normalize the case of the description.
+        description = description.lower()
+        social_media: list[str] = []
         for social in self.known_social_media:
-            if social in description.lower():
-                social_media += social + '\n'
+            if social in description:
+                social_media.append(social)
+        return social_media
 
-        if social_media != '':
-            self.social_media_found.append(social_media)
-        else:
-            self.social_media_found.append('N/A')
-
-    def check_keywords(self, data) -> bool:
+    @override
+    def check_and_append_keywords(self, data: str) -> None:
         for key in self.keywords:
             if key in data.lower():
+                self.keywords_found_in_post.add(key)
+
+    def _should_discard_post(self, description: str) -> bool:
+        if self.join_keywords:
+            # Discard posts that don't contain ALL keywords.
+            if len(self.keywords_found_in_post) < len(self.keywords):
                 return True
-        return False
+        elif not self.only_posts_with_payment_methods and len(self.keywords) > 0:
+            # Discard posts that don't contain ANY keywords, unless:
+            # 1. We're specifically looking for posts with payment methods, in
+            #    which case we keep *all* posts with payment methods.
+            # 2. No keywords were originally provided.
+            if len(self.keywords_found_in_post) == 0:
+                return True
 
-    def check_and_append_keywords(self, data) -> None:
-        for key in self.keywords:
-            if key in data.lower():
-                self.keywords_found_in_post.append(key)
-                self.number_of_keywords_in_post += 1
+        if self.only_posts_with_payment_methods:
+            if not self.check_for_payment_methods(description):
+                return True
+
+        return False
 
     '''
     ---------------------------------
@@ -489,31 +476,24 @@ class YesbackpageScraper(ScraperPrototype):
                     col[0].column_letter].width = adjusted_width
 
     def CLEAN_format_data_to_excel(self) -> None:
+        # Concatenate attributes to fit into the CLEAN spreadsheet format, which
+        # is consistent across all scrapers.
         personal_info = [
-            f"{name} ||| {sex} "
-            for name, sex in zip(
-                self.name, self.sex
-            )
+            f"{name} ||| {sex}"
+            for (name, sex) in zip(self.name, self.sex, strict=True)
         ]
 
-        contact_info = [
+        contacts = [
             f"{phone_number} ||| {email}"
-            for phone_number, email in zip(
-                self.phone_number, self.email
+            for (phone_number, email) in zip(
+                self.phone_number, self.email, strict=True
             )
         ]
 
-        overall_desc = [
-            f"{description} ||| {services} ||| {Reply_to}"
-            for description, services, Reply_to in zip(
-                self.description, self.services, self.reply_to
-            )
-        ]
-
-        post_time = [
-            f" Posted on: {posted_on} Expires on: {expires_on}"
-            for posted_on, expires_on in zip(
-                self.posted_on, self.expires_on
+        overall_description = [
+            f"{description} ||| {services} ||| {reply_to}"
+            for (description, services, reply_to) in zip(
+                self.description, self.services, self.reply_to, strict=True
             )
         ]
 
@@ -524,9 +504,9 @@ class YesbackpageScraper(ScraperPrototype):
             'Inputted City / Region': self.city,
             'Specified Location': self.location,
             'Timeline': self.posted_on,
-            'Contacts': contact_info,
+            'Contacts': contacts,
             'Personal Info': personal_info,
-            'Overall Description': overall_desc,
+            'Overall Description': overall_description,
             # -----
             'Payment-methods': self.payment_methods_found,
             'Social-media-found': self.social_media_found,
@@ -589,19 +569,17 @@ class YesbackpageScraper(ScraperPrototype):
             else:
                 expires_on = second_half.strip()
 
-        print(f"Posted on: {posted_on}")
-        print(f"Updated on: {updated_on if updated_on != 'N/A' else 'No update info'}")
-        print(f"Expires on: {expires_on}")
-        print(f"Reply to: {reply_to if reply_to != 'N/A' else 'No reply info'}")
-
         return posted_on, expires_on, reply_to
 
     def validate_email(self, email):
         return email if "@" in email else "N/A"
 
     def capture_screenshot(self, screenshot_name) -> None:
-        self.driver.save_screenshot(f'{self.screenshot_directory}/{screenshot_name}')
-        self.create_pdf()
+        try:
+            self.driver.save_screenshot(f'{self.screenshot_directory}/{screenshot_name}')
+            self.create_pdf()
+        except Exception as e:
+            print(f"Error capturing screenshot: {e}")
 
     def create_pdf(self) -> None:
         screenshot_files = [os.path.join(self.screenshot_directory, filename) for filename in os.listdir(self.screenshot_directory) if filename.endswith('.png')]

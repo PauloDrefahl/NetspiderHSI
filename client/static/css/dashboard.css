@@ -1,0 +1,458 @@
+/* DEFAULT DASHBOARD CHARACTERISTICS */
+
+/* Resetting default styles and setting font */
+body {
+    font-family: "Plus Jakarta Sans", sans-serif;
+    margin: 0;
+    padding: 0;
+    background-color: #f4f4f4;
+    background-image: url('../documents/white-triangle-pattern-seamless-background-2.jpg'); /* Specify the URL of your background image */
+    background-size: contain; /* Fit the background image within the container */
+    background-repeat: repeat; /* Allow the background image to repeat */
+}
+
+* {
+    scroll-behavior: smooth;
+  }
+
+
+
+.input-container, .button-container {
+    display: flex;
+    align-items: center; /* Center items horizontally */
+    justify-content: center; /* Center items vertically */
+    padding: 10px;
+}
+
+/* Big box under the three existing boxes */
+#big-box {
+    width: 100%;
+    margin-left: 15px;
+    margin-top: 40px;
+    padding: 30px; /* Increased padding */
+    background-color: #fff;
+    border-left: 2px solid #ddd; /* Left border */
+    border-right: 2px solid #ddd; /* Right border */
+    border-radius: 12px; /* Rounded corners */
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    height: 670px;
+    transition: box-shadow 0.3s, transform 0.3s;
+    box-shadow: 0 8px 16px rgba(0, 0, 0, 0.1); /* Improved box shadow */
+}
+
+/* Added Transition CSS */
+.column, .medium-column {
+    transition: transform 0.3s ease, box-shadow 0.3s ease;
+}
+
+
+.medium-column {
+    flex: 1;
+    margin: 5px; /* Decreased margin */
+    padding: 20px; /* Decreased padding */
+    box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1); /* Improved box shadow */
+    max-width: calc(50% - 20px); /* Adjusted max-width */
+    display: flex; /* Added */
+    flex-direction: column; /* Added */
+}
+
+/* Three columns within the big box */
+.column {
+    flex: 1;
+    margin: 30px; /* Increased margin */
+    margin-top: 0%;
+    padding: 30px; /* Increased padding */
+    padding-top: 0;
+    height: 90%;
+    box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1); /* Improved box shadow */;
+}
+
+.column h2{
+    margin-top: 20px;
+    margin-bottom: 17px;
+    color: #09558B;
+    text-align: center;
+}
+
+.column h3{
+    margin-top: 20px;
+    margin-bottom: 17px;
+    color: #09558B;
+    text-align: center;
+    padding: 5px;
+    border: 2px solid #000000;
+    padding: 2%;
+    border-radius: 12px; /* Rounded corners */
+    background-color: #09558B;
+    color: #fff;
+    transition: background-color 0.3s, color 0.3s, border-color 0.3s;
+    box-shadow: 0 6px 8px 0 rgba(0,0,0,0.24),0 8.5px 25px 0 rgba(0,0,0,0.19);
+}
+
+/* Input styles for the Auto Scraper big box */
+#frequency {
+    display: block;
+    width: 50%;
+    margin-left: auto;
+    margin-right: auto;
+}
+
+
+/* Title styles for the big box */
+#big-box h2 {
+    color: #09558B;
+    text-align: center;
+    margin-bottom: 20px;
+}
+
+/* Hover effects */
+.hover-effect {
+    box-shadow: 0 8px 16px rgba(0, 0, 0, 0.2);
+    transform: scale(1.05);
+}
+
+/* Improved CSS for hover */
+.column:hover,.medium-column:hover,#big-box.hover-effect,#big-box-2.hover-effect {
+    composes: hover-effect;
+}
+
+
+/* Medium box under the Big box w/ 3 sections */
+#med-box {
+    display: grid;
+    grid-template-columns: repeat(2, 1fr); /* Two equal-width columns */
+    grid-gap: 20px; /* Gap between columns */
+    width: 60%;
+    margin-left: 15px;
+    margin-top: 40px;
+    padding: 30px; /* Increased padding */
+    background-color: #fff;
+    border-left: 2px solid #ddd; /* Left border */
+    border-right: 2px solid #ddd; /* Right border */
+    border-radius: 12px; /* Rounded corners */
+    position: relative; /* Ensure positioning context for absolute positioning */
+    min-height: 500px;
+    transition: box-shadow 0.3s, transform 0.3s;
+    box-shadow: 0 8px 16px rgba(255, 255, 255, 0.1); /* Improved box shadow */
+}
+
+.setname-input{
+    width: 100%;
+    padding: 10px;
+    border: 2px solid #09558B;
+    border-radius: 8px;
+    background-color: #fff;
+    transition: background-color 0.3s, color 0.3s, border-color 0.3s;
+    box-shadow: 0 6px 8px 0 rgba(0,0,0,0.24),0 8.5px 25px 0 rgba(0,0,0,0.19);
+    cursor: pointer;
+}
+
+#med-box h2 {
+    margin-top: 0; /* Removed top margin */
+    margin-bottom: 20px; /* Adjusted bottom margin */
+    color: #09558B;
+    text-align: center;
+}
+
+#med-box-2 h2 {
+    margin-top: 0; /* Removed top margin */
+    margin-bottom: 20px; /* Adjusted bottom margin */
+    color: #09558B;
+    text-align: center;
+}
+
+/* Specifically for bottom warning in medium box*/
+#med-box .column h3 {
+    color: #09558B;
+    text-align: center;
+    padding: 5px;
+    border: 2px solid #000000;
+    padding: 2%;
+    border-radius: 12px; /* Rounded corners */
+    background-color: #09558B;
+    color: #fff;
+    transition: background-color 0.3s, color 0.3s, border-color 0.3s;
+    box-shadow: 0 6px 8px 0 rgba(0,0,0,0.24),0 8.5px 25px 0 rgba(0,0,0,0.19);
+    cursor: pointer;
+}
+
+/* Text within the medium box */
+#med-box p {
+    margin-left: 5px;
+    margin-right: 5px;
+    color: #09558B;
+    text-align: center;
+    font-size: 17px;
+    margin-bottom: 20px;
+}
+
+#med-box-2 p {
+    margin-left: 5px;
+    margin-right: 5px;
+    color: #09558B;
+    text-align: center;
+    font-size: 17px;
+    margin-bottom: 20px;
+}
+
+#big-box-2 {
+    display: grid;
+    grid-template-columns: repeat(2, 1fr); /* Two equal-width columns */
+    grid-gap: 20px; /* Gap between columns */
+    width: 100%;
+    margin-left: 15px;
+    margin-top: 40px;
+    padding: 30px; /* Increased padding */
+    background-color: #fff;
+    border-left: 2px solid #ddd; /* Left border */
+    border-right: 2px solid #ddd; /* Right border */
+    border-radius: 12px; /* Rounded corners */
+    position: relative; /* Ensure positioning context for absolute positioning */
+    min-height: 500px;
+    transition: box-shadow 0.3s, transform 0.3s;
+    box-shadow: 0 8px 16px rgba(255, 255, 255, 0.1); /* Improved box shadow */
+}
+
+#big-box-2 h2 {
+    margin-bottom: 20px; /* Adjusted bottom margin */
+    color: #09558B;
+    text-align: center;
+}
+
+#box-header {
+    justify-content: center; /* Center horizontally */
+    align-items: center; /* Center vertically */
+    margin: 0;
+    border: 2px solid #ddd; /* Increased border width */
+    padding: 10px;
+    background-color: #fff;
+    text-align: center;
+    width: 96%;
+    border-radius: 7px;
+    box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+    transition: transform 0.3s, box-shadow 0.3s;
+    grid-column: span 2;
+}
+
+#box-header-2 {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    margin: 0 auto;
+    border: 2px solid #ddd;
+    padding: 10px;
+    background-color: #fff;
+    text-align: center;
+    width: 70vw;
+    border-radius: 7px;
+    box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+    transition: transform 0.3s, box-shadow 0.3s;
+}
+
+#box-header h2 {
+    margin: 0;
+}
+
+/* Screen movement / Relativity */
+#wrapper {
+    margin-left:auto;
+    margin-right:auto;
+    min-width: auto;
+    width: 100%;
+}
+
+#big-box-3 {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    width: 100%;
+    margin-left: 15px;
+    margin-top: 40px;
+    padding: 30px;
+    background-color: #fff;
+    border-left: 2px solid #ddd;
+    border-right: 2px solid #ddd;
+    border-radius: 12px;
+    position: relative;
+    min-height: 500px;
+    transition: box-shadow 0.3s, transform 0.3s;
+    box-shadow: 0 8px 16px rgba(255, 255, 255, 0.1);
+}
+
+.table-wrapper {
+    position: relative;
+    width: 100%;
+    max-width: 70vw;
+    margin: 0 auto;
+    max-height: 600px;
+    display: flex; /* Add flex display */
+}
+
+.table-scroll {
+    width: 100%;
+    max-height: 600px;
+    overflow-y: scroll;
+    overflow-x: auto;
+    margin-right: 6px; /* Add space for the scrollbar */
+}
+
+#database-results-container {
+    min-width: 100%;
+    width: max-content;  /* Allows table to take its natural width */
+}
+
+#results-table-container {
+    overflow-y: auto;   /* Enables vertical scrolling */
+    max-height: 500px;
+}
+
+#scrape-results-table {
+    width: 100%;
+    border-collapse: collapse;
+}
+
+#scrape-results-table th,
+#scrape-results-table td {
+    padding: 12px;
+    text-align: left;
+    border: 1px solid #ddd;
+    white-space: nowrap;  /* Prevents text wrapping */
+}
+
+#scrape-results-table thead {
+    position: sticky;
+    top: 0;
+    background-color: white;
+    z-index: 1;
+}
+
+#scrape-results-table th {
+    padding: 12px;
+    text-align: left;
+    border-bottom: 2px solid #ddd;
+    background-color: white; /* Ensure header background is solid */
+}
+
+#scrape-results-table td {
+    padding: 8px;
+    border-bottom: 1px solid #eee;
+}
+
+#scrape-results-table tbody tr:hover {
+    background-color: #f5f5f5;
+}
+
+.table-scroll::-webkit-scrollbar {
+    width: 8px;
+    height: 8px;
+}
+
+.table-scroll::-webkit-scrollbar-track {
+    background: #f1f1f1;
+    border-radius: 4px;
+}
+
+.table-scroll::-webkit-scrollbar-thumb {
+    background: #888;
+    border-radius: 4px;
+}
+
+.table-scroll::-webkit-scrollbar-thumb:hover {
+    background: #555;
+}
+
+#scrape-results-table tr:nth-child(even) {
+    background-color: #f2f2f2;
+}
+
+#scrape-results-table tr:hover {
+    background-color: #ddd;
+}
+
+.database-controls {
+    width: 70vw;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    margin: 20px auto;
+    gap: 20px;
+}
+
+.database-refresh {
+    width: 100%;
+    display: flex;
+    flex-direction: column;
+    margin: 20px auto;
+    gap: 20px;
+}
+
+.database-refresh button {
+    padding: 10px 20px;
+    font-size: 16px;
+    width: 300px;
+    margin: 0 auto;
+}
+
+.filter-dropdown {
+    padding: 8px 12px;
+    font-size: 16px;
+    border: 1px solid #ddd;
+    border-radius: 4px;
+    background-color: white;
+    min-width: 200px;
+}
+
+#tableSelector {
+    min-width: 250px;
+}
+
+.database-controls button {
+    padding: 10px 20px;
+    font-size: 16px;
+    width: 20px;
+    margin: 0 auto;
+}
+
+
+/* Small screen movement */
+@media (max-width: 1400px) {
+    .input-container, .button-container {
+        flex-direction: column; /* Stack items vertically */
+        align-items: flex-start;
+    }
+
+    #big-box {
+        flex-direction: column;
+        height: auto;
+    }
+
+    .medium-column {
+        max-width: 100%;
+    }
+
+    .column {
+        margin: 30px 0;
+        padding: 20px;
+        width: 100%;
+    }
+    #med-box {
+        width: auto;
+        grid-template-columns: repeat(auto-fill, minmax(300px, 1fr)); /* Responsive columns */
+    }
+    
+    #big-box-2 {
+        grid-template-columns: repeat(auto-fill, minmax(300px, 1fr)); /* Responsive columns */
+    }
+
+    #buttonArea {
+        height: auto;
+    }
+
+    #wrapper {
+        width: fit-content;
+        margin-left: -230px;
+        margin-right: auto;
+    }
+}

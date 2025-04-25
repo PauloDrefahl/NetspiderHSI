@@ -1,13 +1,14 @@
 from Backend.ScraperPrototype import ScraperPrototype
-import time
 from datetime import datetime
+from seleniumbase import Driver
 from selenium.common import NoSuchElementException
 from selenium.webdriver.common.by import By
 import pandas as pd
-import undetected_chromedriver as uc
 import os
+import time
 import img2pdf
 from openpyxl.styles import PatternFill
+from typing_extensions import override
 
 
 class ErosScraper(ScraperPrototype):
@@ -37,15 +38,14 @@ class ErosScraper(ScraperPrototype):
         self.scraper_directory = None
         self.screenshot_directory = None
         self.pdf_filename = None
-        self.keywords = None
-        self.flagged_keywords = None
+        self.keywords: set[str] = set()
+        self.flagged_keywords: set[str] = set()
         self.completed = False
 
         self.join_keywords = False
         self.search_mode = False
 
-        self.number_of_keywords_in_post = 0
-        self.keywords_found_in_post = []
+        self.keywords_found_in_post: set[str] = set()
         self.only_posts_with_payment_methods = False
         self.social_media_found = []
 
@@ -84,10 +84,10 @@ class ErosScraper(ScraperPrototype):
     def set_search_mode(self, search_mode) -> None:
         self.search_mode = search_mode
 
-    def set_flagged_keywords(self, flagged_keywords) -> None:
+    def set_flagged_keywords(self, flagged_keywords: set[str]) -> None:
         self.flagged_keywords = flagged_keywords
 
-    def set_keywords(self, keywords) -> None:
+    def set_keywords(self, keywords: set[str]) -> None:
         self.keywords = keywords
 
     '''
@@ -96,25 +96,23 @@ class ErosScraper(ScraperPrototype):
     ---------------------------------------
     '''
     def initialize(self) -> None:
-        # set keywords value
-        # self.keywords = keywords
-
         # Date and time of search
         self.date_time = str(datetime.today())[0:19].replace(' ', '_').replace(':', '-')
 
         # Format website URL based on state and city
         self.get_formatted_url()
 
-        # Selenium Web Driver setup
-        options = uc.ChromeOptions()
-        # TODO - uncomment to run headless
-        # options.add_argument('--headless') #This allows the code to run without opening up a new Chrome window
-        options.headless = self.search_mode  # This determines if you program runs headless or not
-        self.driver = uc.Chrome(use_subprocess=True, options=options)
+        self.driver = Driver(
+            driver_version="mlatest",
+            undetectable=True,
+            uc_subprocess=True,
+            headless=self.search_mode,
+            headed=not self.search_mode,
+            chromium_arg=["--disable-extensions", "--incognito", "--disable-component-extensions-with-background-pages"]
+        )
 
         # Open Webpage with URL
         self.open_webpage()
-        time.sleep(10)
 
         # Find links of posts
         links = self.get_links()
@@ -132,22 +130,24 @@ class ErosScraper(ScraperPrototype):
         self.get_data(links)
         self.close_webpage()
         self.reset_variables()
+        self.completed = True
 
     def stop_scraper(self) -> None:
-        if self.search_mode:
-            self.driver.close()
-            self.driver.quit()
-        else:
-            self.driver.close()
+        self.completed = True
 
     def open_webpage(self) -> None:
         self.driver.implicitly_wait(10)
         self.driver.get(self.url)
-        self.driver.maximize_window()
+        print(self.driver.current_url)
+
+        # NOTE: Maximizing the window in headless mode makes it too big:
+        # https://chromium.googlesource.com/chromium/src.git/+/f2bdeab65/ui/views/win/hwnd_message_handler_headless.cc#264
+        if not self.search_mode:
+            self.driver.maximize_window()
         assert "Page not found" not in self.driver.page_source
 
     def close_webpage(self) -> None:
-        self.driver.close()
+        self.driver.quit()
 
     '''
     ---------------------------------------
@@ -182,83 +182,61 @@ class ErosScraper(ScraperPrototype):
         self.url = self.cities.get(self.city)
 
     def get_data(self, links) -> None:
-        description = ''
-        counter = 0
+        counter = 1
 
         for link in links:
-            self.driver.implicitly_wait(10)
-            self.driver.get(link)
-            assert "Page not found" not in self.driver.page_source
+            print(f"Processing link {counter}/{len(links)}: {link}")
+            if not self.completed:
+                self.driver.implicitly_wait(10)
+                self.driver.get(link)
+                print(self.driver.current_url)
 
-            try:
-                profile_header = self.driver.find_element(
-                    By.XPATH, '//*[@id="pageone"]/div[1]').text
-            except NoSuchElementException:
-                profile_header = 'N/A'
+                assert "Page not found" not in self.driver.page_source
 
-            try:
-                description = self.driver.find_element(
-                    By.XPATH, '// *[ @ id = "pageone"] / div[3] / div / div[1] / div[2]').text
-            except NoSuchElementException:
-                description = 'N/A'
+                try:
+                    profile_header = self.driver.find_element(
+                        By.XPATH, '//*[@id="pageone"]/div[1]').text
+                except NoSuchElementException:
+                    profile_header = 'N/A'
 
-            try:
-                info_details = self.driver.find_element(
-                    By.XPATH, '//*[@id="pageone"]/div[3]/div/div[2]/div[1]/div').text
-            except NoSuchElementException:
-                info_details = 'N/A'
+                try:
+                    description = self.driver.find_element(
+                        By.XPATH, '// *[ @ id = "pageone"] / div[3] / div / div[1] / div[2]').text
+                except NoSuchElementException:
+                    description = 'N/A'
 
-            try:
-                contact_details = self.driver.find_element(
-                    By.XPATH, '//*[@id="pageone"]/div[3]/div/div[2]/div[2]').text
-            except NoSuchElementException:
-                contact_details = 'N/A'
+                try:
+                    info_details = self.driver.find_element(
+                        By.XPATH, '//*[@id="pageone"]/div[3]/div/div[2]/div[1]/div').text
+                except NoSuchElementException:
+                    info_details = 'N/A'
 
-            # reassign variables for each post
-            self.number_of_keywords_in_post = 0
-            self.keywords_found_in_post = []
+                try:
+                    contact_details = self.driver.find_element(
+                        By.XPATH, '//*[@id="pageone"]/div[3]/div/div[2]/div[2]').text
+                except NoSuchElementException:
+                    contact_details = 'N/A'
 
-            if self.join_keywords and self.only_posts_with_payment_methods:
-                if self.check_keywords(profile_header) or self.check_keywords(description) \
-                        or self.check_keywords(info_details) or self.check_keywords(contact_details):
-                    counter = self.join_with_payment_methods(contact_details, counter, description, info_details, link,
-                                                             profile_header)
+                # reassign variables for each post
+                self.keywords_found_in_post.clear()
 
-            elif self.join_keywords or self.only_posts_with_payment_methods:
-                if self.join_keywords:
-                    if self.check_keywords(profile_header) or self.check_keywords(description) \
-                            or self.check_keywords(info_details) or self.check_keywords(contact_details):
-                        self.check_keywords_found(contact_details, description, info_details, profile_header, link)
-                        counter = self.join_inclusive(contact_details, counter, description, info_details, link,
-                                                      profile_header)
+                # Search the post's contents for keywords.
+                self.check_keywords_found(contact_details, description, info_details, profile_header, link)
 
-                elif self.only_posts_with_payment_methods:
-                    if len(self.keywords) > 0:
-                        if self.check_keywords(profile_header) or self.check_keywords(description) \
-                                or self.check_keywords(info_details) or self.check_keywords(contact_details):
-                            self.check_keywords_found(contact_details, description, info_details, profile_header, link)
+                if self._should_discard_post(description):
+                    continue
 
-                    counter = self.payment_methods_only(contact_details, counter, description, info_details, link,
-                                                        profile_header)
+                # Save the data we collected about the post.
+                self.append_data(contact_details, counter, description, info_details, link, profile_header)
+                screenshot_name = str(counter) + ".png"
+                self.capture_screenshot(screenshot_name)
+                counter += 1
 
+                self.RAW_format_data_to_excel()
+                self.CLEAN_format_data_to_excel()
+            # Breaks the links loop for fast closing time once user presses stop scraper
             else:
-                if len(self.keywords) > 0:
-                    if self.check_keywords(profile_header) or self.check_keywords(description) \
-                            or self.check_keywords(info_details) or self.check_keywords(contact_details):
-                        self.check_keywords_found(contact_details, description, info_details, profile_header, link)
-                        self.append_data(contact_details, counter, description, info_details, link, profile_header)
-                        screenshot_name = str(counter) + ".png"
-                        self.capture_screenshot(screenshot_name)
-                        counter += 1
-
-                else:
-                    self.append_data(contact_details, counter, description, info_details, link, profile_header)
-                    screenshot_name = str(counter) + ".png"
-                    self.capture_screenshot(screenshot_name)
-                    counter += 1
-
-            self.RAW_format_data_to_excel()
-            self.CLEAN_format_data_to_excel()
+                break
 
     '''
     --------------------------
@@ -272,38 +250,35 @@ class ErosScraper(ScraperPrototype):
         self.about_info.append(description)
         self.info_details.append(info_details)
         self.contact_details.append(contact_details)
-        self.check_and_append_payment_methods(description)
-        self.check_for_social_media(description)
+        payment_methods = self.get_payment_methods(description)
+        self.payment_methods_found.append("\n".join(payment_methods) or "N/A")
+        social_media = self.get_social_media(description)
+        self.social_media_found.append("\n".join(social_media) or "N/A")
         self.keywords_found.append(', '.join(self.keywords_found_in_post) or 'N/A')
-        self.number_of_keywords_found.append(self.number_of_keywords_in_post or 'N/A')
-
-    def join_inclusive(self, contact_details, counter, description, info_details, link, profile_header):
-        if len(self.keywords) == len(set(self.keywords_found_in_post)):
-            self.append_data(contact_details, counter, description, info_details, link, profile_header)
-
-            screenshot_name = str(counter) + ".png"
-            self.capture_screenshot(screenshot_name)
-
-            return counter + 1
-        return counter
-
-    def payment_methods_only(self, about_info, counter, description, link, services, profile_header) -> int:
-        if self.check_for_payment_methods(description):
-            self.append_data(about_info, counter, description, link, services, profile_header)
-            screenshot_name = str(counter) + ".png"
-            self.capture_screenshot(screenshot_name)
-
-            return counter + 1
-        return counter
-
-    def join_with_payment_methods(self, contact_details, counter, description, info_details, link, profile_header):
-        if self.check_for_payment_methods(description) and len(self.keywords) == len(set(self.keywords_found_in_post)):
-            self.append_data(contact_details, counter, description, info_details, link, profile_header)
-            screenshot_name = str(counter) + ".png"
-            self.capture_screenshot(screenshot_name)
-
-            return counter + 1
-        return counter
+        self.number_of_keywords_found.append(len(self.keywords_found_in_post) or "N/A")
+        # Store information about the post in the database.
+        try:
+            with self.open_database() as connection, connection.cursor() as cursor:
+                cursor.execute(
+                    """
+                    insert into raw_eros_posts
+                    values (%s, %s, %s, %s, %s, %s, %s, %s, %s)
+                    on conflict do nothing;
+                    """,
+                    (
+                        link,
+                        self.city,
+                        profile_header,
+                        description,
+                        info_details,
+                        contact_details,
+                        payment_methods,
+                        social_media,
+                        list(self.keywords_found_in_post),
+                    ),
+                )
+        except Exception as e:
+            print(f"Database write failed: {e}") 
 
     '''
     --------------------------
@@ -317,45 +292,55 @@ class ErosScraper(ScraperPrototype):
         self.check_and_append_keywords(profile_header)
         self.check_and_append_keywords(link)
 
-    def check_for_payment_methods(self, description) -> bool:
+    @override
+    def check_for_payment_methods(self, description: str) -> bool:
         for payment in self.known_payment_methods:
             if payment in description.lower():
                 return True
         return False
 
-    def check_and_append_payment_methods(self, description):
-        payments = ''
-        for payment in self.known_payment_methods:
-            if payment in description.lower():
-                payments += payment + '\n'
+    def get_payment_methods(self, description: str) -> list[str]:
+        # Normalize the case of the description.
+        description = description.lower()
+        payment_methods: list[str] = []
+        for payment_method in self.known_payment_methods:
+            if payment_method in description:
+                payment_methods.append(payment_method)
+        return payment_methods
 
-        if payments != '':
-            self.payment_methods_found.append(payments)
-        else:
-            self.payment_methods_found.append('N/A')
-
-    def check_for_social_media(self, description) -> None:
-        social_media = ''
+    def get_social_media(self, description: str) -> list[str]:
+        # Normalize the case of the description.
+        description = description.lower()
+        social_media: list[str] = []
         for social in self.known_social_media:
-            if social in description.lower():
-                social_media += social + '\n'
+            if social in description:
+                social_media.append(social)
+        return social_media
 
-        if social_media != '':
-            self.social_media_found.append(social_media)
-        else:
-            self.social_media_found.append('N/A')
-
-    def check_keywords(self, data) -> bool:
-        for key in self.keywords:
-            if key in data:
-                return True
-        return False
-
-    def check_and_append_keywords(self, data) -> None:
+    @override
+    def check_and_append_keywords(self, data: str) -> None:
         for key in self.keywords:
             if key in data.lower():
-                self.keywords_found_in_post.append(key)
-                self.number_of_keywords_in_post += 1
+                self.keywords_found_in_post.add(key)
+
+    def _should_discard_post(self, description: str) -> bool:
+        if self.join_keywords:
+            # Discard posts that don't contain ALL keywords.
+            if len(self.keywords_found_in_post) < len(self.keywords):
+                return True
+        elif not self.only_posts_with_payment_methods and len(self.keywords) > 0:
+            # Discard posts that don't contain ANY keywords, unless:
+            # 1. We're specifically looking for posts with payment methods, in
+            #    which case we keep *all* posts with payment methods.
+            # 2. No keywords were originally provided.
+            if len(self.keywords_found_in_post) == 0:
+                return True
+
+        if self.only_posts_with_payment_methods:
+            if not self.check_for_payment_methods(description):
+                return True
+
+        return False
 
     '''
     ---------------------------------
@@ -412,21 +397,14 @@ class ErosScraper(ScraperPrototype):
                     col[0].column_letter].width = adjusted_width
 
     def CLEAN_format_data_to_excel(self) -> None:
-
-        contact_info = [
-            f"{contact_deets}"
-            for contact_deets in zip(
-                self.contact_details
+        # Concatenate attributes to fit into the CLEAN spreadsheet format, which
+        # is consistent across all scrapers.
+        overall_description = [
+            f"{profile_header} ||| {info_details}"
+            for (profile_header, info_details) in zip(
+                self.profile_header, self.info_details, strict=True
             )
         ]
-
-        overall_desc = [
-            f"{profile_head} ||| {info_deets} "
-            for profile_head, info_deets in zip(
-                self.profile_header, self.info_details
-            )
-        ]
-
 
         titled_columns = pd.DataFrame({
             'Post-identifier': self.post_identifier,
@@ -435,9 +413,9 @@ class ErosScraper(ScraperPrototype):
             'Inputted City / Region': self.city,
             'Specified Location': 'N/A',
             'Timeline': 'N/A',
-            'Contacts': contact_info,
+            'Contacts': self.contact_details,
             'Personal Info': self.about_info,
-            'Overall Description': overall_desc,
+            'Overall Description': overall_description,
             # ------
             'Payment-methods': self.payment_methods_found,
             'Social-media-found': self.social_media_found,
@@ -475,8 +453,11 @@ class ErosScraper(ScraperPrototype):
 
 
     def capture_screenshot(self, screenshot_name) -> None:
-        self.driver.save_screenshot(f'{self.screenshot_directory}/{screenshot_name}')
-        self.create_pdf()
+        try:
+            self.driver.save_screenshot(f'{self.screenshot_directory}/{screenshot_name}')
+            self.create_pdf()
+        except Exception as e:
+            print(f"Error capturing screenshot: {e}")
 
     def create_pdf(self) -> None:
         screenshot_files = [

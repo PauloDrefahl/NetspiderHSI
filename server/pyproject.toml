@@ -1,0 +1,29 @@
+[project]
+name = 'netspiderhsi'
+version = '3.0.2'
+requires-python = '>=3.11'
+# List direct dependencies and desired optional dependencies. For future
+# reference, list dependent packages next to desired optional dependencies.
+dependencies = [
+  'apscheduler',
+  'deep-translator',
+  'Flask',
+  'Flask-Cors',
+  'Flask-SocketIO',
+  'gevent',
+  'gevent-websocket', # For 'Flask-SocketIO', 'python-engineio'
+  'img2pdf',
+  'matplotlib',
+  'numpy',
+  'openpyxl',
+  'pandas',
+  'psycopg[binary]',
+  'pyinstaller',
+  'PyPDF2',
+  'PyQt5',
+  'seaborn',
+  'selenium',
+  'seleniumbase',
+  'typing-extensions',
+  'watchdog',
+]

@@ -1,12 +1,13 @@
 import os
-import re
 import time
+import re
 from datetime import datetime
 import pandas as pd
+from seleniumbase import Driver
 from selenium.common import NoSuchElementException
 from selenium.webdriver.common.by import By
+from typing_extensions import override
 from Backend.ScraperPrototype import ScraperPrototype
-import undetected_chromedriver as uc
 import img2pdf
 from openpyxl.styles import PatternFill
 
@@ -55,27 +56,25 @@ class EscortalligatorScraper(ScraperPrototype):
         self.scraper_directory = None
         self.screenshot_directory = None
         self.pdf_filename = None
-        self.keywords = ""
-        self.flagged_keywords = None
+        self.keywords: set[str] = set()
+        self.flagged_keywords: set[str] = set()
         self.only_posts_with_payment_methods = False
         self.completed = False
 
         self.join_keywords = False
         self.search_mode = False
 
-        self.number_of_keywords_in_post = 0
-        self.keywords_found_in_post = []
+        self.keywords_found_in_post: set[str] = set()
 
         # lists to store data and then send to Excel file
         self.phone_number = []
         self.description = []
-        self.location_and_age = []
         self.links = []
         self.post_identifier = []
         self.payment_methods_found = []
         self.timestamps = []
+        self.location = []
         self.age = []
-        self.locationSplits = []
 
         self.number_of_keywords_found = []
         self.keywords_found = []
@@ -104,10 +103,10 @@ class EscortalligatorScraper(ScraperPrototype):
     def set_search_mode(self, search_mode) -> None:
         self.search_mode = search_mode
 
-    def set_flagged_keywords(self, flagged_keywords) -> None:
+    def set_flagged_keywords(self, flagged_keywords: set[str]) -> None:
         self.flagged_keywords = flagged_keywords
 
-    def set_keywords(self, keywords) -> None:
+    def set_keywords(self, keywords: set[str]) -> None:
         self.keywords = keywords
 
     '''
@@ -117,21 +116,21 @@ class EscortalligatorScraper(ScraperPrototype):
     '''
 
     def initialize(self) -> None:
-        # set keywords value
-        #self.keywords = keywords
-
         self.date_time = str(datetime.today())[0:19].replace(' ', '_').replace(':', '-')
 
         # Format website URL based on state and city
         self.get_formatted_url()
 
-        # Selenium Web Driver setup
-        options = uc.ChromeOptions()
-        # TODO - uncomment this to run headless
-        if self.search_mode:
-            options.add_argument('--headless=new')  # This allows the code to run without opening up a new Chrome window
-        # options.headless = self.search_mode  # This determines if you program runs headless or not
-        self.driver = uc.Chrome(subprocess=True, options=options)
+
+        self.driver = Driver(
+            driver_version="mlatest",
+            undetectable=True,
+            uc_subprocess=False,
+            headless=self.search_mode,
+            headed=not self.search_mode,
+            chromium_arg=["--disable-extensions", "--incognito", "--disable-component-extensions-with-background-pages"]
+        )
+
 
         # Open Webpage with URL
         self.open_webpage()
@@ -151,22 +150,24 @@ class EscortalligatorScraper(ScraperPrototype):
         self.get_data(links)
         self.close_webpage()
         self.reset_variables()
+        self.completed = True
 
     def stop_scraper(self) -> None:
-        if self.search_mode:
-            self.driver.close()
-            self.driver.quit()
-        else:
-            self.driver.close()
+        self.completed = True
 
     def open_webpage(self) -> None:
         self.driver.implicitly_wait(10)
         self.driver.get(self.url)
-        self.driver.maximize_window()
+        print(self.driver.current_url)
+#         
+        # NOTE: Maximizing the window in headless mode makes it too big:
+        # https://chromium.googlesource.com/chromium/src.git/+/f2bdeab65/ui/views/win/hwnd_message_handler_headless.cc#264
+        if not self.search_mode:
+            self.driver.maximize_window()
         assert "Page not found" not in self.driver.page_source
 
     def close_webpage(self) -> None:
-        self.driver.close()
+        self.driver.quit()
 
     '''
     ---------------------------------------
@@ -174,16 +175,11 @@ class EscortalligatorScraper(ScraperPrototype):
     ---------------------------------------
     '''
     def get_links(self) -> list:
-        # click on terms btn
-        btn = self.driver.find_element(
-            By.CLASS_NAME, 'button')
-        btn.click()
+        # Click on the "terms of use" button.
+        self.driver.click(By.CLASS_NAME, "button")
 
-        time.sleep(2)
-        # click on 2nd terms btn
-        btn = self.driver.find_element(
-            By.CLASS_NAME, 'footer')
-        btn.click()
+        # Click on the "scum warning" button.
+        self.driver.click(By.CLASS_NAME, "footer")
 
         posts = self.driver.find_elements(
             By.CSS_SELECTOR, '#list [href]')
@@ -197,179 +193,174 @@ class EscortalligatorScraper(ScraperPrototype):
 
     def get_data(self, links) -> None:
         links = set(links)
-        counter = 0
+        counter = 1
 
         for link in links:
-            self.driver.get(link)
-            assert "Page not found" not in self.driver.page_source
-
-
+            print(f"Processing link {counter}/{len(links)}: {link}")
             try:
-                timestamp = self.driver.find_element(
-                    By.CLASS_NAME, 'postCreatedOn').text
-            except NoSuchElementException:
-                timestamp = 'N/A'
+                if not self.completed:
+                    self.driver.get(link)
+                    print(self.driver.current_url)
 
-            try:
-                description = self.driver.find_element(
-                    By.CLASS_NAME, 'viewpostbody').text
-            except NoSuchElementException:
-                description = 'N/A'
+                    assert "Page not found" not in self.driver.page_source
 
-            try:
-                phone_number = self.driver.find_element(
-                    By.CLASS_NAME, 'userInfoContainer').text
-            except NoSuchElementException:
-                phone_number = 'N/A'
+                    try:
+                        timestamp = self.driver.find_element(
+                            By.CLASS_NAME, 'postCreatedOn').text
+                    except NoSuchElementException:
+                        timestamp = 'N/A'
 
-            try:
-                location_and_age = self.driver.find_element(
-                    By.CLASS_NAME, 'viewpostlocationIconBabylon').text
-                age, locationSplits = self.parse_location_and_age(location_and_age)
-            except NoSuchElementException:
-                location_and_age = 'N/A'
-                age = 'N/A'
-                locationSplits = 'N/A'
+                    try:
+                        description = self.driver.find_element(
+                            By.CLASS_NAME, 'viewpostbody').text
+                    except NoSuchElementException:
+                        description = 'N/A'
 
-            # reassign variables for each post
-            self.number_of_keywords_in_post = 0
-            self.keywords_found_in_post = []
+                    try:
+                        phone_number = self.driver.find_element(
+                            By.CLASS_NAME, 'userInfoContainer').text
+                    except NoSuchElementException:
+                        phone_number = 'N/A'
 
-            if self.join_keywords and self.only_posts_with_payment_methods:
-                if self.check_keywords(phone_number) or self.check_keywords(location_and_age) or \
-                        self.check_keywords(description):
-                    counter = self.join_with_payment_methods(counter, description, link, location_and_age, locationSplits, age, phone_number, timestamp)
+                    try:
+                        location_and_age = self.driver.find_element(
+                            By.CLASS_NAME, 'viewpostlocationIconBabylon').text
+                        location, age = self.parse_location_and_age(location_and_age)
+                    except NoSuchElementException:
+                        location, age = "N/A", "N/A"
 
-            elif self.join_keywords or self.only_posts_with_payment_methods:
-                if self.join_keywords:
-                    if self.check_keywords(phone_number) or self.check_keywords(location_and_age)  or \
-                            self.check_keywords(description):
-                        self.check_keywords_found(description, location_and_age, locationSplits, age, phone_number, link)
-                        counter = self.join_inclusive(counter, description, link, location_and_age, locationSplits, age, phone_number, timestamp)
+                    # reassign variables for each post
+                    self.keywords_found_in_post.clear()
 
-                elif self.only_posts_with_payment_methods:
-                    if len(self.keywords) > 0:
-                        if self.check_keywords(phone_number) or self.check_keywords(location_and_age) or \
-                                self.check_keywords(description):
-                            self.check_keywords_found(description, location_and_age, locationSplits, age, phone_number, link)
+                    # Search the post's contents for keywords.
+                    self.check_keywords_found(description, location, age, phone_number, link)
 
-                    counter = self.payment_methods_only(counter, description, link, location_and_age, locationSplits, age, phone_number, timestamp)
-            else:
-                if len(self.keywords) > 0:
-                    if self.check_keywords(phone_number) or self.check_keywords(location_and_age) or \
-                            self.check_keywords(description):
-                        self.check_keywords_found(description, location_and_age, locationSplits, age, phone_number, link)
-                        self.append_data(counter, description, link, location_and_age, locationSplits, age, phone_number, timestamp)
-                        screenshot_name = str(counter) + ".png"
-                        self.capture_screenshot(screenshot_name)
-                        counter += 1
-                else:
-                    self.append_data(counter, description, link, location_and_age, locationSplits, age, phone_number, timestamp)
+                    if self._should_discard_post(description):
+                        continue
+
+                    # Save the data we collected about the post.
+                    self.append_data(counter, description, link, location, age, phone_number, timestamp)
                     screenshot_name = str(counter) + ".png"
                     self.capture_screenshot(screenshot_name)
                     counter += 1
 
-            self.RAW_format_data_to_excel()
-            self.CLEAN_format_data_to_excel()
+                    self.RAW_format_data_to_excel()
+                    self.CLEAN_format_data_to_excel()
+                # Breaks the links loop for fast closing time once user presses stop scraper
+                else:
+                    break
+            except Exception as e:
+                print(f"Error processing link {link}: {e}")
+                continue
 
     '''
     --------------------------
     Appending Data
     --------------------------
     '''
-    def append_data(self, counter, description, link, location_and_age, locationSplits, age, phone_number, timestamp) -> None:
+    def append_data(self, counter, description, link, location, age, phone_number, timestamp) -> None:
         self.post_identifier.append(counter)
         self.phone_number.append(phone_number)
         self.links.append(link)
-        self.location_and_age.append(location_and_age)
-        self.locationSplits.append(locationSplits)
+        self.location.append(location)
         self.age.append(age)
         self.description.append(description)
-        self.check_and_append_payment_methods(description)
+        payment_methods = self.get_payment_methods(description)
+        self.payment_methods_found.append("\n".join(payment_methods) or "N/A")
         self.keywords_found.append(', '.join(self.keywords_found_in_post) or 'N/A')
-        self.number_of_keywords_found.append(self.number_of_keywords_in_post or 'N/A')
-        self.check_for_social_media(description)
+        self.number_of_keywords_found.append(len(self.keywords_found_in_post) or "N/A")
+        social_media = self.get_social_media(description)
+        self.social_media_found.append("\n".join(social_media) or "N/A")
         self.timestamps.append(timestamp)
-
-    def join_inclusive(self, counter, description, link, location_and_age, locationSplits, age, phone_number, timestamp):
-        if len(self.keywords) == len(set(self.keywords_found_in_post)):
-            self.append_data(counter, description, link, location_and_age, locationSplits, age, phone_number, timestamp)
-            screenshot_name = str(counter) + ".png"
-            self.capture_screenshot(screenshot_name)
-
-            return counter + 1
-        return counter
-
-    def payment_methods_only(self, counter, description, link, location_and_age, locationSplits, age, phone_number, timestamp):
-        if self.check_for_payment_methods(description):
-            self.append_data(counter, description, link, location_and_age, locationSplits, age, phone_number, timestamp)
-            screenshot_name = str(counter) + ".png"
-            self.capture_screenshot(screenshot_name)
-
-            return counter + 1
-        return counter
-
-    def join_with_payment_methods(self, counter, description, link, location_and_age, locationSplits, age, phone_number, timestamp):
-        if self.check_for_payment_methods(description) and len(self.keywords) == len(set(self.keywords_found_in_post)):
-            self.append_data(counter, description, link, location_and_age, locationSplits, age, phone_number, timestamp)
-            screenshot_name = str(counter) + ".png"
-            self.capture_screenshot(screenshot_name)
-
-            return counter + 1
-        return counter
+        # Store information about the post in the database.
+        try:
+            with self.open_database() as connection, connection.cursor() as cursor:
+                # Escort Alligator displays timestamps in 24-hour notation, but
+                # still includes 'AM' and 'PM', which confuses PostgreSQL.
+                timestamp = re.sub("AM|PM", "", timestamp)
+                cursor.execute(
+                    """
+                    insert into raw_escort_alligator_posts
+                    values (%s, %s, %s, %s, %s, %s, %s, %s, %s, %s)
+                    on conflict do nothing;
+                    """,
+                    (
+                        link,
+                        self.city,
+                        location,
+                        timestamp,
+                        phone_number,
+                        age,
+                        description,
+                        payment_methods,
+                        social_media,
+                        list(self.keywords_found_in_post),
+                    ),
+                )
+        except Exception as e:
+            print(f"Database write failed: {e}") 
 
     '''
     --------------------------
     Checking and Running Append
     --------------------------
     '''
-    def check_keywords_found(self, description, location_and_age, locationSplits, age, phone_number, link):  # add link as well?
+    def check_keywords_found(self, description, location, age, phone_number, link):
         self.check_and_append_keywords(description)
-        self.check_and_append_keywords(location_and_age)
-        self.check_and_append_keywords(locationSplits)
+        self.check_and_append_keywords(location)
         self.check_and_append_keywords(age)
         self.check_and_append_keywords(phone_number)
         self.check_and_append_keywords(link)
 
-    def check_for_payment_methods(self, description) -> bool:
+    @override
+    def check_for_payment_methods(self, description: str) -> bool:
         for payment in self.known_payment_methods:
             if payment in description.lower():
                 return True
         return False
 
-    def check_and_append_payment_methods(self, description):
-        payments = ''
-        for payment in self.known_payment_methods:
-            if payment in description.lower():
-                payments += payment + '\n'
+    def get_payment_methods(self, description: str) -> list[str]:
+        # Normalize the case of the description.
+        description = description.lower()
+        payment_methods: list[str] = []
+        for payment_method in self.known_payment_methods:
+            if payment_method in description:
+                payment_methods.append(payment_method)
+        return payment_methods
 
-        if payments != '':
-            self.payment_methods_found.append(payments)
-        else:
-            self.payment_methods_found.append('N/A')
-
-    def check_for_social_media(self, description) -> None:
-        social_media = ''
+    def get_social_media(self, description: str) -> list[str]:
+        # Normalize the case of the description.
+        description = description.lower()
+        social_media: list[str] = []
         for social in self.known_social_media:
-            if social in description.lower():
-                social_media += social + '\n'
+            if social in description:
+                social_media.append(social)
+        return social_media
 
-        if social_media != '':
-            self.social_media_found.append(social_media)
-        else:
-            self.social_media_found.append('N/A')
-
-    def check_keywords(self, data) -> bool:
-        for key in self.keywords:
-            if key in data:
-                return True
-        return False
-
-    def check_and_append_keywords(self, data) -> None:
+    @override
+    def check_and_append_keywords(self, data: str) -> None:
         for key in self.keywords:
             if key in data.lower():
-                self.keywords_found_in_post.append(key)
-                self.number_of_keywords_in_post += 1
+                self.keywords_found_in_post.add(key)
+
+    def _should_discard_post(self, description: str) -> bool:
+        if self.join_keywords:
+            # Discard posts that don't contain ALL keywords.
+            if len(self.keywords_found_in_post) < len(self.keywords):
+                return True
+        elif not self.only_posts_with_payment_methods and len(self.keywords) > 0:
+            # Discard posts that don't contain ANY keywords, unless:
+            # 1. We're specifically looking for posts with payment methods, in
+            #    which case we keep *all* posts with payment methods.
+            # 2. No keywords were originally provided.
+            if len(self.keywords_found_in_post) == 0:
+                return True
+
+        if self.only_posts_with_payment_methods:
+            if not self.check_for_payment_methods(description):
+                return True
+
+        return False
 
     '''
     ---------------------------------
@@ -382,7 +373,7 @@ class EscortalligatorScraper(ScraperPrototype):
             'Link': self.links,
             # -------
             'Inputted City / Region': self.city,
-            'Specified Location': self.locationSplits,
+            'Specified Location': self.location,
             # ------
             'Timestamp': self.timestamps,
             # -------
@@ -398,7 +389,6 @@ class EscortalligatorScraper(ScraperPrototype):
             'Keywords-found': self.keywords_found,
             'Number-of-keywords-found': self.number_of_keywords_found
         }
-        # count = 2
         data = pd.DataFrame(titled_columns)
         with pd.ExcelWriter(
                 f'{self.scraper_directory}/RAW-escortalligator-{self.city}-{self.date_time}.xlsx',
@@ -429,34 +419,17 @@ class EscortalligatorScraper(ScraperPrototype):
                 worksheet.column_dimensions[
                     col[0].column_letter].width = adjusted_width
 
-    #call it
     def CLEAN_format_data_to_excel(self) -> None:
-
-        # append certain info together
-        contact_info = [
-            f"{phone_number}"
-            for phone_number in zip(
-                self.phone_number,
-            )
-        ]
-        location = [
-            f"{city}||| {local}"
-            for city, local in zip(
-                self.city, self.locationSplits
-            )
-        ]
-
-        # define columns
         titled_columns = pd.DataFrame({
             # ---- abs identifiers
             'Post-identifier': self.post_identifier,
             'Link': self.links,  # could also be a keyword source too
             # ------- time and place of posting
             'Inputted City / Region': self.city,
-            'Specified Location': self.locationSplits,  # could also be a keyword source too
+            'Specified Location': self.location,  # could also be a keyword source too
             'Timeline': self.timestamps,
             # ------ methods of tracking
-            'Contacts': contact_info,  # could also be a keyword source too
+            'Contacts': self.phone_number,  # could also be a keyword source too
             # ----- keyword sources
             'Personal Info': self.age,
             'Overall Description': self.description,
@@ -478,7 +451,6 @@ class EscortalligatorScraper(ScraperPrototype):
                 keywords = worksheet["K" + str(i)].value  # set the keywords var to each keyword in the cell
                 for flagged_keyword in self.flagged_keywords:
                     if flagged_keyword in keywords:
-                        print("flagging keyword: ", flagged_keyword)
                         worksheet["K" + str(i)].fill = PatternFill(
                             fill_type='solid',
                             start_color='ff0000',
@@ -515,11 +487,14 @@ class EscortalligatorScraper(ScraperPrototype):
         if len(parts) > 1:
             location = parts[1].strip()
 
-        return age, location
+        return location, age
 
     def capture_screenshot(self, screenshot_name) -> None:
-        self.driver.save_screenshot(f'{self.screenshot_directory}/{screenshot_name}')
-        self.create_pdf()
+        try:
+            self.driver.save_screenshot(f'{self.screenshot_directory}/{screenshot_name}')
+            self.create_pdf()
+        except Exception as e:
+            print(f"Error capturing screenshot: {e}")
 
     def create_pdf(self) -> None:
         screenshot_files = [
@@ -531,11 +506,11 @@ class EscortalligatorScraper(ScraperPrototype):
     def reset_variables(self) -> None:
         self.phone_number = []
         self.description = []
-        self.locationSplits = []
+        self.location = []
         self.age = []
-        self.location_and_age = []
         self.links = []
         self.post_identifier = []
+        self.timestamps = []
         self.payment_methods_found = []
         self.number_of_keywords_found = []
         self.keywords_found = []

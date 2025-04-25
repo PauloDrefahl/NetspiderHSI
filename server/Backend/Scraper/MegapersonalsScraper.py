@@ -1,9 +1,11 @@
 import os
+import time
 from datetime import datetime
 import pandas as pd
-import undetected_chromedriver as uc
+from seleniumbase import Driver
 from selenium.common import NoSuchElementException
 from selenium.webdriver.common.by import By
+from typing_extensions import override
 from Backend.ScraperPrototype import ScraperPrototype
 import img2pdf
 from openpyxl.styles import PatternFill
@@ -52,16 +54,15 @@ class MegapersonalsScraper(ScraperPrototype):
         self.scraper_directory = None
         self.screenshot_directory = None
         self.pdf_filename = None
-        self.keywords = None
-        self.flagged_keywords = None
+        self.keywords: set[str] = set()
+        self.flagged_keywords: set[str] = set()
 
         self.only_posts_with_payment_methods = False
         self.completed = False
 
         self.join_keywords = False
         self.search_mode = False
-        self.number_of_keywords_in_post = 0
-        self.keywords_found_in_post = []
+        self.keywords_found_in_post: set[str] = set()
 
         # lists to store data and then send to excel file
         self.description = []
@@ -100,10 +101,10 @@ class MegapersonalsScraper(ScraperPrototype):
     def set_search_mode(self, search_mode) -> None:
         self.search_mode = search_mode
 
-    def set_flagged_keywords(self, flagged_keywords) -> None:
+    def set_flagged_keywords(self, flagged_keywords: set[str]) -> None:
         self.flagged_keywords = flagged_keywords
 
-    def set_keywords(self, keywords) -> None:
+    def set_keywords(self, keywords: set[str]) -> None:
         self.keywords = keywords
 
     '''
@@ -112,25 +113,24 @@ class MegapersonalsScraper(ScraperPrototype):
     ---------------------------------------
     '''
     def initialize(self) -> None:
-        # set keywords value
-        #self.keywords = keywords
-
         # format date
         self.date_time = str(datetime.today())[0:19].replace(' ', '_').replace(':', '-')
 
-        # Selenium Web Driver setup
-        options = uc.ChromeOptions()
-        # TODO - uncomment this to run headless
-        # options.add_argument('--headless') #This allows the code to run without opening up a new Chrome window
-        options.headless = self.search_mode  # This determines if you program runs headless or not
-        self.driver = uc.Chrome(use_subprocess=True, options=options)
+        self.driver = Driver(
+            driver_version="mlatest",
+            undetectable=True,
+            uc_subprocess=True,
+            headless=self.search_mode,
+            headed=not self.search_mode,
+            chromium_arg=["--disable-extensions", "--incognito", "--disable-component-extensions-with-background-pages"]
+        )
 
         # Open Webpage with URL
         self.open_webpage()
 
         # Format website URL based on state and city
         self.get_formatted_url()
-        self.driver.get(self.url)
+
 
         # Find links of posts
         links = self.get_links()
@@ -146,21 +146,25 @@ class MegapersonalsScraper(ScraperPrototype):
         self.get_data(links)
         self.close_webpage()
         self.reset_variables()
+        self.completed = True
 
     def stop_scraper(self) -> None:
-        if self.search_mode:
-            self.driver.close()
-            self.driver.quit()
-        else:
-            self.driver.close()
+        self.completed = True
 
     def open_webpage(self) -> None:
         self.driver.implicitly_wait(10)
         self.driver.get(self.url)
-        self.driver.maximize_window()
+        print(self.driver.current_url)
+        
+        # NOTE: Maximizing the window in headless mode makes it too big:
+        # https://chromium.googlesource.com/chromium/src.git/+/f2bdeab65/ui/views/win/hwnd_message_handler_headless.cc#264
+        if not self.search_mode:
+            self.driver.maximize_window()
         assert "Page not found" not in self.driver.page_source
         self.driver.find_element(By.XPATH, '//*[@id="checkbox-agree"]').click()
-        self.driver.find_element(By.CLASS_NAME, 'btn').click()
+        # There is a quick fade-in during which we cannot click the button.
+        # `driver.click()` automatically waits for the button to be interactive.
+        self.driver.click(By.ID, 'ageagree')
         self.driver.find_element(By.XPATH, '//*[@id="choseCityContainer"]/div[3]/label').click()
         self.driver.find_element(By.XPATH, '//*[@id="choseCityContainer"]/div[3]/article/div[10]/label').click()
         self.driver.find_element(By.XPATH,
@@ -168,7 +172,7 @@ class MegapersonalsScraper(ScraperPrototype):
         self.driver.find_element(By.XPATH, '//*[@id="megapCategoriesOrangeButton"]').click()
 
     def close_webpage(self) -> None:
-        self.driver.close()
+        self.driver.quit()
 
     '''
     ---------------------------------------
@@ -188,89 +192,66 @@ class MegapersonalsScraper(ScraperPrototype):
         self.url = self.cities.get(self.city)
 
     def get_data(self, links) -> None:
-        counter = 0
+        counter = 1
 
         for link in links:
-            self.driver.get(link)
-            assert "Page not found" not in self.driver.page_source
+            print(f"Processing link {counter}/{len(links)}: {link}")
+            if not self.completed:
+                self.driver.get(link)
+                print(self.driver.current_url)
 
-            try:
-                description = self.driver.find_element(
-                    By.XPATH, '/html/body/div/div[6]/span').text
-            except NoSuchElementException:
-                description = 'N/A'
+                assert "Page not found" not in self.driver.page_source
 
-            try:
-                phone_number = self.driver.find_element(
-                    By.XPATH, '/html/body/div/div[6]/div[1]/span').text
-            except NoSuchElementException:
-                phone_number = 'N/A'
+                try:
+                    description = self.driver.find_element(
+                        By.XPATH, '/html/body/div/div[6]/span').text
+                except NoSuchElementException:
+                    description = 'N/A'
 
-            try:
-                name = self.driver.find_element(
-                    By.XPATH, '/html/body/div/div[6]/p[1]/span[2]').text[5:]
-            except NoSuchElementException:
-                name = 'N/A'
+                try:
+                    phone_number = self.driver.find_element(
+                        By.XPATH, '/html/body/div/div[6]/div[1]/span').text
+                except NoSuchElementException:
+                    phone_number = 'N/A'
 
-            try:
-                city = self.driver.find_element(
-                    By.XPATH, '/html/body/div/div[6]/p[1]/span[1]').text[5:]
-            except NoSuchElementException:
-                city = 'N/A'
+                try:
+                    name = self.driver.find_element(
+                        By.XPATH, '/html/body/div/div[6]/p[1]/span[2]').text[5:]
+                except NoSuchElementException:
+                    name = 'N/A'
 
-            try:
-                location = self.driver.find_element(
-                    By.XPATH, '/html/body/div/div[6]/p[2]').text[9:]
-            except NoSuchElementException:
-                location = 'N/A'
+                try:
+                    city = self.driver.find_element(
+                        By.XPATH, '/html/body/div/div[6]/p[1]/span[1]').text[5:]
+                except NoSuchElementException:
+                    city = 'N/A'
 
-            # reassign variables for each post
-            self.number_of_keywords_in_post = 0
-            self.keywords_found_in_post = []
+                try:
+                    location = self.driver.find_element(
+                        By.XPATH, '/html/body/div/div[6]/p[2]').text[9:]
+                except NoSuchElementException:
+                    location = 'N/A'
 
-            if self.join_keywords and self.only_posts_with_payment_methods:
-                if self.check_keywords(description) or self.check_keywords(name) \
-                        or self.check_keywords(phone_number) or self.check_keywords(city) \
-                        or self.check_keywords(location):
-                    self.check_keywords_found(city, description, location, name, phone_number, link)
-                    counter = self.join_with_payment_methods(city, counter, description, link, location, name,
-                                                             phone_number)
+                # reassign variables for each post
+                self.keywords_found_in_post.clear()
 
-            elif self.join_keywords or self.only_posts_with_payment_methods:
-                if self.join_keywords:
-                    if self.check_keywords(description) or self.check_keywords(name) \
-                            or self.check_keywords(phone_number) or self.check_keywords(city) \
-                            or self.check_keywords(location):
-                        self.check_keywords_found(city, description, location, name, phone_number, link)
-                        counter = self.join_inclusive(city, counter, description, link, location, name,
-                                                      phone_number)
+                # Search the post's contents for keywords.
+                self.check_keywords_found(city, description, location, name, phone_number, link)
 
-                elif self.only_posts_with_payment_methods:
-                    if len(self.keywords) > 0:
-                        if self.check_keywords(description) or self.check_keywords(name) \
-                                or self.check_keywords(phone_number) or self.check_keywords(city) \
-                                or self.check_keywords(location):
-                            self.check_keywords_found(city, description, location, name, phone_number, link)
+                if self._should_discard_post(description):
+                    continue
 
-                    counter = self.payment_methods_only(city, counter, description, link, location, name,
-                                                        phone_number)
+                # Save the data we collected about the post.
+                self.append_data(city, counter, description, link, location, name, phone_number)
+                screenshot_name = str(counter) + ".png"
+                self.capture_screenshot(screenshot_name)
+                counter += 1
+
+                self.RAW_format_data_to_excel()
+                self.CLEAN_format_data_to_excel()
+            # Breaks the links loop for fast closing time once user presses stop scraper
             else:
-                if len(self.keywords) > 0:
-                    if self.check_keywords(description) or self.check_keywords(name) \
-                            or self.check_keywords(phone_number) or self.check_keywords(city) \
-                            or self.check_keywords(location):
-                        self.check_keywords_found(city, description, location, name, phone_number, link)
-                        self.append_data(city, counter, description, link, location, name, phone_number)
-                        screenshot_name = str(counter) + ".png"
-                        self.capture_screenshot(screenshot_name)
-                        counter += 1
-                else:
-                    self.append_data(city, counter, description, link, location, name, phone_number)
-                    screenshot_name = str(counter) + ".png"
-                    self.capture_screenshot(screenshot_name)
-                    counter += 1
-            self.RAW_format_data_to_excel()
-            self.CLEAN_format_data_to_excel()
+                break
 
     '''
     --------------------------
@@ -284,40 +265,37 @@ class MegapersonalsScraper(ScraperPrototype):
         self.contentCity.append(city)
         self.location.append(location)
         self.description.append(description)
-        self.check_and_append_payment_methods(description)
+        payment_methods = self.get_payment_methods(description)
+        self.payment_methods_found.append("\n".join(payment_methods) or "N/A")
         self.link.append(link)
         self.keywords_found.append(', '.join(self.keywords_found_in_post) or 'N/A')
-        self.number_of_keywords_found.append(self.number_of_keywords_in_post or 'N/A')
-        self.check_for_social_media(description)
-
-    def join_inclusive(self, city, counter, description, link, location, name, phone_number) -> int:
-        if len(self.keywords) == len(set(self.keywords_found_in_post)):
-            self.append_data(city, counter, description, link, location, name, phone_number)
-            screenshot_name = str(counter) + ".png"
-            self.capture_screenshot(screenshot_name)
-
-            return counter + 1
-        return counter
-
-    def payment_methods_only(self, city, counter, description, link, location, name,
-                             phone_number) -> int:
-        if self.check_for_payment_methods(description):
-            self.append_data(city, counter, description, link, location, name, phone_number)
-            screenshot_name = str(counter) + ".png"
-            self.capture_screenshot(screenshot_name)
-
-            return counter + 1
-        return counter
-
-    def join_with_payment_methods(self, city, counter, description, link, location, name, phone_number) -> int:
-        if self.check_for_payment_methods(description) and len(self.keywords) == len(set(self.keywords_found_in_post)):
-            self.append_data(city, counter, description, link, location, name, phone_number)
-            screenshot_name = str(counter) + ".png"
-            self.capture_screenshot(screenshot_name)
-
-            return counter + 1
-        return counter
-
+        self.number_of_keywords_found.append(len(self.keywords_found_in_post) or "N/A")
+        social_media = self.get_social_media(description)
+        self.social_media_found.append("\n".join(social_media) or "N/A")
+        # Store information about the post in the database.
+        try:
+            with self.open_database() as connection, connection.cursor() as cursor:
+                cursor.execute(
+                    """
+                    insert into raw_mega_personals_posts
+                    values (%s, %s, %s, %s, %s, %s, %s, %s, %s, %s)
+                    on conflict do nothing;
+                    """,
+                    (
+                        link,
+                        self.city,
+                        city,
+                        location,
+                        phone_number,
+                        name,
+                        description,
+                        payment_methods,
+                        social_media,
+                        list(self.keywords_found_in_post),
+                    ),
+                )
+        except Exception as e:
+            print(f"Database write failed: {e}") 
     '''
     --------------------------
     Checking and Running Append
@@ -331,45 +309,55 @@ class MegapersonalsScraper(ScraperPrototype):
         self.check_and_append_keywords(phone_number)
         self.check_and_append_keywords(link)
 
-    def check_for_payment_methods(self, description) -> bool:
+    @override
+    def check_for_payment_methods(self, description: str) -> bool:
         for payment in self.known_payment_methods:
             if payment in description.lower():
                 return True
         return False
 
-    def check_and_append_payment_methods(self, description):
-        payments = ''
-        for payment in self.known_payment_methods:
-            if payment in description.lower():
-                payments += payment + '\n'
+    def get_payment_methods(self, description: str) -> list[str]:
+        # Normalize the case of the description.
+        description = description.lower()
+        payment_methods: list[str] = []
+        for payment_method in self.known_payment_methods:
+            if payment_method in description:
+                payment_methods.append(payment_method)
+        return payment_methods
 
-        if payments != '':
-            self.payment_methods_found.append(payments)
-        else:
-            self.payment_methods_found.append('N/A')
-
-    def check_for_social_media(self, description) -> None:
-        social_media = ''
+    def get_social_media(self, description: str) -> list[str]:
+        # Normalize the case of the description.
+        description = description.lower()
+        social_media: list[str] = []
         for social in self.known_social_media:
-            if social in description.lower():
-                social_media += social + '\n'
+            if social in description:
+                social_media.append(social)
+        return social_media
 
-        if social_media != '':
-            self.social_media_found.append(social_media)
-        else:
-            self.social_media_found.append('N/A')
-
-    def check_keywords(self, data) -> bool:
-        for key in self.keywords:
-            if key in data:
-                return True
-        return False
-
-    def check_and_append_keywords(self, data) -> None:
+    @override
+    def check_and_append_keywords(self, data: str) -> None:
         for key in self.keywords:
             if key in data.lower():
-                self.keywords_found_in_post.append(key)
-                self.number_of_keywords_in_post += 1
+                self.keywords_found_in_post.add(key)
+
+    def _should_discard_post(self, description: str) -> bool:
+        if self.join_keywords:
+            # Discard posts that don't contain ALL keywords.
+            if len(self.keywords_found_in_post) < len(self.keywords):
+                return True
+        elif not self.only_posts_with_payment_methods and len(self.keywords) > 0:
+            # Discard posts that don't contain ANY keywords, unless:
+            # 1. We're specifically looking for posts with payment methods, in
+            #    which case we keep *all* posts with payment methods.
+            # 2. No keywords were originally provided.
+            if len(self.keywords_found_in_post) == 0:
+                return True
+
+        if self.only_posts_with_payment_methods:
+            if not self.check_for_payment_methods(description):
+                return True
+
+        return False
 
     '''
     ---------------------------------
@@ -426,45 +414,25 @@ class MegapersonalsScraper(ScraperPrototype):
                     col[0].column_letter].width = adjusted_width
 
     def CLEAN_format_data_to_excel(self) -> None:
-        location = [
-            f" {city} ||| {location} "
-            for city, location in zip(
-                self.contentCity, self.location
+        # Concatenate attributes to fit into the CLEAN spreadsheet format, which
+        # is consistent across all scrapers.
+        specified_location = [
+            f"{contentCity} ||| {location}"
+            for (contentCity, location) in zip(
+                self.contentCity, self.location, strict=True
             )
         ]
-
-        personal_info = [
-            f"{name}"
-            for name in zip(
-                self.name
-            )
-        ]
-
-        contact_info = [
-            f"{phone_number}"
-            for phone_number in zip(
-                self.phoneNumber
-            )
-        ]
-
-        overall_desc = [
-            f"{description} "
-            for description in zip(
-                self.description
-            )
-        ]
-
 
         titled_columns = pd.DataFrame({
             'Post-identifier': self.post_identifier,
             'Link': self.link,
             # -------
             'Inputted City / Region': self.city,
-            'Specified Location': location,
+            'Specified Location': specified_location,
             'Timeline': 'N/A',
-            'Contacts': contact_info,
+            'Contacts': self.phoneNumber,
             'Personal Info': self.name,
-            'Overall Description': overall_desc,
+            'Overall Description': self.description,
             # -----
             'Payment-methods': self.payment_methods_found,
             'Social-media-found': self.social_media_found,
@@ -501,8 +469,11 @@ class MegapersonalsScraper(ScraperPrototype):
                     col[0].column_letter].width = adjusted_width
 
     def capture_screenshot(self, screenshot_name) -> None:
-        self.driver.save_screenshot(f'{self.screenshot_directory}/{screenshot_name}')
-        self.create_pdf()
+        try:
+            self.driver.save_screenshot(f'{self.screenshot_directory}/{screenshot_name}')
+            self.create_pdf()
+        except Exception as e:
+            print(f"Error capturing screenshot: {e}")
 
     def create_pdf(self) -> None:
         screenshot_files = [os.path.join(self.screenshot_directory, filename) for filename in os.listdir(self.screenshot_directory) if filename.endswith('.png')]

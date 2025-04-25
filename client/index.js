@@ -1,24 +1,24 @@
 const { app, BrowserWindow, Menu} = require('electron');
 const path = require('path');
 const { execFile, exec } = require('child_process');
-
+const os = require('os');
 
 
 // Specify the path to your Flask executable
-const flaskExecutablePath = 'NetSpiderServer.exe';
+const flaskExecutablePath = 'resources/NetSpiderServer.exe';
 
+let flaskProcess = execFile(flaskExecutablePath);
 
-// Use exec to run the Flask executable
-let flaskProcess = execFile(flaskExecutablePath, (error, stdout, stderr) => {
-  if (error) {
-    console.error(`Error: ${error.message}`);
-    return;
-  }
-  if (stderr) {
-    console.error(`stderr: ${stderr}`);
-    return;
-  }
-  console.log(`stdout: ${stdout}`);
+flaskProcess.stdout.on('data', (data) => {
+  console.log(`[Flask stdout]: ${data.toString().trim()}`);
+});
+
+flaskProcess.stderr.on('data', (data) => {
+  console.error(`[Flask stderr]: ${data.toString().trim()}`);
+});
+
+flaskProcess.on('exit', (code, signal) => {
+  console.log(`Flask process exited with code ${code} and signal ${signal}`);
 });
 
 const flaskPID = flaskProcess.pid
@@ -41,13 +41,18 @@ const createWindow = () => {
         height: 1200,
         webPreferences: {
             nodeIntegration: true,
-            preload: path.join(__dirname, 'dashboard/scripts/preload.js'),
-            devTools: false // Disable developer tools
+            preload: path.join(__dirname, 'static/scripts/preload.js'),
+            devTools: true // Disable developer tools
         },
         icon: 'download-removebg-preview.ico'
     });
 
-    mainWindow.setIcon(path.join(__dirname, 'download-removebg-preview.ico'));
+    //Set icon only if running Windows (fix to run on MacOS and Linux)
+    
+    if (process.platform === 'win32') {
+        mainWindow.setIcon(path.join(__dirname, 'download-removebg-preview.ico'));
+    }
+
 
     // and load the index.html of the app.
     mainWindow.loadFile(path.join(__dirname, 'index.html')).then(r => r);
@@ -74,7 +79,18 @@ const createWindow = () => {
                 { role: 'separator'},
                 { role: 'resetZoom'},
                 { role: 'zoomIn'},
-                { role: 'zoomOut'}
+                { role: 'zoomOut'},
+                { type: 'separator' },
+                {
+                    label: 'Toggle Developer Tools',
+                    accelerator: process.platform === 'darwin' ? 'Command+Alt+I' : 'Ctrl+Shift+I',
+                    click: () => {
+                        const focusedWindow = BrowserWindow.getFocusedWindow();
+                        if (focusedWindow) {
+                            focusedWindow.webContents.toggleDevTools();
+                        }
+                    }
+                }
             ]
         }
     ];
@@ -90,7 +106,7 @@ app.on('ready', () => {
     // Add a delay before creating the window
     setTimeout(() => {
         createWindow();
-    }, 15000); // 15000 milliseconds = 15 seconds
+    }, 1500); // 15000 milliseconds = 15 seconds
 });
 
 // Quit when all windows are closed, except on macOS. There, it's common
@@ -107,5 +123,5 @@ app.on('before-quit', async () => {
   process.kill(flaskPID, 'SIGKILL');
   exec('taskkill /IM NetSpiderServer.exe /F');
   exec('taskkill /IM NetSpiderServer.exe /F');
-  exec('taskkill /IM undetected_chromedriver.exe /F');
+  exec('taskkill /IM uc_driver.exe /F');
 });

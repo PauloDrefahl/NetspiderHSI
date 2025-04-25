@@ -1,11 +1,11 @@
 from abc import ABC, abstractmethod
-from Backend.Keywords import Keywords
+from . import database
 
 
 class ScraperPrototype(ABC):
-    def __init__(self):
+    def __init__(self) -> None:
         self.location = None
-        self.keywords = Keywords()
+        self.keywords: set[str] = set()
         self.join = None
         self.payment = None
         self.url = None
@@ -32,7 +32,7 @@ class ScraperPrototype(ABC):
         pass
 
     @abstractmethod
-    def check_for_payment_methods(self, description):
+    def check_for_payment_methods(self, description: str) -> bool:
         pass
 
     @abstractmethod
@@ -40,9 +40,10 @@ class ScraperPrototype(ABC):
         pass
 
     @abstractmethod
-    def check_keywords(self, text):
+    def check_and_append_keywords(self, data: str) -> None:
         pass
 
-    @abstractmethod
-    def check_and_append_keywords(self, text):
-        pass
+    @staticmethod
+    def open_database() -> database.Connection:
+        """Open a connection to the database."""
+        return database.connect()

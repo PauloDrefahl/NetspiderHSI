@@ -1,0 +1,328 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>DHS Netspider</title>
+    <link rel="icon" type="icons" href="icons/spider-solid.svg"> 
+    <link rel="stylesheet" href="../static/css/dashboard.css">    
+    <link rel="stylesheet" href="../static/css/icons.css">
+    <link rel="stylesheet" href="../static/css/fileInput.css">
+    <link rel="stylesheet" href="../static/css/help.css">
+    <link rel="stylesheet" href="../static/css/navbar.css">
+    <link rel="stylesheet" href="../static/css/scrapersettings.css">
+    <link rel="stylesheet" href="../static/css/website.css">
+    <link rel="stylesheet" href="../static/css/editKeywords.css">
+    <link rel="stylesheet" href="../static/css/selectKeywords.css">
+    <link rel="stylesheet" href="../static/css/resultManager.css">
+
+    <script src="../static/scripts/databaseResults.js" defer></script>
+    <script src="../static/scripts/files.js" defer></script>
+    <script src="../static/scripts/keywords.js" defer></script>
+    <script src="../static/scripts/nav.js" defer></script>
+    <script src="../static/scripts/scraper.js" defer></script>
+
+    <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.6.0/jquery.min.js"></script>
+
+</head>
+
+<body>
+
+<div id="navbar"> <!-- Added hamburger menu into navbar and reorganized navbar into classes -->
+    <div class="hamburger" onclick="toggleMenu()">
+        &#9776;
+    </div>
+
+    <div class="nav-logo">
+        <img src="../static/photos/logo-hsi.png">
+        <h1>Homeland Security Netspider</h1>
+    </div>
+
+    <div class="nav-links">
+        <a href="#" id="settings-link"  ><img src="../static/icons/gear-solid.svg" class="icon"/><span>Settings</span></a>
+        <a href="#" id="netspider-link"><img src="../static/icons/spider-solid.svg" class="icon"/><span>Netspider</span></a>
+        <a href="#med-box" id="keyword-link"><img src="../static/icons/key-solid.svg" class="icon"/><span>Keyword</span></a>
+        <a href="#small-box" id="help-link"><img src="../static/icons/circle-question-solid.svg" class="icon"/><span>Help</span></a>
+        <a href="#big-box-2" id="results-link"><img src="../static/icons/box-archive-solid.svg" class="icon"/><span>Results</span></a>
+        <a href="../index.html" id="logout-link" class="last-child-divider"><img src="../static/icons/right-from-bracket-solid.svg" class="icon"/><span>Logout</span></a>
+    </div>
+    <div class="nav-logo">
+        <img src="../static/photos/fgcu-logo.png" class="fgcu-logo">
+        <div class="divider"></div>
+    </div>
+</div>
+
+<div id="wrapper">
+<div id="content">
+    <div id="content-wrapper">
+        <div class="box" id="keyword-box">
+            <h2><img src="../static/icons/file-regular.svg" class="icon"/> Select Keywords File</h2>
+            <input type="file" id="file1" name="file1" class="file-input">
+        </div>
+        <div class="box" id="keyword-box">
+            <h2><img src="../static/icons/book-solid.svg" class="icon"/> Select Keysets File</h2>
+            <input type="file" id="file2" name="file2" class="file-input">
+        </div> 
+        <div class="box" id="folder-box">
+            <h2><img src="../static/icons/folder-open-regular.svg" class="icon"/> Select Results Folder</h2>
+            <input class="file-input" type="file" id="folderInput" webkitdirectory directory multiple style="display: none;">
+            <button class="select-folder" id="folder-input-btn" >Select Folder</button>
+        </div>
+
+        <!-- Big box under the three existing boxes -->
+        <div id="big-box">
+            <div class="column">
+                <h2><img src="../static/icons/pager-solid.svg" class="icon"/>Select Website:</h2>
+                <div class="radio-buttons">
+                    <input type="radio" id="website1" name="website" value="Escort Alligator" onclick="updateDropdown()">
+                    <label for="website1">Escort Alligator</label>
+
+                    <input type="radio" id="website2" name="website" value="Mega Personals" onclick="updateDropdown()">
+                    <label for="website2">Mega Personals</label>
+
+                    <input type="radio" id="website3" name="website" value="Skip The Games" onclick="updateDropdown()">
+                    <label for="website3">Skip The Games</label>
+
+                    <input type="radio" id="website4" name="website" value="Yes Back Page" onclick="updateDropdown()">
+                    <label for="website4">Yes Back Page</label>
+
+                    <input type="radio" id="website5" name="website" value="Eros" onclick="updateDropdown()">
+                    <label for="website5">Eros</label>
+
+                    <input type="radio" id="website6" name="website" value="RubRatings" onclick="updateDropdown()">
+                    <label for="website6">RubRatings</label>
+                    <div class="divider"></div>
+                </div>
+                <h2 style="margin-top: 25px; margin-bottom: 7px;"><img src="../static/icons/location-arrow-solid.svg" class="icon"/>Select Location:</h2>
+                <!-- Add the following within the #navbar div, after the last <a> tag -->
+                    <div class="dropdown">
+                        <a href="#" class="dropdown-item">Select Location</a>
+                        <div class="dropdown-content">
+
+                        </div>
+                    </div>
+
+                    <h2 style="margin-top: 30px; margin-bottom: 7px;"><img src="../static/icons/book-solid.svg" class="icon"/>Select Keyset:</h2>
+                <!-- Add the following within the #navbar div, after the last <a> tag -->
+                    <div class="dropdown">
+                        <a href="#" class="dropdown-item-keyset" >Select Keyset</a>
+                        <div class="dropdown-content-keyset">
+                        </div>
+                    </div>
+
+            </div>
+            <div class="column">
+                <h2><img src="../static/icons/key-solid.svg" class="icon" id="blueIcon"/>Select Keywords:</h2>
+                <!-- Add content for column 2 here -->
+                <div class="listbox-area">
+                    <select id="itemList" multiple="multiple"></select>
+                </div>
+                <button id="select-all-btn">Select All</button>
+                <button id="open-results-folder-btn" onclick="this.classList.toggle('clicked')">Open Results Folder</button>
+            </div>
+            <div class="column">
+
+                <h2><img src="../static/icons/gear-solid.svg" class="icon" id="blueIcon2"/> Scraper Settings:</h2>
+                <p>Enter Text to Scrape:</p>
+                <textarea id="scraperTextbox" name="scraperTextbox"></textarea>
+
+                <div class="checkboxes" style="margin-top: 10px;">
+                    <p> <input type="checkbox" id="all_keywords" name="all_keywords"> Search For Page with all Keywords Included</p>
+                    <p> <input type="checkbox" id="payment_method" name="payment_method"> Find Posts Only with Payment Methods</p>
+                    <p> <input type="checkbox" id="hide_browser" name="hide_browser">Hide Browser while Running</p>
+                    <div class="divider"></div>
+                </div>
+                <h2><img src="../static/icons/play-solid.svg" class="icon"/>Start Scraper:</h2>
+                <div>
+                    <label onclick="StartScraper(selectedWebsite, selectedLocation)" id="startButton">Start</label>
+                    <label onclick="StopScraper()" id="stopButton">Stop</label>
+                </div>
+
+                <div id="additionalDiv">
+                    <div style="margin-right: 5%; min-height: 28px;" class="column-s">
+                        <!-- Content for the first column -->
+                        <h2 id='status' style="font-size: 20px;">Status: OFF</h2>
+                    </div>
+                    <div class="column-s">
+                        <!-- Content for the second column -->
+                        <h2><div id="clock"></div></h2>
+                        <h2><div id="clock"></div></h2>
+                    </div>
+                </div>
+            </div>
+        </div>
+<!---------------------------Automatic Scraper Setup----------------------------->
+        <div id="big-box">
+            <div class="column">
+                <h2>Add Automatic Scraper:</h2>
+                <h3>Scraper Name:</h3>
+                <div class="input-container">
+                    <input type="text" class="setScrp-input setname-input" placeholder="Type Scraper Name" id="addScraperText">
+                </div>
+                <h3>Number of Days to Scrape:</h3>
+                <div class="input-container">
+                    <input type="number" class="auto-days-input setname-input" placeholder="Number of Days" id="addLengthNumber" min="1">
+                </div>
+                <h3>Scraper Frequency:</h3>
+                <h4> 
+                    <select id="frequency" name="frequency">
+                        <option value="daily">Daily</option>
+                        <option value="weekly">Weekly</option>
+                    </select>
+                </h4>
+                <div>
+                    <label onclick="saveScheduledScraper(
+                        document.getElementById('addScraperText'),
+                        document.getElementById('addLengthNumber'),
+                        document.getElementById('frequency'),
+                    )" id="addScheduleButton">Schedule Scraper</label>
+                </div>
+            </div>
+
+            <div class="column">
+                <h2>Delete AutoScraper:</h2>
+                <h3>Scraper Name:</h3>
+                <div class="input-container">
+                    <input type="text" class="setScrp-input setname-input" placeholder="Type Scraper Name" id="deleteScraperText">
+                </div>
+                <div>
+                    <label onclick="deleteScheduledScraper(
+                        document.getElementById('deleteScraperText'),
+                    )" id="deleteScheduleButton">Delete Scheduled Scraper</label>
+                </div>
+            </div>
+
+            <div class="column">
+                <h2><img src="../static/icons/pager-solid.svg" class="icon"/>Active Schedules:</h2>
+                <ul id="scheduleList">
+                    <!--Dynamic Schedule List-->
+                </ul>
+            </div>
+        </div>
+
+        <div id="med-box">
+            <div id="box-header">
+                <h2 style="color: #09558B;"><img src="../static/icons/pen-to-square-solid.svg" class="icon"/>Edit Keywords & Sets:</h2>
+            </div>
+            <div class="column">
+                <h3>Enter New Keyword:</h3>
+                <div class="input-container">
+                    <input type="text" class="setname-input" placeholder="Type new keyword" id="addKeywordText">
+                    <button class="create-set-btn" id="addKeyword">Add Keyword</button>
+                </div>
+                <div class="listbox-area2">
+                    <select id="itemListKeywords" multiple="multiple"></select>
+                </div>
+                <div class="button-container">
+                    <button class="deleteButton" id="deleteKeyword" style="width: 60%; display: inline-block; white-space: nowrap; padding-right: 10px;">Delete Keyword<img style="height: 12px; margin-left: 5%;" src="../static/icons/trash-solid.svg"/> </button>
+                </div>
+            </div>
+            <div class="column">
+                <h3>Enter Set Name:</h3>
+                <div class="input-container">
+                    <input type="text" class="setname-input" placeholder="Type new set name" id="setname">
+                    <button class="create-set-btn" id="create-set">Create Set</button>
+                </div>
+                <div class="listbox-area2">
+                    <select id="itemListSet" multiple="multiple"></select>
+                </div>
+                <div class="button-container">
+                    <button class="deleteButton" id="delete-set">Delete Set <img style="height: 12px; margin-left: 5%;" src="../static/icons/trash-solid.svg"/> </button>
+                </div>
+            </div>
+        </div>
+
+
+        <div id="small-box" style="width: 30%; margin-left: 4%;">
+            <div id="box-header"  style="margin-bottom: 12%">
+                <h2 style="color: #09558B;"><img style="height: 20px; margin-right: 10px;" src="../static/icons/circle-question-solid.svg" class="blueIcon2">Resources and Support:</h2>
+            </div>
+            <button onclick="window.open('../netspider.pdf', '_blank');" class="button-hp">User Guide</button>
+            <button onclick="window.open('https://github.com/PauloDrefahl/NetspiderHSI', '_blank');" class="button-hp">Github Repository</button>
+            <button onclick="window.open('../NetSpider_user_manual_v1.1.pdf', '_blank');" class="button-hp">Developers Guide</button>
+            <button onclick="window.open('../APP LICENSE', '_blank');" class="button-hp">Licensing Agreement</button>
+        </div>
+
+        <div id="big-box-2">
+            <div id="box-header">
+                <h2 style="color: #09558B;"><img src="../static/icons/box-archive-solid_old.svg" class="icon"/>Result Manager</h2>
+            </div>
+            <div class = "result-list-col">
+                <div id="contentContainer"> <!-- Container to hold both the list and the grid of buttons -->
+                    <div id="listSection"> <!-- Section for the list -->
+                        <div>
+                            <button id="refreshListButton" class="button-app-sub">Refresh List</button>
+                        </div>
+                        <div id="listContainer">
+                            <ol id="list"></ol>
+                        </div>
+                        <div id="appendButtons">
+                            <button id="appendButton" class="button-app-append">Append</button> <!-- Removed space from ID for better practice -->
+                            <button id="cancelButton" class="button-app-cancel">Cancel</button>
+                            <button id="submitButton" class="button-app-submit">Submit</button>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            <div class = "result-button-col">
+                <div id="buttonArea"> <!-- Grid for 6 buttons -->
+                    <button id="viewPdfButton" class="button-result-ops">View PDF</button>
+                    <button id="viewSsButton" class="button-result-ops">View Screenshot Directory</button>
+                    <button id="viewRawDataButton" class="button-result-ops">View RAW Data</button>
+                    <button id="viewCleanDataButton" class="button-result-ops">View CLEAN Data</button>
+                    <button id="viewDiagramButton" class="button-result-ops">View Diagram Directory</button>
+<!--                    <button id="generateKeywordsButton" class="button-hp">Generate New Keywords</button>-->
+                </div>
+            </div>
+        </div>
+
+        <div id="big-box-3">
+            <div id="box-header-2">
+                <h2 style="color: #09558B;">Database Results</h2>
+            </div>
+            <div class="database-refresh">
+                <button id="refreshDatabaseResults" class="button-app-sub">Refresh Results</button>
+            </div>
+            <div class="database-controls">
+                <select id="tableSelector" class="filter-dropdown">
+                    <option value="raw_escort_alligator_posts">Escort Alligator</option>
+                    <option value="raw_eros_posts">Eros</option>
+                    <option value="raw_mega_personals_posts">Mega Personals</option>
+                    <option value="raw_rub_ratings_posts">Rub Ratings</option>
+                    <option value="raw_skipthegames_posts">Skip the Games</option>
+                    <option value="raw_yesbackpage_posts">Yes Back Page</option>
+                </select>
+                <select id="locationFilter" class="filter-dropdown">
+                    <option value="">All Locations</option>
+                </select>
+            </div>
+            <div class="table-wrapper">
+                <div class="table-scroll">
+                    <table id="scrape-results-table">
+                        <thead>
+                            <!-- table headers are dynamically populated -->
+                        </thead>
+                        <tbody>
+                            <!-- table rows are dynamically populated-->
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+</div>
+
+
+<script>
+
+    function FocusON() {
+        document.getElementById("settings-link").focus();
+    }
+</script>
+
+<script src="../static/scripts/resultManager.js"></script>
+<script src="../static/scripts/scheduler.js"></script>
+
+</body>
+</html>
