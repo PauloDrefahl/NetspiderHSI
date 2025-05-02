@@ -25,5 +25,4 @@ dependencies = [
   'selenium',
   'seleniumbase',
   'typing-extensions',
-  'watchdog',
 ]

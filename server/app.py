@@ -20,7 +20,6 @@ from flask_socketio import SocketIO
 from flask_cors import CORS
 from PyQt5.QtWidgets import QFileDialog, QApplication
 from engineio.async_drivers import gevent
-from watchdog.events import FileSystemEventHandler
 from apscheduler.schedulers.background import BackgroundScheduler
 from apscheduler.executors.pool import ThreadPoolExecutor
 from apscheduler.triggers.cron import CronTrigger
@@ -50,20 +49,6 @@ socketio = SocketIO(app, async_mode='gevent', cors_allowed_origins="*")
     ---------------------------------
 '''
 
-
-class DirectoryWatchHandler(FileSystemEventHandler):
-    def on_any_event(self, event):
-        print(f"Event triggered: {event}")  # Debugging line
-        print("Updating files list...")  # Debugging line
-        resultManager.update_folders_json()
-        # resultList = resultManager.get_folders()
-        #
-        # # Check if resultList is not empty and send the list
-        # if resultList:
-        #     socketio.emit('result_folder_selected', {'folders': resultList})
-        # else:
-        #     # Notify if the directory is empty or there are no folders
-        #     socketio.emit('result_folder_selected', {'error': 'No folders found in the selected directory'})
 
 def list_threads():
     threads = threading.enumerate()

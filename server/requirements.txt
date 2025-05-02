@@ -102,7 +102,6 @@ typing_extensions
 tzdata
 tzlocal
 urllib3
-watchdog
 websocket-client
 websockets
 Werkzeug
