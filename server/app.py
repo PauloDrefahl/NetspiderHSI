@@ -1,22 +1,25 @@
+# We should patch the standard library as early as possible.
+# Source: https://www.gevent.org/api/gevent.monkey.html
+# ruff: noqa: E402
+import gevent.monkey
+
+gevent.monkey.patch_all()
+
 #standard library imports
 import os
 import json
 import threading
-from datetime import datetime, timedelta
+from datetime import datetime
 
 #third-party imports
-import gevent.monkey
-gevent.monkey.patch_all()
-
 import psycopg
 from psycopg import sql
 from psycopg.rows import dict_row
-from flask import Flask, jsonify
+from flask import Flask
 from flask_socketio import SocketIO
 from flask_cors import CORS
 from PyQt5.QtWidgets import QFileDialog, QApplication
 from engineio.async_drivers import gevent
-from watchdog.observers import Observer
 from watchdog.events import FileSystemEventHandler
 from apscheduler.schedulers.background import BackgroundScheduler
 from apscheduler.executors.pool import ThreadPoolExecutor
@@ -24,12 +27,12 @@ from apscheduler.triggers.cron import CronTrigger
 
 #local imports
 from Backend.Scraper import (
+    ErosScraper,
+    EscortalligatorScraper,
     MegapersonalsScraper,
+    RubratingsScraper,
     SkipthegamesScraper,
     YesbackpageScraper,
-    EscortalligatorScraper,
-    ErosScraper,
-    RubratingsScraper
 )
 from Backend import database
 from Backend.resultManager.appendResults import FolderAppender

@@ -1,6 +1,6 @@
 """Set up and connect to the database."""
 
-__all__ = ["connect"]
+__all__ = ["Connection", "Cursor", "connect"]
 
 import contextlib
 from contextlib import suppress
