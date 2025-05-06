@@ -1,8 +1,9 @@
-const { app, BrowserWindow, Menu} = require('electron');
-const path = require('path');
-const { execFile, exec } = require('child_process');
-const os = require('os');
+const { exec, execFile } = require('node:child_process');
+const path = require('node:path');
+const { app, BrowserWindow, Menu } = require('electron/main');
 
+// Handle creating/removing shortcuts on Windows when installing/uninstalling.
+if (require('electron-squirrel-startup')) app.quit();
 
 // Specify the path to your Flask executable
 const flaskExecutablePath = 'resources/NetSpiderServer.exe';
@@ -28,11 +29,6 @@ flaskProcess.on('exit', (code, signal) => {
   console.log(`Flask process exited with code ${code} and signal ${signal}`);
   console.log(`Flask pid: ${flaskPID}`)
 });
-
-// Handle creating/removing shortcuts on Windows when installing/uninstalling.
-if (require('electron-squirrel-startup')) {
-    app.quit();
-}
 
 const createWindow = () => {
     // Create the browser window.

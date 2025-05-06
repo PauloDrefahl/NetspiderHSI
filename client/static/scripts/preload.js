@@ -1,13 +1,11 @@
-// preload.js
 // See the Electron documentation for details on how to use preload scripts:
 // https://www.electronjs.org/docs/latest/tutorial/process-model#preload-scripts
-const { ipcRenderer, contextBridge, shell } = require('electron');
+const fs = require('node:fs');
+const path = require('node:path');
+const { contextBridge, ipcRenderer, shell } = require('electron/renderer');
 const io = require('socket.io-client');
-const fs = require('fs');
-const path = require('path');
 
-
-// Create a new socket connection with the dynamic port
+// Connect to the server using a fixed port number of 5173.
 const socket = io.connect(`http://127.0.0.1:5173`);
 
 contextBridge.exposeInMainWorld('ipcRenderer', ipcRenderer);
