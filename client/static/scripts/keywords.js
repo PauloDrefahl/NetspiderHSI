@@ -335,8 +335,7 @@ function unflagKeyword(flaggedKeyword) {
 
 
 // adding and removing keyword to keywords file
-document.addEventListener("DOMContentLoaded", function () {
-    window.editFile = undefined;
+document.addEventListener("DOMContentLoaded", () => {
     const addKeywordButton = document.getElementById('addKeyword');
     const deleteKeywordButton = document.getElementById('deleteKeyword');
     const keywordInput = document.getElementById('addKeywordText');

@@ -1,8 +1,3 @@
-// Assuming data.json is in the same directory as your main script
-// const dataPath = window.electronPath.join(window.nodePaths.__dirname, 'folders.json');
-//
-// let jsonData = JSON.parse(fs.readFileSync(dataPath, 'utf8'));
-
 document.addEventListener('DOMContentLoaded', () => {
     
     // operations for result manager

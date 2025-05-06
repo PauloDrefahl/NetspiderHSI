@@ -1,14 +1,11 @@
 // See the Electron documentation for details on how to use preload scripts:
 // https://www.electronjs.org/docs/latest/tutorial/process-model#preload-scripts
 const fs = require('node:fs');
-const path = require('node:path');
-const { contextBridge, ipcRenderer, shell } = require('electron/renderer');
+const { contextBridge, shell } = require('electron/renderer');
 const io = require('socket.io-client');
 
 // Connect to the server using a fixed port number of 5173.
 const socket = io.connect(`http://127.0.0.1:5173`);
-
-contextBridge.exposeInMainWorld('ipcRenderer', ipcRenderer);
 
 contextBridge.exposeInMainWorld('socket', {
     on: (channel, callback) => {
@@ -17,32 +14,6 @@ contextBridge.exposeInMainWorld('socket', {
     emit: (channel, ...args) => {
         socket.emit(channel, ...args);
     },
-});
-
-contextBridge.exposeInMainWorld('electronPath', {
-    join: (...args) => path.join(...args)
-});
-
-contextBridge.exposeInMainWorld('nodePaths', {
-    __dirname: __dirname,
-    // You can also expose other Node.js path functionalities as needed
-});
-
-contextBridge.exposeInMainWorld('electronAPI', {
-    readJson: (filePath) => new Promise((resolve, reject) => {
-        fs.readFile(filePath, 'utf8', (err, data) => {
-            if (err) {
-                reject(err);
-                return;
-            }
-            try {
-                const jsonData = JSON.parse(data);
-                resolve(jsonData);
-            } catch (parseErr) {
-                reject(parseErr);
-            }
-        });
-    })
 });
 
 // Editing KeywordsFile & KeysetsFile

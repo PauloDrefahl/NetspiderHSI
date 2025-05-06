@@ -3,9 +3,6 @@ let keywordsSetFile = ''
 let resultFolder = ''
 let folderList = ''
 
-window.resultManager = undefined;
-window.electronAPI = undefined;
-
 document.addEventListener("DOMContentLoaded", function () {
     const fileInputs = document.querySelectorAll('.file-input');
 
