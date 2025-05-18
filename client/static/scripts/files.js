@@ -148,19 +148,6 @@ document.addEventListener("DOMContentLoaded", function () {
     });
 
     window.socket.on('result_folder_selected', (data) => {
-
-        if (data.error) {
-            console.error('Error received:', data.error);
-            listElement.innerHTML = `<li>Error: ${data.error}</li>`; // Display error in the list
-            return;
-        }
-
-        if (data.file_explorer_opened) {
-            console.log("File explorer opened but no directory was selected.");
-            listElement.innerHTML = '<li>No directory selected.</li>';
-            return;
-        }
-
         if (data.result_dir) {
             console.log("Result Folder selected:", data.result_dir);
             resultFolder = data.result_dir; // Store the result directory globally if needed
