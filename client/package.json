@@ -1,6 +1,8 @@
 {
   "name": "netspiderhsi",
   "version": "3.0.2",
+  "productName": "NetSpider",
+  "private": true,
   "main": "index.js",
   "devDependencies": {
     "@electron/packager": "^18.3.6",
