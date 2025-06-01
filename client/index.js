@@ -31,34 +31,6 @@ flaskProcess.on('exit', (code, signal) => {
 });
 
 const createWindow = () => {
-    // Create the browser window.
-    const mainWindow = new BrowserWindow({
-        width: 800,
-        height: 1200,
-        webPreferences: {
-            nodeIntegration: true,
-            preload: path.join(__dirname, 'static/scripts/preload.js'),
-            devTools: true // Disable developer tools
-        },
-        icon: 'download-removebg-preview.ico'
-    });
-
-    //Set icon only if running Windows (fix to run on MacOS and Linux)
-    
-    if (process.platform === 'win32') {
-        mainWindow.setIcon(path.join(__dirname, 'download-removebg-preview.ico'));
-    }
-
-
-    // and load the index.html of the app.
-    mainWindow.loadFile(path.join(__dirname, 'index.html')).then(r => r);
-
-    // Prevent opening of developer tools
-    mainWindow.webContents.on('context-menu', (e, props) => {
-        if (props.editFlags.canInspect) {
-            e.preventDefault();
-        }
-    });
     // Create a custom menu
     const menuTemplate = [
         {
@@ -93,6 +65,35 @@ const createWindow = () => {
 
     const menu = Menu.buildFromTemplate(menuTemplate);
     Menu.setApplicationMenu(menu);
+
+    // Create the browser window.
+    const mainWindow = new BrowserWindow({
+        width: 800,
+        height: 1200,
+        webPreferences: {
+            nodeIntegration: true,
+            preload: path.join(__dirname, 'static/scripts/preload.js'),
+            devTools: true // Disable developer tools
+        },
+        icon: 'download-removebg-preview.ico'
+    });
+
+    //Set icon only if running Windows (fix to run on MacOS and Linux)
+    
+    if (process.platform === 'win32') {
+        mainWindow.setIcon(path.join(__dirname, 'download-removebg-preview.ico'));
+    }
+
+
+    // and load the index.html of the app.
+    mainWindow.loadFile(path.join(__dirname, 'index.html')).then(r => r);
+
+    // Prevent opening of developer tools
+    mainWindow.webContents.on('context-menu', (e, props) => {
+        if (props.editFlags.canInspect) {
+            e.preventDefault();
+        }
+    });
 };
 
 
