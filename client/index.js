@@ -75,15 +75,8 @@ const createWindow = () => {
             preload: path.join(__dirname, 'static/scripts/preload.js'),
             devTools: true // Disable developer tools
         },
-        icon: 'download-removebg-preview.ico'
+        icon: path.join(__dirname, 'download-removebg-preview.ico'),
     });
-
-    //Set icon only if running Windows (fix to run on MacOS and Linux)
-    
-    if (process.platform === 'win32') {
-        mainWindow.setIcon(path.join(__dirname, 'download-removebg-preview.ico'));
-    }
-
 
     // and load the index.html of the app.
     mainWindow.loadFile(path.join(__dirname, 'index.html')).then(r => r);
