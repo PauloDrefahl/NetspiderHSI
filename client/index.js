@@ -2,6 +2,8 @@ const { exec, execFile } = require('node:child_process');
 const path = require('node:path');
 const { app, BrowserWindow, Menu } = require('electron/main');
 
+const inProduction = app.isPackaged;
+
 // Handle creating/removing shortcuts on Windows when installing/uninstalling.
 if (require('electron-squirrel-startup')) app.quit();
 
@@ -33,34 +35,21 @@ flaskProcess.on('exit', (code, signal) => {
 const createWindow = () => {
     // Create a custom menu
     const menuTemplate = [
-        {
-            label: 'File',
-            submenu: [
-                { role: 'quit' }
-            ]
-        },
+        { role: 'fileMenu' },
         {
             label: 'View',
             submenu: [
                 { role: 'reload' },
-                { role: 'forcereload' },
-                { role: 'separator'},
-                { role: 'resetZoom'},
-                { role: 'zoomIn'},
-                { role: 'zoomOut'},
+                { role: 'forceReload' },
+                ...(inProduction ? [] : [{ role: 'toggleDevTools' }]),
                 { type: 'separator' },
-                {
-                    label: 'Toggle Developer Tools',
-                    accelerator: process.platform === 'darwin' ? 'Command+Alt+I' : 'Ctrl+Shift+I',
-                    click: () => {
-                        const focusedWindow = BrowserWindow.getFocusedWindow();
-                        if (focusedWindow) {
-                            focusedWindow.webContents.toggleDevTools();
-                        }
-                    }
-                }
-            ]
-        }
+                { role: 'resetZoom' },
+                { role: 'zoomIn' },
+                { role: 'zoomOut' },
+                { type: 'separator' },
+                { role: 'togglefullscreen' },
+            ],
+        },
     ];
 
     const menu = Menu.buildFromTemplate(menuTemplate);
