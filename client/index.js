@@ -32,7 +32,7 @@ flaskProcess.on('exit', (code, signal) => {
   console.log(`Flask pid: ${flaskPID}`)
 });
 
-const createWindow = () => {
+const createWindow = async () => {
     // Create a custom menu
     const menuTemplate = [
         { role: 'fileMenu' },
@@ -58,24 +58,18 @@ const createWindow = () => {
     // Create the browser window.
     const mainWindow = new BrowserWindow({
         width: 800,
-        height: 1200,
+        height: 800,
         webPreferences: {
+            // Allow the preload script to import arbitrary Node.js modules.
             nodeIntegration: true,
             preload: path.join(__dirname, 'static/scripts/preload.js'),
-            devTools: true // Disable developer tools
+            devTools: !inProduction,
         },
         icon: path.join(__dirname, 'download-removebg-preview.ico'),
     });
 
     // and load the index.html of the app.
-    mainWindow.loadFile(path.join(__dirname, 'index.html')).then(r => r);
-
-    // Prevent opening of developer tools
-    mainWindow.webContents.on('context-menu', (e, props) => {
-        if (props.editFlags.canInspect) {
-            e.preventDefault();
-        }
-    });
+    await mainWindow.loadFile(path.join(__dirname, 'index.html'));
 };
 
 
