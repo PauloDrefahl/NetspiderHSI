@@ -406,7 +406,8 @@ def load_json(file_path):
             config = json.load(file)
         return config
     except FileNotFoundError:
-        print(f"File {file_path} not found. Ensure the file exists.")
+        # The user has never scheduled a scraper.
+        return {}
     except json.JSONDecodeError:
         print(f"Error decoding JSON from {file_path}.")
 
