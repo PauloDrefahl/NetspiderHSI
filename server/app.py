@@ -10,6 +10,7 @@ import os
 import json
 import threading
 from datetime import datetime
+from pathlib import Path
 
 #third-party imports
 import psycopg
@@ -37,6 +38,8 @@ from Backend import database
 from Backend.resultManager.appendResults import FolderAppender
 from Backend.resultManager.resultManager import ResultManager
 
+
+AUTOSCRAPER_CONFIG_PATH = Path("server/scheduled_scrapers.json")
 
 app = Flask(__name__)
 qt_app = QApplication([])
@@ -400,21 +403,26 @@ def handle_database_results(data):
     # If the scheduler restarts none of the jobs will be okay if they arent said in a job scheduler
 
 #------function called to load automatic scrapers from json------
-def load_json(file_path):
+def load_json(path: Path):
     try:
-        with open(file_path, 'r') as file:
-            config = json.load(file)
+        config = json.loads(path.read_text(encoding="utf-8"))
+        if not isinstance(config, dict):
+            message = "The autoscraper configuration must be an object."
+            raise Exception(message)
         return config
     except FileNotFoundError:
         # The user has never scheduled a scraper.
         return {}
     except json.JSONDecodeError:
-        print(f"Error decoding JSON from {file_path}.")
+        print(f"Error decoding JSON from {path}.")
+        raise
+
 
 #------function called to save scraper updates after run------
-def save_json(config, file_path):
-    with open(file_path, 'w') as json_file:
-        json.dump(config, json_file, indent=4)
+def save_json(config, path: Path) -> None:
+    with path.open("w", encoding="utf-8") as file:
+        json.dump(config, file, indent=4)
+
 
 def process_scraper(scraper_name, scraper_settings):
         print(f"Processing {scraper_name}")
@@ -425,10 +433,9 @@ def process_scraper(scraper_name, scraper_settings):
         print(f"{scraper_name} processing complete.")
 
 def load_autoscraper_jobs():
-        # Gets autoscrapers configurations from json file
-        file_path = "server/scheduled_scrapers.json"
-        config = load_json(file_path)
-        
+        # Load the autoscraper's configuration from a JSON file.
+        config = load_json(AUTOSCRAPER_CONFIG_PATH)
+
         # Gives any schedule scraper 2 hours to start from start time before terminating and not running
         scraper_grace_period = 7200 # time in seconds
         
@@ -448,18 +455,17 @@ def load_autoscraper_jobs():
                     job_object = scheduler.add_job(run_scheduled_scraper, weekly_cron_trigger, misfire_grace_time= scraper_grace_period, args=[scraper_config_name, "scrap"] )
                     print(f"Scraper Loaded: {scraper_config_name}, Scraper ID: {job_object.id}")
                     config[scraper_config_name]["job_id"] = job_object.id
-                    save_json(config, file_path)
+                    save_json(config, AUTOSCRAPER_CONFIG_PATH)
 
                 elif run_daily:
                     daily_cron_trigger = CronTrigger(hour=scraper_settings["hour"], minute=scraper_settings["minute"])
                     job_object = scheduler.add_job(run_scheduled_scraper, trigger=daily_cron_trigger, misfire_grace_time= scraper_grace_period, args=[scraper_config_name, "scrap"] )
                     print(f"Scraper Loaded: {scraper_config_name}, Scraper ID: {job_object.id}")
                     config[scraper_config_name]["job_id"] = job_object.id
-                    save_json(config, file_path)
+                    save_json(config, AUTOSCRAPER_CONFIG_PATH)
 
 def delete_autoscraper_jobs():
-    file_path = "server/scheduled_scrapers.json" 
-    config = load_json(file_path)
+    config = load_json(AUTOSCRAPER_CONFIG_PATH)
 
     for scraper_config_name, scraper_settings in config.items():
         runs_left = scraper_settings["runs_left"]
@@ -473,8 +479,8 @@ def delete_autoscraper_jobs():
             
             scraper_settings["job_id"] = ""
             scraper_settings["runs_left"] = 0
-        
-            save_json(config, file_path)
+
+            save_json(config, AUTOSCRAPER_CONFIG_PATH)
 
     # Deletes scrapers if they have be rename,deleted, modified
     current_schedules = scheduler.get_jobs()
@@ -521,9 +527,7 @@ def manage_scraper():
 
 #------function called to run scraper------
 def run_scheduled_scraper(scraper_name, function_name):
-    
-    file_path = "server/scheduled_scrapers.json" 
-    config = load_json(file_path)
+    config = load_json(AUTOSCRAPER_CONFIG_PATH)
 
     print(f"Checking for scraper: {scraper_name}\nTask:{function_name}")
     if scraper_name in config:
@@ -544,8 +548,9 @@ def run_scheduled_scraper(scraper_name, function_name):
             process_scraper(scraper_name, scraper_config)
             
             print(f"Scraper Finished: {scraper_name}")
-            save_json(config, file_path)  
-    
+            save_json(config, AUTOSCRAPER_CONFIG_PATH)
+
+
 # Start of main code
 # Test for later(Will put process on multiple cpus):
 #       -processpool: ProcessPoolExecutor(2)
