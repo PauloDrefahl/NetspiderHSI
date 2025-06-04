@@ -1,6 +1,6 @@
 const { exec, execFile } = require('node:child_process');
 const path = require('node:path');
-const { app, BrowserWindow, Menu } = require('electron/main');
+const { app, BrowserWindow, dialog, ipcMain, Menu } = require('electron/main');
 
 const inProduction = app.isPackaged;
 
@@ -72,10 +72,12 @@ const createWindow = async () => {
     await mainWindow.loadFile(path.join(__dirname, 'index.html'));
 };
 
-
 // This method will be called when Electron has finished
 // initialization and is ready to create browser windows.
-app.whenReady().then(createWindow);
+app.whenReady().then(() => {
+    initializeIpc();
+    createWindow();
+});
 
 // Quit when all windows are closed, except on macOS. There, it's common
 // for applications and their menu bar to stay active until the user quits
@@ -93,3 +95,14 @@ app.on('before-quit', async () => {
   exec('taskkill /IM NetSpiderServer.exe /F');
   exec('taskkill /IM uc_driver.exe /F');
 });
+
+function initializeIpc() {
+    ipcMain.handle('dialog:openDirectory', async (event) => {
+        const senderWindow = BrowserWindow.fromWebContents(event.sender);
+        // Keep the properties we want, and discard the macOS `bookmarks`.
+        const { canceled, filePaths } = await dialog.showOpenDialog(senderWindow, {
+            properties: ['openDirectory', 'createDirectory'],
+        });
+        return { canceled, filePaths };
+    });
+}

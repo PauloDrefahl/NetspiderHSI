@@ -1,7 +1,7 @@
 // See the Electron documentation for details on how to use preload scripts:
 // https://www.electronjs.org/docs/latest/tutorial/process-model#preload-scripts
 const fs = require('node:fs');
-const { contextBridge, shell } = require('electron/renderer');
+const { contextBridge, ipcRenderer, shell } = require('electron/renderer');
 const io = require('socket.io-client');
 
 // Connect to the server using a fixed port number of 5173.
@@ -167,6 +167,12 @@ contextBridge.exposeInMainWorld('editFile', {
                 console.error('Error opening folder:', error);
             });
     }
+});
+
+contextBridge.exposeInMainWorld('ipc', {
+    dialog: {
+        openDirectory: () => ipcRenderer.invoke('dialog:openDirectory'),
+    },
 });
 
 // Scheduling Scrapers

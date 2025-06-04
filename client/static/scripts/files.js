@@ -131,59 +131,26 @@ function addOptionKeyset(keysets) {
         option2.classList.add('selected');
         
     });
-    document.querySelector('.dropdown-content-keyset').appendChild(option2);
+    document.querySelector('.dropdown-content-keyset').append(option2);
 }
 
-document.addEventListener("DOMContentLoaded", function () {
+document.addEventListener('DOMContentLoaded', () => {
     const openResultsFolderButton = document.getElementById('open-results-folder-btn');
     const resultsFolderButton = document.getElementById('folder-input-btn');
-    const listElement = document.getElementById('list'); // Ensure this element exists in your HTML
+    const listElement = document.getElementById('list');
 
-    openResultsFolderButton.addEventListener('click', function () {
+    openResultsFolderButton.addEventListener('click', () => {
         window.editFile.openResults(resultFolder);
     });
 
-    resultsFolderButton.addEventListener('click', function () {
-        window.socket.emit('set_result_dir');
-    });
-
-    window.socket.on('result_folder_selected', (data) => {
-        if (data.result_dir) {
-            console.log("Result Folder selected:", data.result_dir);
-            resultFolder = data.result_dir; // Store the result directory globally if needed
-        }
-
-        folderList = data.folders; // This should match the key used in backend 'folders'
-        console.log("Result list:", folderList);
-
-        console.log("Result list:", folderList);
-        if (Array.isArray(folderList) && folderList.length > 0) {
-            console.log('Folders:', folderList);
-            listElement.innerHTML = ''; // Clear previous entries
-
-            folderList.forEach(item => {
-                const listItem = document.createElement('li');
-                listItem.textContent = item;
-
-                listElement.appendChild(listItem);
-
-                listItem.addEventListener('click', function () {
-                    const previouslySelected = document.querySelector('#list li.selected');
-                    if (previouslySelected) {
-                        previouslySelected.classList.remove('selected');
-                    }
-                    this.classList.add('selected');
-                    console.log("Selected Folder:", this.textContent); // For demonstration
-                });
-            });
-        } else {
-            console.error('Error: Folder list is empty or not in expected format');
-            listElement.innerHTML = '<li>No folders found.</li>';
-        }
+    resultsFolderButton.addEventListener('click', async () => {
+        const { canceled, filePaths } = await window.ipc.dialog.openDirectory();
+        if (canceled || filePaths.length === 0) return;
+        resultFolder = filePaths[0];
+        window.socket.emit('set_result_dir', resultFolder);
     });
 
     window.socket.on('result_list_refreshed', (data) => {
-
         if (data.error) {
             console.error('Error received:', data.error);
             listElement.innerHTML = `<li>Error: ${data.error}</li>`; // Display error in the list
@@ -200,8 +167,8 @@ document.addEventListener("DOMContentLoaded", function () {
 
             folderList.forEach(item => {
                 const listItem = document.createElement('li');
-                listItem.textContent = item;  // adding text conte
-                listElement.appendChild(listItem);
+                listItem.textContent = item;
+                listElement.append(listItem);
 
                 listItem.addEventListener('click', function () {
                     const previouslySelected = document.querySelector('#list li.selected');

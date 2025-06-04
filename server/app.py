@@ -6,7 +6,6 @@ import gevent.monkey
 gevent.monkey.patch_all()
 
 #standard library imports
-import os
 import json
 import threading
 from datetime import datetime
@@ -19,7 +18,6 @@ from psycopg.rows import dict_row
 from flask import Flask
 from flask_socketio import SocketIO
 from flask_cors import CORS
-from PyQt5.QtWidgets import QFileDialog, QApplication
 from engineio.async_drivers import gevent
 from apscheduler.schedulers.background import BackgroundScheduler
 from apscheduler.executors.pool import ThreadPoolExecutor
@@ -42,7 +40,6 @@ from Backend.resultManager.resultManager import ResultManager
 AUTOSCRAPER_CONFIG_PATH = Path("server/scheduled_scrapers.json")
 
 app = Flask(__name__)
-qt_app = QApplication([])
 CORS(app)
 socketio = SocketIO(app, async_mode='gevent', cors_allowed_origins="*")
 
@@ -281,15 +278,8 @@ def open_diagram_dir(data):
     return {'Response': response}
 
 
-@socketio.on('set_result_dir')
-def set_result_dir():
-    print("Selecting result directory")
-    directory = QFileDialog.getExistingDirectory(None, "Select Directory", os.getcwd())
-    print("Selected Directory: ", directory)
-
-    print("Selected Directory: ", directory)
-    result_dir = os.path.join(os.getcwd(), directory)
-
+@socketio.on("set_result_dir")
+def set_result_dir(result_dir: str) -> None:
     # initialize the folder appender and result manager
     initialize_result_manager(result_dir)
     initialize_folder_appender(result_dir)
@@ -300,7 +290,7 @@ def set_result_dir():
     print(resultList)
 
     print("sending Result list")
-    socketio.emit('result_folder_selected', {'folders': resultList, 'result_dir': result_dir})
+    socketio.emit("result_list_refreshed", {"folders": resultList})
 
 
 @socketio.on('refresh_result_list')
