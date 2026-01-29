@@ -187,7 +187,7 @@ Please read our [Contributing Guidelines](link-to-contributing-guidelines) for m
 * **Mentor**: Dr. Fernando Gonzalez
 
 ## 25-26 Sponsors and Mentors
-* **Sponsor**: Dave Leorzel
+* **Sponsor**: Dave Loerzel
 * **Mentor**: Dr. Fernando Gonzalez
 
 ## License
