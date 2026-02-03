@@ -18,7 +18,6 @@ from psycopg.rows import dict_row
 from flask import Flask
 from flask_socketio import SocketIO
 from flask_cors import CORS
-from PyQt5.QtWidgets import QFileDialog, QApplication
 from engineio.async_drivers import gevent
 from apscheduler.schedulers.background import BackgroundScheduler
 from apscheduler.executors.pool import ThreadPoolExecutor
@@ -39,7 +38,6 @@ from Backend.resultManager.resultManager import ResultManager
 
 
 app = Flask(__name__)
-qt_app = QApplication([])
 CORS(app)
 socketio = SocketIO(app, async_mode='gevent', cors_allowed_origins="*")
 
@@ -281,9 +279,7 @@ def open_diagram_dir(data):
 @socketio.on('set_result_dir')
 def set_result_dir():
     print("Selecting result directory")
-    directory = QFileDialog.getExistingDirectory(None, "Select Directory", os.getcwd())
-    print("Selected Directory: ", directory)
-
+    directory = os.environ.get('RESULT_DIR', 'results')
     print("Selected Directory: ", directory)
     result_dir = os.path.join(os.getcwd(), directory)
 
