@@ -12,14 +12,8 @@ class DataAnalyzer:
         self.results_directory = results_directory
         self.selected_folder = selected_folder
 
-        print(self.results_directory + "\n")
-        print(self.selected_folder + "\n")
-
-        # the new diagram dir
         self.selected_result_folder_path = os.path.join(self.results_directory, self.selected_folder)
-        self.new_diagram_folder_path = self.selected_result_folder_path + "\\diagrams"
-        print(self.selected_result_folder_path + "\n")
-        print(self.new_diagram_folder_path + "\n")
+        self.new_diagram_folder_path = os.path.join(self.selected_result_folder_path, "diagrams")
 
 
         # creates the directory
@@ -47,18 +41,16 @@ class DataAnalyzer:
     def create_diagrams_directory(self):
         try:
             os.makedirs(self.new_diagram_folder_path, exist_ok=True)
-            print("Directory created successfully or already exists.")
         except Exception as e:
-            print(f"Error creating directory: {e}")
+            raise RuntimeError(f"Error creating directory: {e}") from e
 
     def read_data(self):
         spreadsheet_name = 'CLEAN-' + self.selected_folder + '.xlsx'
         file_path = self.selected_result_folder_path + "\\" + spreadsheet_name
-        print("selected file path", file_path)
         if os.path.exists(file_path):
             self.df = pd.read_excel(file_path)
         else:
-            print("Spreadsheet does not exist in the specified path.")
+            raise FileNotFoundError(f"Spreadsheet does not exist: {file_path}")
 
     def preprocess_data(self):
         if self.df is not None:
@@ -69,11 +61,10 @@ class DataAnalyzer:
             self.df_exploded_keywords = self.df.explode('Keywords-found-list')
             self.df_exploded_social_media = self.df.explode('Social-media-found-list')
         else:
-            print("Data frame is empty. Ensure data is read correctly before preprocessing.")
+            raise ValueError("Data frame is empty. Ensure data is read correctly before preprocessing.")
 
     def plot_keywords_vs_location(self):
         if self.df_exploded_keywords is not None:
-            print("Plotting keywords vs location.")
             location_keyword_counts = self.df_exploded_keywords.groupby(
                 [self.city_column, 'Keywords-found-list']).size().unstack(fill_value=0)
 
@@ -87,12 +78,11 @@ class DataAnalyzer:
             plt.ylabel('Inputted City / Region')
             plt.xticks(rotation=45, ha='right')
             plt.tight_layout()
-            plt.savefig(self.new_diagram_folder_path + '\\keywords-vs-location.png')
+            plt.savefig(os.path.join(self.new_diagram_folder_path, 'keywords-vs-location.png'))
             plt.close()
 
     def plot_posts_vs_region(self):
         if self.df is not None:
-            print("plotting posts vs region\n")
             posts_per_location = self.df.groupby(self.city_column).size()
 
             plt.figure(figsize=(12, 8))
@@ -103,12 +93,11 @@ class DataAnalyzer:
             plt.xticks(rotation=45, ha='right')
             plt.tight_layout()
 
-            plt.savefig(self.new_diagram_folder_path + '\\posts-vs-location.png')
+            plt.savefig(os.path.join(self.new_diagram_folder_path, 'posts-vs-location.png'))
             plt.close()
 
     def plot_keyword_frequency(self):
         if self.df is not None:
-            print("plotting the keyword freq")
             # Set the figure size to make it larger
             plt.figure(figsize=(12, 8))
 
@@ -130,16 +119,15 @@ class DataAnalyzer:
 
             plt.tight_layout()  # Adjust layout to make room for the rotated x-axis labels
 
-            plt.savefig(self.new_diagram_folder_path + '\\keyword-frequency.png', dpi=300)
-            plt.show()
+            plt.savefig(os.path.join(self.new_diagram_folder_path, 'keyword-frequency.png'), dpi=300)
+            plt.close()
 
     def plot_location_vs_payment(self):
         if self.df is not None:
             sns.barplot(x=self.city_column, y=self.payment_methods_column, data=self.df)
             plt.title('Location vs. Payment')
-            plt.xticks(rotation=45)  # Rotate labels if they overlap
-            # plt.savefig(plot_filename_location_vs_payment)  # Save the plot
-            plt.show()
+            plt.xticks(rotation=45)
+            plt.close()
 
     def plot_location_vs_social_media(self):
         if self.df is not None:
@@ -172,7 +160,7 @@ class DataAnalyzer:
             plt.xticks(rotation=45)
             plt.legend(title='Social Media')
             plt.tight_layout()
-            plt.show()
+            plt.close()
 
 
 # Usage
