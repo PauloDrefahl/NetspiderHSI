@@ -68,7 +68,7 @@ Netspider allows users to navigate through complex web structures, extract data 
 
 2. Navigate to the project directory:
    ```bash
-   cd netspider
+   cd NetspiderHSI
    ```
 
 3. Create a virtual environment (recommended):
@@ -79,18 +79,15 @@ Netspider allows users to navigate through complex web structures, extract data 
 
 4. Install the required dependencies:
    ```bash
+   cd server
    pip install -r requirements.txt
    ```
 
-5. In Client Directory, enter:
+5. In the client directory, install dependencies:
    ```bash
-    npm init
-    ```
-
-6. install electron in client:
-    ```bash
-    npm install --save-dev electron
-    ```
+   cd ../client
+   npm install
+   ```
 
 
 ## Usage
@@ -110,7 +107,7 @@ Start the Client without the main Executable script:
 Start the scraper by running the main script:
 
   ```bash
-  python netspider.py
+  python server/app.py
   ```
 
 Follow the prompts in the UI to configure your keyword sets and begin scraping.
