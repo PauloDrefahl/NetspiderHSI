@@ -15,15 +15,8 @@ def list_folders_in_directory_to_json(directory_path):
     return folders_json
 
 
-# Specify the path to the directory you're interested in
-directory_path = "/result"
-
-# Get the folders in JSON format
-folders_json = list_folders_in_directory_to_json(directory_path)
-
-# Print the JSON string to the console
-print(folders_json)
-
-# Optionally, save the JSON string to a file
-#with open("folders_list.json", "w") as json_file:
-   # json_file.write(folders_json)
+if __name__ == "__main__":
+    import sys
+    directory_path = sys.argv[1] if len(sys.argv) > 1 else "/result"
+    folders_json = list_folders_in_directory_to_json(directory_path)
+    print(folders_json)
