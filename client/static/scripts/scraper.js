@@ -54,20 +54,7 @@ const itemList = document.getElementById("itemList");
 
 function StartScraper() {
     startClock();
-    console.log("Selected Website: ", selectedWebsite, "Selected Location: ", selectedLocation);
-
-    // Clear the selectedKeywords array
-    // selectedKeywords = [];
-
-    // Get all selected options from the itemList
-    // $("#itemList option:selected").each(function () {
-    //     selectedKeywords.push($(this).val()); // Push the value of the selected option to the array
-    // });
-
-    // Log the selected items
-    console.log("Keywords: ", selectedKeywords);
     statusText.textContent = 'Status: On'
-    console.log("clicked start scraper button")
     const data = {
         website: selectedWebsite,
         city: selectedLocation,
@@ -80,38 +67,26 @@ function StartScraper() {
         path: resultFolder
     };
     window.socket.emit('start_scraper', data);
-    console.log("emitted data", data);
-    console.log("flagged keywords", flaggedKeywords)
-    console.log("selected keywords", selectedKeywords)
 }
 
 const StopScraper = async () => {
     stopClock()
     statusText.textContent = 'Status: Off'
-    console.log("stop button clicked");
     window.socket.emit('stop_scraper');
 };
 
-window.socket.on('connect', () => {
-    console.log("connected");
-});
+window.socket.on('connect', () => {});
 
-window.socket.on('disconnect', () => {
-    console.log("Disconnected");
-});
+window.socket.on('disconnect', () => {});
 
 window.socket.on('scraper_update', (data) => {
-    console.log('Received scraper_update event:', data);
-
-    // Update the UI or take any action based on the data received from the server
     if (data.status === 'started') {
-        console.log('Scraper is running...');
+        // Scraper running
     } else if (data.status === 'stopped') {
-        console.log('Scraper completed');
+        // Scraper stopped
     } else if (data.status === 'error') {
-        console.log('Error occurred: ' + data.error);
+        statusText.textContent = 'Status: Error - ' + (data.error || 'Unknown');
     } else if (data.status === 'completed') {
-        console.log('Scraper completed');
         stopClock();
         statusText.textContent = 'Status: Off';
     }

@@ -7,62 +7,27 @@ document.addEventListener('DOMContentLoaded', () => {
     
     // operations for result manager
     const refresh_result_list = async () => {
-        console.log("emitting refresh result list event");
-
         window.socket.emit('refresh_result_list');
-        console.log("emitted data");
     };
 
     const open_PDF = async (path) => {
-        console.log("emitting open_PDF event");
-
-        const data = {
-            pdf_path: path
-        };
-
-        window.socket.emit('open_PDF', data);
-        console.log("emitted data");
+        window.socket.emit('open_PDF', { pdf_path: path });
     };
 
     const open_ss_dir = async (path) => {
-        console.log("emitting view ss dir event");
-
-        const data = {
-            ss_path: path
-        };
-
-        window.socket.emit('open_ss_dir', data);
-        console.log("emitted data");
+        window.socket.emit('open_ss_dir', { ss_path: path });
     };
 
     const open_raw_data = async (path) => {
-        console.log("emitting view ss dir event");
-        const data = {
-            raw_path: path
-        };
-
-        window.socket.emit('open_raw_data', data);
-        console.log("emitted data");
+        window.socket.emit('open_raw_data', { raw_path: path });
     };
 
     const open_clean_data = async (path) => {
-        console.log("emitting view clean data event");
-        const data = {
-            clean_path: path
-        };
-
-        window.socket.emit('open_clean_data', data);
-        console.log("emitted data");
+        window.socket.emit('open_clean_data', { clean_path: path });
     };
 
     const open_diagram_dir = async (path) => {
-        console.log("emitting view diagram event");
-        const data = {
-            diagram_path: path
-        };
-
-        window.socket.emit('open_diagram_dir', data);
-        console.log("emitted data");
+        window.socket.emit('open_diagram_dir', { diagram_path: path });
     };
 
     // const generate_keywords = async (path) => {
@@ -77,10 +42,7 @@ document.addEventListener('DOMContentLoaded', () => {
     // };
 
     const append_results = async (paths) => {
-        console.log("emitting view generate keywords event");
-
         window.socket.emit('start_append', paths);
-        console.log("emitted data");
     };
 
 
@@ -94,9 +56,6 @@ document.addEventListener('DOMContentLoaded', () => {
     document.getElementById('submitButton').addEventListener('click', function () {
         // Check if multiple selection mode is enabled
         if (multipleSelectionEnabled) {
-            console.log("Submitting selected items:");
-            console.log(selectedItems.map(item => item.textContent)); // Log the text content of each selected item
-
             // sending the selected items to the server
             const data = selectedItems.map(item => item.textContent)
             append_results(data).then(r => r);
@@ -110,10 +69,6 @@ document.addEventListener('DOMContentLoaded', () => {
 
             selectedItems.length = 0; // Clear the selectedItems array
 
-            console.log("Multiple selection mode is now disabled.");
-
-        } else {
-            console.log("Multiple selection mode is not enabled. No action taken.");
         }
 
         // Turn off multiple selection mode
@@ -148,7 +103,6 @@ document.addEventListener('DOMContentLoaded', () => {
         multipleSelectionEnabled = !multipleSelectionEnabled; // Toggle selection mode
 
         // update the UI to indicate the current mode
-        console.log("Mode:", multipleSelectionEnabled ? "Multiple Selection" : "Single Selection");
 
         // Update submit & cancel button visibility
         updateSubmitButtonVisibility();
@@ -163,7 +117,6 @@ document.addEventListener('DOMContentLoaded', () => {
         multipleSelectionEnabled = !multipleSelectionEnabled; // Toggle selection mode
 
         // update the UI to indicate the current mode
-        console.log("Mode:", multipleSelectionEnabled ? "Multiple Selection" : "Single Selection");
 
         // Update submit & cancel button visibility
         updateSubmitButtonVisibility();
@@ -183,72 +136,41 @@ document.addEventListener('DOMContentLoaded', () => {
     // event listeners to buttons in the button grid
 
     document.getElementById('refreshListButton').addEventListener('click', function () {
-        console.log("clicked refresh list button");
-
-        // logSelectedItems("Diagram Directory View Requested: ", "\\diagrams");
-
         refresh_result_list().then(r => r);
     });
 
     document.getElementById('viewPdfButton').addEventListener('click', function () {
-        console.log("clicked view pdf button");
-
         let pdfPath = "\\screenshots\\" + selectedItems[0].textContent + ".pdf";
         let path = selectedItems[0].textContent + pdfPath;
-        //logSelectedItems("PDF View Requested: ", pdfPath);
-        console.log(path);
-
         open_PDF(path).then(r => r);
 
     });
 
     document.getElementById('viewSsButton').addEventListener('click', function () {
-        console.log("clicked view ss dir button");
-
         let ssPath = "\\screenshots";
         let path = selectedItems[0].textContent + ssPath;
-        //logSelectedItems("Screenshot Directory View Requested: ", ssPath);
-        console.log(path);
-
         open_ss_dir(path).then(r => r);
 
     });
 
     document.getElementById('viewRawDataButton').addEventListener('click', function () {
-        console.log("clicked view raw data button");
-
         let rDataPath = "\\RAW-" + selectedItems[0].textContent + ".xlsx";
         let path = selectedItems[0].textContent + rDataPath;
-        // logSelectedItems("RAW Data View Requested: ","\\RAW-" + selectedItems[0].textContent);
-        console.log(path);
-
         open_raw_data(path).then(r => r);
     });
 
     document.getElementById('viewCleanDataButton').addEventListener('click', function () {
-        console.log("clicked view clean data button");
-
         let cDataPath = "\\CLEAN-" + selectedItems[0].textContent + ".xlsx";
         let path = selectedItems[0].textContent + cDataPath;
-        //logSelectedItems("CLEAN Data View Requested: ", "\\CLEAN-" + selectedItems[0].textContent);
-        console.log(path);
-
         open_clean_data(path).then(r => r);
     });
 
     document.getElementById('viewDiagramButton').addEventListener('click', function () {
-        console.log("clicked view diagram dir button");
-        // let diagramPath = "\\diagrams";
-        let path = selectedItems[0].textContent ;
-        console.log(path);
-
-        // logSelectedItems("Diagram Directory View Requested: ", "\\diagrams");
-
+        let path = selectedItems[0].textContent;
         open_diagram_dir(path).then(r => r);
     });
 
     document.getElementById('generateKeywordsButton').addEventListener('click', function () {
-        console.log("clicked generate keywords button");
         let genKeyPath = "\\keywords\\Keywords.txt";
         let path = selectedItems[0].textContent + genKeyPath;
         //logSelectedItems("Generate Keywords Requested: ", "\\keywords\\Keywords.txt");
@@ -331,7 +253,7 @@ document.addEventListener('DOMContentLoaded', () => {
     }
 
     window.socket.on('result_manager_update', (data) => {
-        console.log("Recieved result_manager_update event", data);
+        // Result manager status update
     });
 
 });
