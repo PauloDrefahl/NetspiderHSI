@@ -3,6 +3,9 @@
 # '[Dd]esktop.ini', '.DS_Store', or '.vscode', put those in your global
 # .gitignore file or in /path/to/repository/.git/info/exclude. Thanks!
 
+# macOS
+.DS_Store
+
 # Ignore files that we previously used for dynamic port selection. Since commit
 # 0239bbef700, NetSpider uses a fixed port, but we'll keep these patterns around
 # for some time to stop people from accidentally re-committing those files.

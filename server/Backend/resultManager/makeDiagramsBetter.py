@@ -124,15 +124,19 @@ class DataAnalyzer:
 
     def plot_location_vs_payment(self):
         if self.df is not None:
+            plt.figure(figsize=(12, 8))
             sns.barplot(x=self.city_column, y=self.payment_methods_column, data=self.df)
             plt.title('Location vs. Payment')
             plt.xticks(rotation=45)
+            plt.tight_layout()
+            plt.savefig(os.path.join(self.new_diagram_folder_path, 'location-vs-payment.png'))
             plt.close()
 
     def plot_location_vs_social_media(self):
-        if self.df is not None:
+        if self.df_exploded_social_media is not None:
             # Filter out empty strings which might have come from the split operation
-            df_exploded_social_media = self.df_exploded_social_media['Social-media-found-list'].str.strip() != ''
+            non_empty = self.df_exploded_social_media['Social-media-found-list'].str.strip() != ''
+            df_social = self.df_exploded_social_media.loc[non_empty].copy()
 
             # Calculating social media presence by location
             social_media_mapping = {
@@ -143,23 +147,25 @@ class DataAnalyzer:
                 # Add more mappings as needed
             }
 
-            # Assuming 'Social-media-found-list' is the column after exploding and cleaning
-            df_exploded_social_media['Normalized Social Media'] = df_exploded_social_media[
-                'Social-media-found-list'].map(social_media_mapping).fillna(
-                df_exploded_social_media['Social-media-found-list'])
+            df_social['Normalized Social Media'] = (
+                df_social['Social-media-found-list'].map(social_media_mapping).fillna(
+                    df_social['Social-media-found-list'])
+            )
 
-            ## Aggregate data by location and normalized social media name
-            normalized_social_media_counts = df_exploded_social_media.groupby(
-                ['Inputted City / Region', 'Normalized Social Media']).size().unstack(fill_value=0)
+            # Aggregate data by location and normalized social media name
+            normalized_social_media_counts = df_social.groupby(
+                [self.city_column, 'Normalized Social Media']).size().unstack(fill_value=0)
 
             # Plotting
-            normalized_social_media_counts.plot(kind='bar', stacked=True, figsize=(12, 8))
+            plt.figure(figsize=(12, 8))
+            normalized_social_media_counts.plot(kind='bar', stacked=True)
             plt.title('Normalized Social Media Presence by Location')
             plt.xlabel('Inputted City / Region')
             plt.ylabel('Counts')
             plt.xticks(rotation=45)
             plt.legend(title='Social Media')
             plt.tight_layout()
+            plt.savefig(os.path.join(self.new_diagram_folder_path, 'location-vs-social-media.png'))
             plt.close()
 
 
