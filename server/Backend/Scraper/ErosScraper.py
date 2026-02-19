@@ -96,12 +96,14 @@ class ErosScraper(ScraperPrototype):
     ---------------------------------------
     '''
     def initialize(self) -> None:
+        self._report_progress("initializing", "Setting up search…")
         # Date and time of search
         self.date_time = str(datetime.today())[0:19].replace(' ', '_').replace(':', '-')
 
         # Format website URL based on state and city
         self.get_formatted_url()
 
+        self._report_progress("opening_browser", "Launching browser…")
         self.driver = Driver(
             driver_version="mlatest",
             undetectable=True,
@@ -112,9 +114,11 @@ class ErosScraper(ScraperPrototype):
         )
 
         # Open Webpage with URL
+        self._report_progress("loading_page", "Loading website…")
         self.open_webpage()
 
         # Find links of posts
+        self._report_progress("collecting_links", "Finding listing links…")
         links = self.get_links()
 
         # Create directory for search data
@@ -127,6 +131,7 @@ class ErosScraper(ScraperPrototype):
         os.mkdir(self.screenshot_directory)
 
         # Get data from posts
+        self._report_progress("processing_posts", f"0/{len(links)} links")
         self.get_data(links)
         self.close_webpage()
         self.reset_variables()
@@ -183,9 +188,13 @@ class ErosScraper(ScraperPrototype):
 
     def get_data(self, links) -> None:
         counter = 1
+        total = len(links)
+        current = 0  # Index of link being processed (for progress; increments every link)
 
         for link in links:
-            print(f"Processing link {counter}/{len(links)}: {link}")
+            current += 1
+            self._report_progress("processing_posts", f"{current}/{total} links")
+            print(f"Processing link {current}/{len(links)}: {link}")
             if not self.completed:
                 self.driver.implicitly_wait(10)
                 self.driver.get(link)

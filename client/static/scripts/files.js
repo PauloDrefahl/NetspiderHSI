@@ -146,8 +146,12 @@ document.addEventListener("DOMContentLoaded", function () {
         window.editFile.openResults(resultFolder);
     });
 
-    resultsFolderButton.addEventListener('click', function () {
-        window.socket.emit('set_result_dir');
+    resultsFolderButton.addEventListener('click', async function () {
+        // Use Electron's native dialog (appears in front) instead of server's Qt dialog
+        const selectedPath = await window.folderDialog.open();
+        if (selectedPath) {
+            window.socket.emit('set_result_dir_from_path', { path: selectedPath });
+        }
     });
 
     window.socket.on('result_folder_selected', (data) => {
@@ -155,18 +159,26 @@ document.addEventListener("DOMContentLoaded", function () {
         if (data.error) {
             console.error('Error received:', data.error);
             listElement.innerHTML = `<li>Error: ${data.error}</li>`; // Display error in the list
+            document.getElementById('folder-box')?.classList.remove('folder-selected');
+            document.getElementById('folder-input-btn')?.classList.remove('folder-selected');
             return;
         }
 
         if (data.file_explorer_opened) {
             console.log("File explorer opened but no directory was selected.");
             listElement.innerHTML = '<li>No directory selected.</li>';
+            document.getElementById('folder-box')?.classList.remove('folder-selected');
+            document.getElementById('folder-input-btn')?.classList.remove('folder-selected');
             return;
         }
 
         if (data.result_dir) {
             console.log("Result Folder selected:", data.result_dir);
             resultFolder = data.result_dir; // Store the result directory globally if needed
+            const folderBox = document.getElementById('folder-box');
+            const folderBtn = document.getElementById('folder-input-btn');
+            if (folderBox) folderBox.classList.add('folder-selected');
+            if (folderBtn) folderBtn.classList.add('folder-selected');
         }
 
         folderList = data.folders; // This should match the key used in backend 'folders'
@@ -195,6 +207,8 @@ document.addEventListener("DOMContentLoaded", function () {
         } else {
             console.error('Error: Folder list is empty or not in expected format');
             listElement.innerHTML = '<li>No folders found.</li>';
+            document.getElementById('folder-box')?.classList.remove('folder-selected');
+            document.getElementById('folder-input-btn')?.classList.remove('folder-selected');
         }
     });
 

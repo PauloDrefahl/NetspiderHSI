@@ -3,7 +3,7 @@
 # '[Dd]esktop.ini', '.DS_Store', or '.vscode', put those in your global
 # .gitignore file or in /path/to/repository/.git/info/exclude. Thanks!
 
-# macOS
+# macOS folder metadata (do not commit)
 .DS_Store
 
 # Ignore files that we previously used for dynamic port selection. Since commit

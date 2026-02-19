@@ -46,7 +46,7 @@ class DataAnalyzer:
 
     def read_data(self):
         spreadsheet_name = 'CLEAN-' + self.selected_folder + '.xlsx'
-        file_path = self.selected_result_folder_path + "\\" + spreadsheet_name
+        file_path = os.path.join(self.selected_result_folder_path, spreadsheet_name)
         if os.path.exists(file_path):
             self.df = pd.read_excel(file_path)
         else:
