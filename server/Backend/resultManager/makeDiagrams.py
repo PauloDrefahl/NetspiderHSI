@@ -1,8 +1,7 @@
-'''
-    ---------------------------------
-    libraries
-    ---------------------------------
-'''
+"""
+Legacy standalone script for diagram generation.
+
+"""
 
 import re
 
