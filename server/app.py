@@ -6,10 +6,13 @@ import gevent.monkey
 gevent.monkey.patch_all()
 
 #standard library imports
+import logging
 import os
 import json
 import threading
 from datetime import datetime
+
+logger = logging.getLogger(__name__)
 
 #third-party imports
 import psycopg
@@ -50,9 +53,9 @@ socketio = SocketIO(app, async_mode='gevent', cors_allowed_origins="*")
 
 def list_threads():
     threads = threading.enumerate()
-    for thread in threads:
-        print(f"Thread Name: {thread.name}, Thread ID: {thread.ident}")
-
+    if logger.isEnabledFor(logging.DEBUG):
+        for thread in threads:
+            logger.debug("Thread: %s (ID: %s)", thread.name, thread.ident)
     return len(threads)
 
 
@@ -71,7 +74,7 @@ class ScraperManager:
 
     def wait_for_scraper_to_complete(self):
         if self.scraper_thread and self.scraper_thread.is_alive():
-            print("Waiting for the scraper thread to finish...")
+            logger.info("Waiting for the scraper thread to finish...")
             self.scraper_thread.join()
 
 
@@ -79,15 +82,14 @@ class ScraperManager:
         if self.scraper_thread and self.scraper_thread.is_alive():
             self.scraper_thread.stop_thread()
             self.scraper_thread.join_with_timeout()  # Wait for the thread to finish
-            # thread_id = threading.get_native_id()
-            print("thread count after stop: ", list_threads())
+            logger.debug("Thread count after stop: %d", list_threads())
             return {"Response": "Scraper Thread Stopped Forcefully"}
         else:
-            print("number of threads: ", list_threads())
+            logger.debug("Thread count: %d (no active scraper)", list_threads())
             return {"Response": "No active Scraper Thread, Forceful Stop Attempted"}
 
     def get_scraper_status(self):
-        print("get_scraper_status = ", self.scraper_thread.is_alive())
+        logger.debug("Scraper status: %s", self.scraper_thread.is_alive() if self.scraper_thread else None)
         if self.scraper_thread and self.scraper_thread.is_alive():
             socketio.emit('scraper_update', {'status': 'scraper thread alive'})
         else:
@@ -126,21 +128,13 @@ class ScraperThread(threading.Thread):
         self._stop_event = threading.Event()
 
     def run(self):
-        print("number of threads before: ", list_threads())
+        logger.debug("Thread count before scraper: %d", list_threads())
         while not self._stop_event.is_set() and not self.scraper.completed:
-            thread_id = threading.get_native_id()
-            print("start thread id", thread_id)
             socketio.emit('scraper_update', {'status': 'running'})
             self.scraper.initialize()
-            print(self.is_alive(), "1")
-        print(self.scraper.completed, "scraper completed")
-        print(self.is_alive(), "thread is alive")
         if self.scraper.completed:
-            print("scraper done")
+            logger.info("Scraper completed")
             self.stop_thread()
-            print("stopping thread")
-            # self.join_with_timeout()
-            print(self.is_alive(), "2")
         socketio.emit('scraper_update', {'status': 'completed'})
 
     def stop_thread(self):
@@ -150,13 +144,9 @@ class ScraperThread(threading.Thread):
 
     def join_with_timeout(self, timeout=10):
         if not self.scraper.completed:
-            print("join attempt in function")
             self.join(timeout)
-            print("after join")
             if self.is_alive():
-                print("Warning: ScraperThread did not terminate in time.")
-        else:
-            print("scraper is completed not joining")
+                logger.warning("ScraperThread did not terminate in time")
 
     def stopped(self):
         return self._stop_event.is_set()
@@ -173,17 +163,10 @@ scraper_manager = ScraperManager()
 
 
 def initialize_result_manager(result_dir):
-    # Access the stored result directory from Flask app configuration
-    # result_dir = app.config.get('RESULT_DIR', 'default_directory_if_not_set')
-    #print("stored result directory", result_dir)
     global resultManager
     resultManager = ResultManager(result_dir)
-    resultManager.debug_print()
 
 def initialize_folder_appender(result_dir):
-    # Access the stored result directory from Flask app configuration
-    # result_dir = app.config.get('RESULT_DIR', 'default_directory_if_not_set')
-    #print("stored result directory", result_dir)
     global folderAppend
     folderAppend = FolderAppender(result_dir)
 
@@ -198,7 +181,7 @@ def initialize_folder_appender(result_dir):
 # Connection Manager Sockets
 @socketio.on("connect")
 def connected():
-    print("connected")
+    logger.info("Client connected")
 
 
 # Scraper Manager Sockets
@@ -210,7 +193,7 @@ def get_status():
 @socketio.on('start_scraper')
 def start_scraper(data):
     socketio.emit('scraper_update', {'status': 'started'})
-    print(data)
+    logger.debug("Start scraper request: %s", data)
     response = scraper_manager.start_scraper(data)
     return {'Response': response}
 
@@ -225,7 +208,7 @@ def stop_scraper():
 # Result Manager Sockets
 @socketio.on('start_append')
 def start_append(data):
-    print(data)
+    logger.debug("Start append request: %s", data)
     socketio.emit('result_manager_update', {'status': 'appending'})
     folderAppend.setSelectedFolders(data)
     folderAppend.create_new_folder()
@@ -238,7 +221,6 @@ def start_append(data):
 @socketio.on('open_PDF')
 def open_PDF(data):
     socketio.emit('result_manager_update', {'status': 'view_pdf'})
-    print(data)
     response = resultManager.view_pdf(data)
     return {'Response': response}
 
@@ -246,7 +228,6 @@ def open_PDF(data):
 @socketio.on('open_ss_dir')
 def open_ss_dir(data):
     socketio.emit('result_manager_update', {'status': 'view_SS_dir'})
-    print(data)
     response = resultManager.view_ss_dir(data)
     return {'Response': response}
 
@@ -254,7 +235,6 @@ def open_ss_dir(data):
 @socketio.on('open_clean_data')
 def open_clean_data(data):
     socketio.emit('result_manager_update', {'status': 'view_clean_data'})
-    print(data)
     response = resultManager.view_clean_data(data)
     return {'Response': response}
 
@@ -262,37 +242,28 @@ def open_clean_data(data):
 @socketio.on('open_raw_data')
 def open_raw_data(data):
     socketio.emit('result_manager_update', {'status': 'view_raw_data'})
-    print(data)
     response = resultManager.view_raw_data(data)
-    print(response)
     return {'Response': response}
 
 
 @socketio.on('open_diagram_dir')
 def open_diagram_dir(data):
     socketio.emit('result_manager_update', {'status': 'view_diagram_dir'})
-    print(data)
     response = resultManager.view_diagram_dir(data)
     return {'Response': response}
 
 
 @socketio.on('set_result_dir')
 def set_result_dir():
-    print("Selecting result directory")
-    directory = os.environ.get('RESULT_DIR', 'results')
-    print("Selected Directory: ", directory)
-    result_dir = os.path.join(os.getcwd(), directory)
+    directory = QFileDialog.getExistingDirectory(None, "Select Directory", os.getcwd())
+    if not directory:
+        return
+    result_dir = os.path.abspath(directory)
 
-    # initialize the folder appender and result manager
     initialize_result_manager(result_dir)
     initialize_folder_appender(result_dir)
-
-    # get the result list from result manager
     resultList = resultManager.get_folders()
-
-    print(resultList)
-
-    print("sending Result list")
+    logger.info("Result directory selected: %s", result_dir)
     socketio.emit('result_folder_selected', {'folders': resultList, 'result_dir': result_dir})
 
 
@@ -312,14 +283,14 @@ def refresh_result_list():
 
 @socketio.on_error_default
 def handle_error(e):
-    print(f"An error occurred: {str(e)}")
+    logger.error("Socket error: %s", str(e))
     socketio.emit('scraper_update', {'status': 'error', 'error': str(e)})
     response = {"error": str(e)}
     return response, 500
 
 @socketio.on('get_database_results')
 def handle_database_results(data):
-    print("server received get_database_results with data: " + str(data))
+    logger.debug("get_database_results: %s", data)
     try:
         conn = database.connect(read_only=True)
     except psycopg.Error:
@@ -345,7 +316,7 @@ def handle_database_results(data):
 
             socketio.emit('database_results', {'data': serializable_results})
     except Exception as e:
-        print(f"Database error: {str(e)}")
+        logger.error("Database error: %s", str(e))
         socketio.emit('database_results', {'error': str(e)})
     finally:
         if conn:
@@ -402,9 +373,9 @@ def load_json(file_path):
             config = json.load(file)
         return config
     except FileNotFoundError:
-        print(f"File {file_path} not found. Ensure the file exists.")
+        logger.warning("File %s not found", file_path)
     except json.JSONDecodeError:
-        print(f"Error decoding JSON from {file_path}.")
+        logger.error("Error decoding JSON from %s", file_path)
 
 #------function called to save scraper updates after run------
 def save_json(config, file_path):
@@ -412,12 +383,10 @@ def save_json(config, file_path):
         json.dump(config, json_file, indent=4)
 
 def process_scraper(scraper_name, scraper_settings):
-        print(f"Processing {scraper_name}")
-        # Start the scraper
+        logger.info("Processing scraper: %s", scraper_name)
         start_scraper(scraper_settings['data'])
-        # Wait for the scraper to complete
         scraper_manager.wait_for_scraper_to_complete()
-        print(f"{scraper_name} processing complete.")
+        logger.info("Scraper %s processing complete", scraper_name)
 
 def load_autoscraper_jobs():
         # Gets autoscrapers configurations from json file
@@ -425,9 +394,7 @@ def load_autoscraper_jobs():
         config = load_json(file_path)
         
         # Gives any schedule scraper 2 hours to start from start time before terminating and not running
-        scraper_grace_period = 7200 # time in seconds
-        
-        print("Checking for autoscraper to load")
+        scraper_grace_period = 7200  # time in seconds
 
         for scraper_config_name, scraper_settings in config.items():
 
@@ -441,14 +408,14 @@ def load_autoscraper_jobs():
                 if run_weekly:
                     weekly_cron_trigger = CronTrigger(day=scraper_settings["day_to_run"], hour=scraper_settings["hour"], minute=scraper_settings["minute"])
                     job_object = scheduler.add_job(run_scheduled_scraper, weekly_cron_trigger, misfire_grace_time= scraper_grace_period, args=[scraper_config_name, "scrap"] )
-                    print(f"Scraper Loaded: {scraper_config_name}, Scraper ID: {job_object.id}")
+                    logger.info("Scraper loaded: %s (ID: %s)", scraper_config_name, job_object.id)
                     config[scraper_config_name]["job_id"] = job_object.id
                     save_json(config, file_path)
 
                 elif run_daily:
                     daily_cron_trigger = CronTrigger(hour=scraper_settings["hour"], minute=scraper_settings["minute"])
                     job_object = scheduler.add_job(run_scheduled_scraper, trigger=daily_cron_trigger, misfire_grace_time= scraper_grace_period, args=[scraper_config_name, "scrap"] )
-                    print(f"Scraper Loaded: {scraper_config_name}, Scraper ID: {job_object.id}")
+                    logger.info("Scraper loaded: %s (ID: %s)", scraper_config_name, job_object.id)
                     config[scraper_config_name]["job_id"] = job_object.id
                     save_json(config, file_path)
 
@@ -462,7 +429,7 @@ def delete_autoscraper_jobs():
         
         # Deletes job from scraper if it has no runs left
         if runs_left <= 0 and scraper_id != "":
-            print("Deleting due to scraper finishing all runs")
+            logger.info("Deleting scraper %s (finished all runs)", scraper_config_name)
             job_id = scraper_settings["job_id"]
             scheduler.remove_job(job_id)
             
@@ -485,15 +452,15 @@ def delete_autoscraper_jobs():
                     #Modified
                     # deleting from scheduler because the user has modified the exist scheduler's json
                     if job_id != config[scraper_name]["job_id"]:
-                        print("Deleting due to scraper being data being modified by user")
+                        logger.info("Deleting scraper %s (modified by user)", scraper_name)
                         scheduler.remove_job(job_id)
                 # Rename/Deleted
                 # Deleting from scheduler because the scraper in not in the json
                 else:
-                    print("Deleting due to scraper not being listed in json")
+                    logger.info("Deleting scraper %s (not in config)", scraper_name)
                     scheduler.remove_job(job_id)
-        except:
-            print("Job is not a scraper")
+        except Exception:
+            logger.debug("Job is not a scraper")
 
 #################Task Section for ApScheduler#########################
 #------function called to manage_scrapers------
@@ -501,18 +468,8 @@ def delete_autoscraper_jobs():
 # it will delete scrapers if they are modified, delete, or renamed
 # it will also assign new scrapers or reassign modified scraper to the scheduler
 def manage_scraper():
-    count = 0
-    print("Before management:")
-    for job in scheduler.get_jobs():
-        count += 1
-        print(f"{count})Job ID:{job.id}\n Job function: {job.func}\n Job argments: {job.args}\n")
     delete_autoscraper_jobs()
     load_autoscraper_jobs()
-    count = 0
-    print("After management:")
-    for job in scheduler.get_jobs():
-        count += 1
-        print(f"{count})Job ID:{job.id}\n Job function: {job.func}\n Job argments: {job.args}\n")
 
 #------function called to run scraper------
 def run_scheduled_scraper(scraper_name, function_name):
@@ -520,9 +477,8 @@ def run_scheduled_scraper(scraper_name, function_name):
     file_path = "server/scheduled_scrapers.json" 
     config = load_json(file_path)
 
-    print(f"Checking for scraper: {scraper_name}\nTask:{function_name}")
+    logger.debug("Checking scraper: %s, task: %s", scraper_name, function_name)
     if scraper_name in config:
-        print(f"Running Scraper:{scraper_name}")
         scraper_config = config[scraper_name]
         runs_left = scraper_config["runs_left"]
 
@@ -534,11 +490,9 @@ def run_scheduled_scraper(scraper_name, function_name):
             scraper_config["last_run"] = last_run  # Updates last run time value
             scraper_config["runs_left"] -= 1  # Updates count of days/weeks left
 
-            #Scraper does things
-            print(f"Scraper running:{scraper_name}\n Last time scraper ran: {scraper_config['last_run']} \n Runs left:{scraper_config['runs_left']}\n Scraper Id:{scraper_config['job_id']}")
+            logger.info("Running scraper: %s (runs left: %d)", scraper_name, scraper_config['runs_left'])
             process_scraper(scraper_name, scraper_config)
-            
-            print(f"Scraper Finished: {scraper_name}")
+            logger.info("Scraper finished: %s", scraper_name)
             save_json(config, file_path)  
     
 # Start of main code
@@ -576,34 +530,21 @@ scheduler.start()
 
 #2 - Function is called by socket.io translate and is passed language to translate the keywords file to
 def translate_keywords(language):
-    
-    print("Opening keyword file")
+    logger.info("Translating keywords to %s", language)
     with open('keywords.txt', 'r') as file:
         keywords = file.read().splitlines()
 
-    print("Calling Google Translate")
-
     translated_keywords = []
-
-    #will need to restructure loop, goal will be to take list of english words and return translated list in following format:
-    #original word 1, language 1 translated word 1, language 2 translated word 1, original word 2, language 1 translated word 2, language 2 translated word 2, etc.
     for word in keywords:
         if word.strip():
-            safe_word = str(word) #if we go DB route, I imagine a lot of my error handling will be obsolete but TBD
-            print(f"Translating: {safe_word}")
-            translated_keywords.append(GoogleTranslator(source="auto", target=language).translate(safe_word))
-
-    #print all translated words
-    for translated_word in translated_keywords:
-        print(translated_word)
-
-    #translator works, gets all the keywords from the file and translates them. 
+            safe_word = str(word)
+            translated_keywords.append(GoogleTranslator(source="auto", target=language).translate(safe_word)) 
 
 
 #1 - When translate button is hit on front end, this function is called and data is passed to it
 @socketio.on('translator')
 def translator(language):
-    print(f"translate_keywords({language}) called...")
+    logger.debug("translate_keywords(%s) called", language)
     translate_keywords(language)
 
 #-------------------------------Translator End---------------------------------
@@ -613,7 +554,6 @@ def translator(language):
 
 
 if __name__ == "__main__":
-    print("active threads: ", list_threads())
-
+    logging.basicConfig(level=logging.INFO, format="%(levelname)s: %(message)s")
     socketio.run(app, host='127.0.0.1', port=5173, allow_unsafe_werkzeug=True)
     
