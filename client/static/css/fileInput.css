@@ -133,3 +133,12 @@ input[type="file"].file-selected {
     cursor: pointer;
     transition: background-color 0.3s, transform 0.3s, box-shadow 0.3s;
 }
+
+/* Selected state for Results Folder (matches file-selected styling on Keywords/Keysets boxes) */
+#folder-box .select-folder.folder-selected,
+#folder-box.folder-selected .select-folder {
+    background:
+        linear-gradient(#fff 0 0) padding-box,
+        linear-gradient(to bottom, #09558B, green 49%, green) border-box;
+    border: 2px dashed #fff;
+}

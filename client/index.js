@@ -1,7 +1,18 @@
-const { app, BrowserWindow, Menu} = require('electron');
+const { app, BrowserWindow, Menu, ipcMain, dialog } = require('electron');
 const path = require('path');
 const { execFile, exec } = require('child_process');
 const os = require('os');
+
+// Electron native folder picker (works reliably on Mac - appears in front of app)
+ipcMain.handle('open-folder-dialog', async () => {
+    const result = await dialog.showOpenDialog({
+        properties: ['openDirectory']
+    });
+    if (!result.canceled && result.filePaths.length > 0) {
+        return result.filePaths[0];
+    }
+    return null;
+});
 
 
 // Specify the path to your Flask executable

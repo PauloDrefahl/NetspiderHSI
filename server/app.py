@@ -21,7 +21,6 @@ from psycopg.rows import dict_row
 from flask import Flask
 from flask_socketio import SocketIO
 from flask_cors import CORS
-from PyQt5.QtWidgets import QFileDialog, QApplication
 from engineio.async_drivers import gevent
 from apscheduler.schedulers.background import BackgroundScheduler
 from apscheduler.executors.pool import ThreadPoolExecutor
@@ -42,7 +41,6 @@ from Backend.resultManager.resultManager import ResultManager
 
 
 app = Flask(__name__)
-qt_app = QApplication([])
 CORS(app)
 socketio = SocketIO(app, async_mode='gevent', cors_allowed_origins="*")
 
@@ -128,11 +126,16 @@ class ScraperThread(threading.Thread):
             self.scraper.set_only_posts_with_payment_methods()
         self.scraper.set_city(kwargs['city'])
         self._stop_event = threading.Event()
+        self._progress_callback = lambda phase, detail: socketio.emit(
+            'scraper_update',
+            {'status': 'running', 'phase': phase, 'detail': detail or ''}
+        )
+        self.scraper.set_progress_callback(self._progress_callback)
 
     def run(self):
         logger.debug("Thread count before scraper: %d", list_threads())
         while not self._stop_event.is_set() and not self.scraper.completed:
-            socketio.emit('scraper_update', {'status': 'running'})
+            socketio.emit('scraper_update', {'status': 'running', 'phase': 'starting', 'detail': ''})
             self.scraper.initialize()
         if self.scraper.completed:
             logger.info("Scraper completed")
@@ -255,18 +258,40 @@ def open_diagram_dir(data):
     return {'Response': response}
 
 
-@socketio.on('set_result_dir')
-def set_result_dir():
-    directory = QFileDialog.getExistingDirectory(None, "Select Directory", os.getcwd())
-    if not directory:
-        return
-    result_dir = os.path.abspath(directory)
+def _get_qt_file_dialog():
+    """Lazy-load Qt so the server can start without a display. Required only for directory picker."""
+    from PyQt5.QtWidgets import QApplication, QFileDialog
+    app_instance = QApplication.instance()
+    if app_instance is None:
+        app_instance = QApplication([])
+    return QFileDialog.getExistingDirectory(None, "Select Directory", os.getcwd())
 
+
+def _initialize_from_result_dir(result_dir):
+    """Initialize result manager and folder appender from a directory path."""
     initialize_result_manager(result_dir)
     initialize_folder_appender(result_dir)
     resultList = resultManager.get_folders()
     logger.info("Result directory selected: %s", result_dir)
     socketio.emit('result_folder_selected', {'folders': resultList, 'result_dir': result_dir})
+
+
+@socketio.on('set_result_dir')
+def set_result_dir():
+    """Legacy: Opens Qt file dialog on server (may appear behind windows on Mac)."""
+    directory = _get_qt_file_dialog()
+    if not directory:
+        return
+    _initialize_from_result_dir(os.path.abspath(directory))
+
+
+@socketio.on('set_result_dir_from_path')
+def set_result_dir_from_path(data):
+    """Uses path from Electron's native dialog (reliable on Mac)."""
+    directory = data.get('path')
+    if not directory or not os.path.isdir(directory):
+        return
+    _initialize_from_result_dir(os.path.abspath(directory))
 
 
 @socketio.on('refresh_result_list')
@@ -557,5 +582,7 @@ def translator(language):
 
 if __name__ == "__main__":
     logging.basicConfig(level=logging.INFO, format="%(levelname)s: %(message)s")
+    print("Starting NetSpider server on http://127.0.0.1:5173 ...")
+    print("(Ctrl+C to stop)")
     socketio.run(app, host='127.0.0.1', port=5173, allow_unsafe_werkzeug=True)
     

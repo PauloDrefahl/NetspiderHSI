@@ -12,6 +12,10 @@ const socket = io.connect(`http://127.0.0.1:5173`);
 
 contextBridge.exposeInMainWorld('ipcRenderer', ipcRenderer);
 
+contextBridge.exposeInMainWorld('folderDialog', {
+    open: () => ipcRenderer.invoke('open-folder-dialog')
+});
+
 contextBridge.exposeInMainWorld('socket', {
     on: (channel, callback) => {
         socket.on(channel, (event, ...args) => callback(event, ...args));

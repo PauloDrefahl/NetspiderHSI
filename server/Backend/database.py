@@ -2,6 +2,7 @@
 
 __all__ = ["Connection", "Cursor", "connect"]
 
+import os
 import contextlib
 from contextlib import suppress
 from importlib import resources
@@ -57,11 +58,12 @@ def _open_connection(
     The caller can override the database name, user, and password, but
     the remaining connection parameters are hardcoded.
     """
+    port = int(os.environ.get("PGPORT", "5432"))
     return Connection.connect(
         autocommit=True,
         row_factory=namedtuple_row,
-        host="localhost",
-        port=5432,
+        host=os.environ.get("PGHOST", "localhost"),
+        port=port,
         dbname=dbname,
         user=user,
         password=password,

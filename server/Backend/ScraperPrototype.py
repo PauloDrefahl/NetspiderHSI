@@ -10,6 +10,16 @@ class ScraperPrototype(ABC):
         self.payment = None
         self.url = None
         self.text_search = None
+        self._progress_callback = None
+
+    def set_progress_callback(self, callback):
+        """Set a callback(phase: str, detail: str | None) for progress updates."""
+        self._progress_callback = callback
+
+    def _report_progress(self, phase: str, detail: str | None = None) -> None:
+        """Report progress so the UI can show what the scraper is doing (e.g. when browser is hidden)."""
+        if self._progress_callback:
+            self._progress_callback(phase, detail)
 
     @abstractmethod
     def initialize(self):

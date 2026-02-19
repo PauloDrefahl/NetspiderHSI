@@ -71,3 +71,7 @@ Be prepared to "fill the gaps" and resolve any issues that come your way:
 3. Run a PostgreSQL container, setting the username to `postgres` and the
    password to `password`. NetSpider runs outside of the container, so publish
    the container port for PostgreSQL, 5432 by default, to host port 5432.
+
+   **If port 5432 is already in use** (e.g. by a local PostgreSQL install), the
+   project's `docker-compose.yml` maps host port 5433 instead. When using that
+   setup, run the NetSpider server with `PGPORT=5433` (e.g. `PGPORT=5433 python app.py`).

@@ -79,18 +79,31 @@ window.socket.on('connect', () => {});
 
 window.socket.on('disconnect', () => {});
 
+// Human-readable labels for scraper phases (so you can see progress when browser is hidden)
+const phaseLabels = {
+    starting: 'Starting…',
+    initializing: 'Setting up…',
+    opening_browser: 'Opening browser…',
+    loading_page: 'Loading page…',
+    collecting_links: 'Collecting links…',
+    processing_posts: 'Processing posts…'
+};
+
 window.socket.on('scraper_update', (data) => {
     if (data.status === 'started') {
-        // Scraper running
+        statusText.textContent = 'Status: On';
     } else if (data.status === 'stopped') {
-        // Scraper stopped
+        statusText.textContent = 'Status: Off';
     } else if (data.status === 'error') {
         statusText.textContent = 'Status: Error - ' + (data.error || 'Unknown');
     } else if (data.status === 'completed') {
         stopClock();
         statusText.textContent = 'Status: Off';
+    } else if (data.status === 'running') {
+        const label = phaseLabels[data.phase] || data.phase || 'Running…';
+        const detail = (data.detail && String(data.detail).trim()) ? ' ' + data.detail : '';
+        statusText.textContent = 'Status: On – ' + label + detail;
     }
-
 });
 
 const scraperStatus = async () => {
