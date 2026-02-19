@@ -131,7 +131,7 @@ class ErosScraper(ScraperPrototype):
         os.mkdir(self.screenshot_directory)
 
         # Get data from posts
-        self._report_progress("processing_posts", f"0/{len(links)} posts")
+        self._report_progress("processing_posts", f"0/{len(links)} links")
         self.get_data(links)
         self.close_webpage()
         self.reset_variables()
@@ -189,10 +189,12 @@ class ErosScraper(ScraperPrototype):
     def get_data(self, links) -> None:
         counter = 1
         total = len(links)
+        current = 0  # Index of link being processed (for progress; increments every link)
 
         for link in links:
-            self._report_progress("processing_posts", f"{counter}/{total} posts")
-            print(f"Processing link {counter}/{len(links)}: {link}")
+            current += 1
+            self._report_progress("processing_posts", f"{current}/{total} links")
+            print(f"Processing link {current}/{len(links)}: {link}")
             if not self.completed:
                 self.driver.implicitly_wait(10)
                 self.driver.get(link)

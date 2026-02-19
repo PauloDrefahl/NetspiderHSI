@@ -166,6 +166,19 @@ scraper_manager = ScraperManager()
     ---------------------------------   
 '''
 
+# Initialized when user selects result directory; None until then (avoids NameError if handlers run first)
+resultManager = None
+folderAppend = None
+
+
+def _require_result_manager():
+    """Return True if resultManager and folderAppend are initialized, else emit error and return False."""
+    global resultManager, folderAppend
+    if resultManager is None or folderAppend is None:
+        socketio.emit('result_folder_selected', {'error': 'Select a result directory first'})
+        return False
+    return True
+
 
 def initialize_result_manager(result_dir):
     global resultManager
@@ -213,6 +226,8 @@ def stop_scraper():
 # Result Manager Sockets
 @socketio.on('start_append')
 def start_append(data):
+    if not _require_result_manager():
+        return
     logger.debug("Start append request: %s", data)
     socketio.emit('result_manager_update', {'status': 'appending'})
     folderAppend.setSelectedFolders(data)
@@ -225,6 +240,8 @@ def start_append(data):
 
 @socketio.on('open_PDF')
 def open_PDF(data):
+    if not _require_result_manager():
+        return
     socketio.emit('result_manager_update', {'status': 'view_pdf'})
     response = resultManager.view_pdf(data)
     return {'Response': response}
@@ -232,6 +249,8 @@ def open_PDF(data):
 
 @socketio.on('open_ss_dir')
 def open_ss_dir(data):
+    if not _require_result_manager():
+        return
     socketio.emit('result_manager_update', {'status': 'view_SS_dir'})
     response = resultManager.view_ss_dir(data)
     return {'Response': response}
@@ -239,6 +258,8 @@ def open_ss_dir(data):
 
 @socketio.on('open_clean_data')
 def open_clean_data(data):
+    if not _require_result_manager():
+        return
     socketio.emit('result_manager_update', {'status': 'view_clean_data'})
     response = resultManager.view_clean_data(data)
     return {'Response': response}
@@ -246,6 +267,8 @@ def open_clean_data(data):
 
 @socketio.on('open_raw_data')
 def open_raw_data(data):
+    if not _require_result_manager():
+        return
     socketio.emit('result_manager_update', {'status': 'view_raw_data'})
     response = resultManager.view_raw_data(data)
     return {'Response': response}
@@ -253,6 +276,8 @@ def open_raw_data(data):
 
 @socketio.on('open_diagram_dir')
 def open_diagram_dir(data):
+    if not _require_result_manager():
+        return
     socketio.emit('result_manager_update', {'status': 'view_diagram_dir'})
     response = resultManager.view_diagram_dir(data)
     return {'Response': response}
@@ -296,16 +321,16 @@ def set_result_dir_from_path(data):
 
 @socketio.on('refresh_result_list')
 def refresh_result_list():
-
+    if not _require_result_manager():
+        return
     resultManager.update_folders_json()
-
     resultList = resultManager.get_folders()
-
-    # Check if resultList is not empty and send the list
-    if resultList:
+    # get_folders() returns (error_dict, 500) on failure; tuple is truthy so we must check explicitly
+    if isinstance(resultList, tuple) and len(resultList) == 2 and resultList[1] == 500:
+        socketio.emit('result_list_refreshed', {'error': resultList[0].get('error', 'Unknown error')})
+    elif resultList:
         socketio.emit('result_list_refreshed', {'folders': resultList})
     else:
-        # Notify if the directory is empty or there are no folders
         socketio.emit('result_list_refreshed', {'error': 'No folders found in the selected directory'})
 
 @socketio.on_error_default
