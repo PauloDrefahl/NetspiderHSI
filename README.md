@@ -177,9 +177,17 @@ Please read our [Contributing Guidelines](link-to-contributing-guidelines) for m
 * **William Ward** - Full Stack Developer
 * **Daniel Kareh** - Backend Developer
 
+## Netspider 25-26 Team
+* **Aaron Cole** - Full Stack and Backend Developer
+* **Martin Patterson** - Full Stack and Backend Developer
+
 ## Sponsors and Mentors
 
 * **Sponsor**: Clinton Thompson
+* **Mentor**: Dr. Fernando Gonzalez
+
+## 25-26 Sponsors and Mentors
+* **Sponsor**: Dave Loerzel
 * **Mentor**: Dr. Fernando Gonzalez
 
 ## License
