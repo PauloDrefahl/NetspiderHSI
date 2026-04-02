@@ -38,6 +38,8 @@ from Backend.Scraper import (
 from Backend import database
 from Backend.resultManager.appendResults import FolderAppender
 from Backend.resultManager.resultManager import ResultManager
+from Backend.classification.classifier import PostClassifier
+from Backend.classification.cross_site_linker import CrossSiteLinker
 
 
 app = Flask(__name__)
@@ -96,9 +98,20 @@ class ScraperManager:
             socketio.emit('scraper_update', {'status': 'scraper thread not alive'})
 
 
+WEBSITE_TO_TABLE = {
+    'eros': 'raw_eros_posts',
+    'escortalligator': 'raw_escort_alligator_posts',
+    'megapersonals': 'raw_mega_personals_posts',
+    'rubratings': 'raw_rub_ratings_posts',
+    'skipthegames': 'raw_skipthegames_posts',
+    'yesbackpage': 'raw_yesbackpage_posts',
+}
+
+
 class ScraperThread(threading.Thread):
     def __init__(self, kwargs):
         super().__init__()
+        self.source_table = WEBSITE_TO_TABLE.get(kwargs['website'])
         keywords = set(kwargs["keywords"])
         flagged_keywords = set(kwargs["flagged_keywords"])
         # Ignore empty search text.
@@ -140,6 +153,17 @@ class ScraperThread(threading.Thread):
         if self.scraper.completed:
             logger.info("Scraper completed")
             self.stop_thread()
+            # Run post-scrape classification on the scraped source table
+            if self.source_table:
+                try:
+                    socketio.emit('scraper_update', {'status': 'classifying', 'phase': 'classifying', 'detail': 'Running post classification...'})
+                    classifier = PostClassifier()
+                    count = classifier.classify_all(source_table=self.source_table)
+                    logger.info("Post-scrape classification: %d posts classified from %s", count, self.source_table)
+                    socketio.emit('classification_update', {'status': 'completed', 'source': self.source_table, 'count': count})
+                except Exception as e:
+                    logger.error("Post-scrape classification failed: %s", e, exc_info=True)
+                    socketio.emit('classification_update', {'status': 'error', 'error': str(e)})
         socketio.emit('scraper_update', {'status': 'completed'})
 
     def stop_thread(self):
@@ -377,7 +401,333 @@ def handle_database_results(data):
 
 '''
     ---------------------------------
-    Auto Scraper 
+    Classification & Review Queue
+    ---------------------------------
+'''
+
+
+@socketio.on('run_classification')
+def handle_run_classification(data=None):
+    source_table = data.get('source_table') if data else None
+    try:
+        classifier = PostClassifier()
+        count = classifier.classify_all(source_table=source_table)
+        socketio.emit('classification_update', {'status': 'completed', 'count': count})
+        return {'Response': f'{count} posts classified'}
+    except Exception as e:
+        logger.error("Classification failed: %s", e, exc_info=True)
+        socketio.emit('classification_update', {'status': 'error', 'error': str(e)})
+        return {'error': str(e)}
+
+
+@socketio.on('get_classification_stats')
+def handle_classification_stats():
+    try:
+        conn = database.connect(read_only=True)
+    except psycopg.Error:
+        socketio.emit('classification_stats', {'error': 'Could not connect to database'})
+        return
+
+    try:
+        with conn.cursor(row_factory=dict_row) as cur:
+            cur.execute("""
+                SELECT
+                    COUNT(*) FILTER (WHERE bucket = 1) AS bucket_1_count,
+                    COUNT(*) FILTER (WHERE bucket = 2) AS bucket_2_count,
+                    COUNT(*) FILTER (WHERE bucket = 3) AS bucket_3_count,
+                    COUNT(*) FILTER (WHERE bucket = 4) AS bucket_4_count,
+                    COUNT(*) FILTER (WHERE reviewed = false AND bucket >= 3) AS unreviewed_count,
+                    COUNT(*) AS total
+                FROM post_classifications
+            """)
+            stats = cur.fetchone()
+            socketio.emit('classification_stats', {'data': stats})
+    except Exception as e:
+        logger.error("Stats query failed: %s", e)
+        socketio.emit('classification_stats', {'error': str(e)})
+    finally:
+        conn.close()
+
+
+@socketio.on('get_review_queue')
+def handle_get_review_queue(data):
+    bucket = data.get('bucket')
+    source_table = data.get('source_table')
+    reviewed_filter = data.get('reviewed')  # true, false, or None for all
+    page = data.get('page', 1)
+    per_page = data.get('per_page', 50)
+    offset = (page - 1) * per_page
+
+    try:
+        conn = database.connect(read_only=True)
+    except psycopg.Error:
+        socketio.emit('review_queue', {'error': 'Could not connect to database'})
+        return
+
+    try:
+        with conn.cursor(row_factory=dict_row) as cur:
+            conditions = []
+            params = []
+
+            if bucket is not None:
+                conditions.append("pc.bucket = %s")
+                params.append(bucket)
+            if source_table:
+                conditions.append("pc.source_table = %s")
+                params.append(source_table)
+            if reviewed_filter is not None:
+                conditions.append("pc.reviewed = %s")
+                params.append(reviewed_filter)
+
+            where_clause = ""
+            if conditions:
+                where_clause = "WHERE " + " AND ".join(conditions)
+
+            # Get total count
+            cur.execute(
+                f"SELECT COUNT(*) AS total FROM post_classifications pc {where_clause}",
+                params,
+            )
+            total = cur.fetchone()['total']
+
+            # Get paginated results
+            cur.execute(
+                f"""
+                SELECT pc.id, pc.source_table, pc.post_link, pc.post_city,
+                       pc.bucket, pc.risk_score, pc.keyword_hits,
+                       pc.payment_flag, pc.social_flag,
+                       pc.classified_at, pc.reviewed, pc.reviewed_by,
+                       pc.reviewed_at, pc.review_notes, pc.original_bucket
+                FROM post_classifications pc
+                {where_clause}
+                ORDER BY pc.risk_score DESC, pc.classified_at DESC
+                LIMIT %s OFFSET %s
+                """,
+                params + [per_page, offset],
+            )
+            results = cur.fetchall()
+
+            # Serialize datetime fields
+            serializable = []
+            for row in results:
+                r = dict(row)
+                for field in ('classified_at', 'reviewed_at'):
+                    if r.get(field) is not None:
+                        r[field] = r[field].isoformat()
+                if r.get('risk_score') is not None:
+                    r['risk_score'] = float(r['risk_score'])
+                serializable.append(r)
+
+            socketio.emit('review_queue', {
+                'data': serializable,
+                'total': total,
+                'page': page,
+                'per_page': per_page,
+            })
+    except Exception as e:
+        logger.error("Review queue query failed: %s", e)
+        socketio.emit('review_queue', {'error': str(e)})
+    finally:
+        conn.close()
+
+
+@socketio.on('get_classified_post')
+def handle_get_classified_post(data):
+    classification_id = data.get('classification_id')
+    if not classification_id:
+        socketio.emit('classified_post_detail', {'error': 'Missing classification_id'})
+        return
+
+    try:
+        conn = database.connect(read_only=True)
+    except psycopg.Error:
+        socketio.emit('classified_post_detail', {'error': 'Could not connect to database'})
+        return
+
+    try:
+        with conn.cursor(row_factory=dict_row) as cur:
+            # Get the classification record
+            cur.execute(
+                "SELECT * FROM post_classifications WHERE id = %s",
+                (classification_id,),
+            )
+            classification = cur.fetchone()
+            if not classification:
+                socketio.emit('classified_post_detail', {'error': 'Classification not found'})
+                return
+
+            classification = dict(classification)
+            for field in ('classified_at', 'reviewed_at'):
+                if classification.get(field) is not None:
+                    classification[field] = classification[field].isoformat()
+            if classification.get('risk_score') is not None:
+                classification['risk_score'] = float(classification['risk_score'])
+
+            # Get the source post data from the clean view
+            source_table = classification['source_table']
+            from Backend.classification.classifier import CLEAN_VIEWS
+            clean_view = CLEAN_VIEWS.get(source_table)
+            post_data = None
+            if clean_view:
+                cur.execute(
+                    f"SELECT * FROM {clean_view} WHERE link = %s AND city_or_region = %s",
+                    (classification['post_link'], classification['post_city']),
+                )
+                row = cur.fetchone()
+                if row:
+                    post_data = dict(row)
+                    for key, val in post_data.items():
+                        if hasattr(val, 'isoformat'):
+                            post_data[key] = val.isoformat()
+
+            # Get cross-site links if any
+            cur.execute(
+                """
+                SELECT csl.cluster_id, csl.match_type, csl.match_value
+                FROM cross_site_links csl
+                WHERE csl.classification_id = %s
+                """,
+                (classification_id,),
+            )
+            cross_links = [dict(r) for r in cur.fetchall()]
+
+            # If there are cross-site links, get the other posts in the cluster
+            cluster_posts = []
+            if cross_links:
+                cluster_ids = list(set(str(cl['cluster_id']) for cl in cross_links))
+                for cid in cluster_ids:
+                    cur.execute(
+                        """
+                        SELECT DISTINCT pc.id, pc.source_table, pc.post_link,
+                               pc.post_city, pc.risk_score, pc.bucket
+                        FROM cross_site_links csl
+                        JOIN post_classifications pc ON pc.id = csl.classification_id
+                        WHERE csl.cluster_id = %s::uuid AND pc.id != %s
+                        """,
+                        (cid, classification_id),
+                    )
+                    for row in cur.fetchall():
+                        r = dict(row)
+                        if r.get('risk_score') is not None:
+                            r['risk_score'] = float(r['risk_score'])
+                        cluster_posts.append(r)
+
+            socketio.emit('classified_post_detail', {
+                'classification': classification,
+                'post_data': post_data,
+                'cross_links': cross_links,
+                'cluster_posts': cluster_posts,
+            })
+    except Exception as e:
+        logger.error("Post detail query failed: %s", e)
+        socketio.emit('classified_post_detail', {'error': str(e)})
+    finally:
+        conn.close()
+
+
+@socketio.on('reclassify_post')
+def handle_reclassify_post(data):
+    classification_id = data.get('classification_id')
+    new_bucket = data.get('new_bucket')
+    review_notes = data.get('review_notes', '')
+    reviewed_by = data.get('reviewed_by', 'agent')
+
+    if not classification_id or new_bucket is None:
+        socketio.emit('reclassify_result', {'error': 'Missing required fields'})
+        return
+
+    try:
+        conn = database.connect()
+    except psycopg.Error:
+        socketio.emit('reclassify_result', {'error': 'Could not connect to database'})
+        return
+
+    try:
+        with conn.cursor() as cur:
+            cur.execute(
+                """
+                UPDATE post_classifications
+                SET original_bucket = CASE
+                        WHEN original_bucket IS NULL THEN bucket
+                        ELSE original_bucket
+                    END,
+                    bucket = %s,
+                    reviewed = true,
+                    reviewed_by = %s,
+                    reviewed_at = now(),
+                    review_notes = %s
+                WHERE id = %s
+                """,
+                (new_bucket, reviewed_by, review_notes, classification_id),
+            )
+        socketio.emit('reclassify_result', {'status': 'success', 'classification_id': classification_id})
+    except Exception as e:
+        logger.error("Reclassification failed: %s", e)
+        socketio.emit('reclassify_result', {'error': str(e)})
+    finally:
+        conn.close()
+
+
+@socketio.on('run_cross_site_analysis')
+def handle_cross_site_analysis():
+    try:
+        linker = CrossSiteLinker()
+        result = linker.find_links()
+        socketio.emit('cross_site_result', {'status': 'completed', 'data': result})
+        return {'Response': result}
+    except Exception as e:
+        logger.error("Cross-site analysis failed: %s", e)
+        socketio.emit('cross_site_result', {'status': 'error', 'error': str(e)})
+        return {'error': str(e)}
+
+
+@socketio.on('get_cross_site_clusters')
+def handle_get_clusters(data=None):
+    page = data.get('page', 1) if data else 1
+    per_page = data.get('per_page', 20) if data else 20
+
+    try:
+        conn = database.connect(read_only=True)
+    except psycopg.Error:
+        socketio.emit('cross_site_clusters', {'error': 'Could not connect to database'})
+        return
+
+    try:
+        with conn.cursor(row_factory=dict_row) as cur:
+            # Get distinct clusters with post counts
+            cur.execute(
+                """
+                SELECT csl.cluster_id,
+                       csl.match_type,
+                       csl.match_value,
+                       COUNT(DISTINCT csl.classification_id) AS post_count,
+                       MIN(csl.created_at) AS first_seen
+                FROM cross_site_links csl
+                GROUP BY csl.cluster_id, csl.match_type, csl.match_value
+                ORDER BY post_count DESC, first_seen DESC
+                LIMIT %s OFFSET %s
+                """,
+                (per_page, (page - 1) * per_page),
+            )
+            clusters = []
+            for row in cur.fetchall():
+                r = dict(row)
+                r['cluster_id'] = str(r['cluster_id'])
+                if r.get('first_seen') is not None:
+                    r['first_seen'] = r['first_seen'].isoformat()
+                clusters.append(r)
+
+            socketio.emit('cross_site_clusters', {'data': clusters, 'page': page})
+    except Exception as e:
+        logger.error("Clusters query failed: %s", e)
+        socketio.emit('cross_site_clusters', {'error': str(e)})
+    finally:
+        conn.close()
+
+
+'''
+    ---------------------------------
+    Auto Scraper
     ---------------------------------
 '''
 

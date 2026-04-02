@@ -30,7 +30,7 @@
 
 .column-edit-keywords {
     grid-column: 1 / span 2; /* Span both columns */
-    position: relative; /* Ensure positioning context for absolute positioning */
+    position: relative;
     width: fit-content;
     height:  fit-content;
 }
@@ -44,7 +44,7 @@
     text-align: center;
     padding: 8PX;
     border: 2px solid #000000;
-    border-radius: 4px; /* Rounded corners */
+    border-radius: 4px;
     background-color: #09558B;
     color: #fff;
     font: 15px "Plus Jakarta Sans", sans-serif;
@@ -71,7 +71,7 @@
     text-align: center;
     padding: 8PX;
     border: 2px solid #000000;
-    border-radius: 4px; /* Rounded corners */
+    border-radius: 4px;
     background-color: #09558B;
     color: #fff;
     font: 15px "Plus Jakarta Sans", sans-serif;

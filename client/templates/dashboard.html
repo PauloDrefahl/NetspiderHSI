@@ -15,8 +15,10 @@
     <link rel="stylesheet" href="../static/css/editKeywords.css">
     <link rel="stylesheet" href="../static/css/selectKeywords.css">
     <link rel="stylesheet" href="../static/css/resultManager.css">
+    <link rel="stylesheet" href="../static/css/reviewQueue.css">
 
     <script src="../static/scripts/databaseResults.js" defer></script>
+    <script src="../static/scripts/reviewQueue.js" defer></script>
     <script src="../static/scripts/files.js" defer></script>
     <script src="../static/scripts/keywords.js" defer></script>
     <script src="../static/scripts/nav.js" defer></script>
@@ -44,6 +46,7 @@
         <a href="#med-box" id="keyword-link"><img src="../static/icons/key-solid.svg" class="icon"/><span>Keyword</span></a>
         <a href="#small-box" id="help-link"><img src="../static/icons/circle-question-solid.svg" class="icon"/><span>Help</span></a>
         <a href="#big-box-2" id="results-link"><img src="../static/icons/box-archive-solid.svg" class="icon"/><span>Results</span></a>
+        <a href="#review-box" id="review-link"><img src="../static/icons/magnifying-glass-solid.svg" class="icon"/><span>Review Queue</span></a>
         <a href="../index.html" id="logout-link" class="last-child-divider"><img src="../static/icons/right-from-bracket-solid.svg" class="icon"/><span>Logout</span></a>
     </div>
     <div class="nav-logo">
@@ -309,6 +312,135 @@
                 </div>
             </div>
         </div>
+
+        <div id="review-box">
+            <div id="box-header-2">
+                <h2 style="color: #09558B;"><img src="../static/icons/magnifying-glass-solid.svg" class="icon"/> Post Classification &amp; Review Queue</h2>
+            </div>
+
+            <!-- Stats bar -->
+            <div class="review-stats-bar">
+                <div class="stat-badge stat-monitor">
+                    <span class="stat-count" id="stat-bucket-1">0</span>
+                    <span class="stat-label">Monitor</span>
+                </div>
+                <div class="stat-badge stat-review">
+                    <span class="stat-count" id="stat-bucket-2">0</span>
+                    <span class="stat-label">Review</span>
+                </div>
+                <div class="stat-badge stat-priority">
+                    <span class="stat-count" id="stat-bucket-3">0</span>
+                    <span class="stat-label">Priority</span>
+                </div>
+                <div class="stat-badge stat-alert">
+                    <span class="stat-count" id="stat-bucket-4">0</span>
+                    <span class="stat-label">Alert</span>
+                </div>
+                <div class="stat-badge stat-unreviewed">
+                    <span class="stat-count" id="stat-unreviewed">0</span>
+                    <span class="stat-label">Unreviewed</span>
+                </div>
+            </div>
+
+            <!-- Filter controls -->
+            <div class="review-filters">
+                <select id="review-bucket-filter">
+                    <option value="">All Buckets</option>
+                    <option value="1">Bucket 1 - Monitor</option>
+                    <option value="2">Bucket 2 - Review</option>
+                    <option value="3">Bucket 3 - Priority</option>
+                    <option value="4">Bucket 4 - Alert</option>
+                </select>
+                <select id="review-source-filter">
+                    <option value="">All Sources</option>
+                    <option value="raw_escort_alligator_posts">Escort Alligator</option>
+                    <option value="raw_eros_posts">Eros</option>
+                    <option value="raw_mega_personals_posts">Mega Personals</option>
+                    <option value="raw_rub_ratings_posts">Rub Ratings</option>
+                    <option value="raw_skipthegames_posts">Skip The Games</option>
+                    <option value="raw_yesbackpage_posts">Yes Back Page</option>
+                </select>
+                <select id="review-status-filter">
+                    <option value="">All Status</option>
+                    <option value="false">Pending Review</option>
+                    <option value="true">Reviewed</option>
+                </select>
+                <button id="review-refresh-btn">Refresh</button>
+                <button id="review-classify-btn" class="btn-classify">Run Classification</button>
+                <button id="review-crosssite-btn" class="btn-crosssite">Cross-Site Analysis</button>
+            </div>
+
+            <!-- Results table -->
+            <div class="review-table-wrapper">
+                <table id="review-table">
+                    <thead>
+                        <tr>
+                            <th>Risk Score</th>
+                            <th>Bucket</th>
+                            <th>Source</th>
+                            <th>City</th>
+                            <th>Post Link</th>
+                            <th>Keywords</th>
+                            <th>Payment</th>
+                            <th>Social</th>
+                            <th>Review Status</th>
+                            <th>Actions</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        <tr><td colspan="10">No classified posts yet. Run a scraper or click "Run Classification" to classify existing posts.</td></tr>
+                    </tbody>
+                </table>
+            </div>
+
+            <!-- Pagination -->
+            <div class="review-pagination">
+                <button id="review-prev-page" disabled>Previous</button>
+                <span class="page-info" id="review-page-info">Page 1 of 1</span>
+                <button id="review-next-page" disabled>Next</button>
+            </div>
+
+            <!-- Detail panel (hidden by default) -->
+            <div id="review-detail-panel" class="review-detail-panel">
+                <div class="detail-header">
+                    <h3>Post Detail &amp; Review</h3>
+                    <button id="close-detail-btn" class="btn-close-detail">Close</button>
+                </div>
+
+                <div class="detail-grid">
+                    <div class="detail-section">
+                        <h4>Score Breakdown</h4>
+                        <div id="detail-score"></div>
+                    </div>
+                    <div class="detail-section">
+                        <h4>Keyword Hits by Category</h4>
+                        <div id="detail-keywords"></div>
+                    </div>
+                </div>
+
+                <div class="detail-section">
+                    <h4>Post Content</h4>
+                    <div id="detail-content"></div>
+                </div>
+
+                <!-- Cross-site cluster info -->
+                <div id="detail-clusters" class="cluster-section" style="display:none;"></div>
+
+                <!-- Reclassify controls -->
+                <div class="reclassify-controls">
+                    <h4>Reclassify Post</h4>
+                    <select id="reclassify-bucket">
+                        <option value="1">Bucket 1 - Monitor</option>
+                        <option value="2">Bucket 2 - Review</option>
+                        <option value="3">Bucket 3 - Priority</option>
+                        <option value="4">Bucket 4 - Alert</option>
+                    </select>
+                    <textarea id="reclassify-notes" placeholder="Review notes (optional)"></textarea>
+                    <button id="save-review-btn" class="btn-save-review">Save Review</button>
+                </div>
+            </div>
+        </div>
+
     </div>
 </div>
 </div>

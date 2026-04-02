@@ -96,6 +96,8 @@ window.socket.on('scraper_update', (data) => {
         statusText.textContent = 'Status: Off';
     } else if (data.status === 'error') {
         statusText.textContent = 'Status: Error - ' + (data.error || 'Unknown');
+    } else if (data.status === 'classifying') {
+        statusText.textContent = 'Status: Classifying posts…';
     } else if (data.status === 'completed') {
         stopClock();
         statusText.textContent = 'Status: Off';

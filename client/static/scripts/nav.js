@@ -7,13 +7,15 @@ document.addEventListener("DOMContentLoaded", function () {
     var netspiderLink = document.getElementById("netspider-link");
     var keywordLink = document.getElementById("keyword-link");
     var helpLink = document.getElementById("help-link");
-    var resultsLink = document.getElementById("results-link")
+    var resultsLink = document.getElementById("results-link");
+    var reviewLink = document.getElementById("review-link");
 
     var boxes = document.querySelectorAll(".box");
     var bigBox = document.getElementById("big-box");
     var medBox = document.getElementById("med-box");
     var smBox = document.getElementById("small-box");
     var bigBox2 = document.getElementById("big-box-2");
+    var reviewBox = document.getElementById("review-box");
 
     function addHoverEffect(element) {
         element.classList.add("hover-effect");
@@ -42,8 +44,14 @@ document.addEventListener("DOMContentLoaded", function () {
     });
 
     resultsLink.addEventListener("click", function () {
-        addHoverEffect(bigBox2); // Assuming there's a big box 2, adjust accordingly
+        addHoverEffect(bigBox2);
     });
+
+    if (reviewLink && reviewBox) {
+        reviewLink.addEventListener("click", function () {
+            addHoverEffect(reviewBox);
+        });
+    }
 
     /* Toggle Hamburger Menu */
     window.toggleMenu = function() {
