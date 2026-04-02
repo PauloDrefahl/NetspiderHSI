@@ -8,7 +8,7 @@
     min-width: 963px;
 }
  
-/* New wrapper with margin on the left */
+/* Wrapper with margin on the left */
 #content-wrapper {
     margin-top: 20px;
     margin-left: 300px;
@@ -21,14 +21,14 @@
 .box {
     width: calc(29.33% - 20px);
     margin: 0 auto;
-    padding: 20px; /* Increased padding */
+    padding: 20px;
     border: 1px solid #ddd;
     background-color: #fff;
     text-align: center;
-    border-radius: 12px; /* Rounded corners */
+    border-radius: 12px;
     transition: box-shadow 0.3s, transform 0.3s;
     box-sizing: border-box;
-    box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1); /* Improved box shadow */
+    box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
 }
 
 /* Heading styles within the boxes */
@@ -40,13 +40,13 @@
 
 /* Box hover effect */
 .box:hover {
-    box-shadow: 0 8px 16px rgba(0, 0, 0, 0.2); /* Enhanced box shadow on hover */
+    box-shadow: 0 8px 16px rgba(0, 0, 0, 0.2);
     transform: scale(1.05);
 }
 
-/* Add this CSS for the hover effect */
+
 .box.hover-effect {
-    box-shadow: 0 8px 16px rgba(0, 0, 0, 0.2); /* Enhanced box shadow on hover */
+    box-shadow: 0 8px 16px rgba(0, 0, 0, 0.2);
     transform: scale(1.05);
 }
 
@@ -56,10 +56,10 @@
 input[type="file"] {
     width: 100%;
     box-sizing: border-box;
-    margin-top: 20px; /* Increased margin */
+    margin-top: 20px;
     text-align: center;
-    padding: 15px; /* Increased padding */
-    border: 2px dashed #09558B; /* Thicker border */
+    padding: 15px;
+    border: 2px dashed #09558B;
     border-radius: 8px;
     background-color: #fff;
     transition: background-color 0.3s, border-color 0.3s;
@@ -81,36 +81,36 @@ input[type="file"].file-selected {
 
 /* Styles for the folder box */
 #folder-box {
-    width: calc(29.33% - 20px); /* Same width as other boxes */
-    margin: 0 auto; /* Centered */
-    padding: 20px; /* Same padding as other boxes */
-    border: 1px solid #ddd; /* Same border as other boxes */
-    background-color: #fff; /* Same background color as other boxes */
-    text-align: center; /* Same text alignment as other boxes */
-    border-radius: 12px; /* Same border radius as other boxes */
-    transition: box-shadow 0.3s, transform 0.3s; /* Same transition effect as other boxes */
-    box-sizing: border-box; /* Same box-sizing as other boxes */
-    box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1); /* Same box shadow as other boxes */
+    width: calc(29.33% - 20px);
+    margin: 0 auto;
+    padding: 20px;
+    border: 1px solid #ddd;
+    background-color: #fff;
+    text-align: center;
+    border-radius: 12px;
+    transition: box-shadow 0.3s, transform 0.3s;
+    box-sizing: border-box;
+    box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
 }
 
 #folder-box h2 {
-    margin: 0 auto; /* Centered */
-    text-align: center; /* Same text alignment as other boxes */
-    color: #09558B; /* Same color as other boxes */
+    margin: 0 auto;
+    text-align: center;
+    color: #09558B;
 }
 
 #folder-box:hover {
-    box-shadow: 0 8px 16px rgba(0, 0, 0, 0.2); /* Same hover effect as other boxes */
-    transform: scale(1.05); /* Same hover effect as other boxes */
+    box-shadow: 0 8px 16px rgba(0, 0, 0, 0.2);
+    transform: scale(1.05);
 }
 
 #folder-box .icon {
-    vertical-align: middle; /* Align icon vertically */
-    margin-right: 10px; /* Add some space between icon and text */
+    vertical-align: middle;
+    margin-right: 10px;
 }
 
 #folder-box input[type="file"] {
-    display: none; /* Hide the file input */
+    display: none;
 }
 
 #folder-box .select-folder-button {

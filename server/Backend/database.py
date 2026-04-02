@@ -22,8 +22,9 @@ _DATABASE_NAME = "netspider"
 # WARNING: To save users from frequently entering passwords, we use a hardcoded
 # password. NetSpider is intended to run *locally*, so we don't really need
 # proper authentication or secrets management.
-_DEFAULT_USER = "postgres"  # Bootstrap superuser
-_DEFAULT_PASSWORD = "password"  # noqa: S105
+# Override with PGUSER / PGPASSWORD environment variables if needed.
+_DEFAULT_USER = os.environ.get("PGUSER", "postgres")  # Bootstrap superuser
+_DEFAULT_PASSWORD = os.environ.get("PGPASSWORD", "password")  # noqa: S105
 _READ_ONLY_USER = "netspider_read_only"
 _READ_ONLY_PASSWORD = "password"  # noqa: S105
 
@@ -121,3 +122,7 @@ def _set_up(connection: Connection) -> None:
         # WARNING: This type cast bypasses the SQL injection prevention, but
         # `schema_v00` comes from a trusted source (us!), so it's okay.
         cursor.execute(cast(LiteralString, schema_v00))
+
+        schema_v01_resource = resources.files(schema) / "v01_classification.sql"
+        schema_v01 = schema_v01_resource.read_text(encoding="utf-8")
+        cursor.execute(cast(LiteralString, schema_v01))

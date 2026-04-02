@@ -1,14 +1,13 @@
-/* DEFAULT DASHBOARD CHARACTERISTICS */
+/* DEFAULT DASHBOARD STYLES */
 
-/* Resetting default styles and setting font */
 body {
     font-family: "Plus Jakarta Sans", sans-serif;
     margin: 0;
     padding: 0;
     background-color: #f4f4f4;
-    background-image: url('../documents/white-triangle-pattern-seamless-background-2.jpg'); /* Specify the URL of your background image */
-    background-size: contain; /* Fit the background image within the container */
-    background-repeat: repeat; /* Allow the background image to repeat */
+    background-image: url('../documents/white-triangle-pattern-seamless-background-2.jpg');
+    background-size: contain;
+    background-repeat: repeat;
 }
 
 * {
@@ -19,8 +18,8 @@ body {
 
 .input-container, .button-container {
     display: flex;
-    align-items: center; /* Center items horizontally */
-    justify-content: center; /* Center items vertically */
+    align-items: center;
+    justify-content: center;
     padding: 10px;
 }
 
@@ -29,10 +28,10 @@ body {
     width: 100%;
     margin-left: 15px;
     margin-top: 40px;
-    padding: 30px; /* Increased padding */
+    padding: 30px;
     background-color: #fff;
-    border-left: 2px solid #ddd; /* Left border */
-    border-right: 2px solid #ddd; /* Right border */
+    border-left: 2px solid #ddd;
+    border-right: 2px solid #ddd;
     border-radius: 12px; /* Rounded corners */
     display: flex;
     justify-content: space-between;
@@ -50,23 +49,23 @@ body {
 
 .medium-column {
     flex: 1;
-    margin: 5px; /* Decreased margin */
-    padding: 20px; /* Decreased padding */
-    box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1); /* Improved box shadow */
-    max-width: calc(50% - 20px); /* Adjusted max-width */
-    display: flex; /* Added */
-    flex-direction: column; /* Added */
+    margin: 5px;
+    padding: 20px;
+    box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+    max-width: calc(50% - 20px);
+    display: flex;
+    flex-direction: column;
 }
 
 /* Three columns within the big box */
 .column {
     flex: 1;
-    margin: 30px; /* Increased margin */
+    margin: 30px;
     margin-top: 0%;
-    padding: 30px; /* Increased padding */
+    padding: 30px;
     padding-top: 0;
     height: 90%;
-    box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1); /* Improved box shadow */;
+    box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);;
 }
 
 .column h2{
@@ -122,20 +121,20 @@ body {
 /* Medium box under the Big box w/ 3 sections */
 #med-box {
     display: grid;
-    grid-template-columns: repeat(2, 1fr); /* Two equal-width columns */
-    grid-gap: 20px; /* Gap between columns */
+    grid-template-columns: repeat(2, 1fr);
+    grid-gap: 20px;
     width: 60%;
     margin-left: 15px;
     margin-top: 40px;
-    padding: 30px; /* Increased padding */
+    padding: 30px;
     background-color: #fff;
-    border-left: 2px solid #ddd; /* Left border */
-    border-right: 2px solid #ddd; /* Right border */
-    border-radius: 12px; /* Rounded corners */
-    position: relative; /* Ensure positioning context for absolute positioning */
+    border-left: 2px solid #ddd;
+    border-right: 2px solid #ddd;
+    border-radius: 12px;
+    position: relative;
     min-height: 500px;
     transition: box-shadow 0.3s, transform 0.3s;
-    box-shadow: 0 8px 16px rgba(255, 255, 255, 0.1); /* Improved box shadow */
+    box-shadow: 0 8px 16px rgba(255, 255, 255, 0.1);
 }
 
 .setname-input{
@@ -200,32 +199,32 @@ body {
 #big-box-2 {
     display: grid;
     grid-template-columns: repeat(2, 1fr); /* Two equal-width columns */
-    grid-gap: 20px; /* Gap between columns */
+    grid-gap: 20px;
     width: 100%;
     margin-left: 15px;
     margin-top: 40px;
-    padding: 30px; /* Increased padding */
+    padding: 30px;
     background-color: #fff;
-    border-left: 2px solid #ddd; /* Left border */
-    border-right: 2px solid #ddd; /* Right border */
-    border-radius: 12px; /* Rounded corners */
-    position: relative; /* Ensure positioning context for absolute positioning */
+    border-left: 2px solid #ddd;
+    border-right: 2px solid #ddd;
+    border-radius: 12px;
+    position: relative;
     min-height: 500px;
     transition: box-shadow 0.3s, transform 0.3s;
-    box-shadow: 0 8px 16px rgba(255, 255, 255, 0.1); /* Improved box shadow */
+    box-shadow: 0 8px 16px rgba(255, 255, 255, 0.1);
 }
 
 #big-box-2 h2 {
-    margin-bottom: 20px; /* Adjusted bottom margin */
+    margin-bottom: 20px;
     color: #09558B;
     text-align: center;
 }
 
 #box-header {
-    justify-content: center; /* Center horizontally */
-    align-items: center; /* Center vertically */
+    justify-content: center;
+    align-items: center;
     margin: 0;
-    border: 2px solid #ddd; /* Increased border width */
+    border: 2px solid #ddd;
     padding: 10px;
     background-color: #fff;
     text-align: center;
