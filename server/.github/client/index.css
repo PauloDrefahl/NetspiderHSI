@@ -1,0 +1,64 @@
+        body {
+            font-family: Arial, sans-serif;
+            margin: 0;
+            padding: 0;
+            background-color: #220ba5;
+            background-image: url(photos/background.jpg);
+            background-repeat: no-repeat;
+            background-attachment: fixed;
+            background-size: cover;
+
+        }
+
+        nav {
+            background-color: #333;
+            color: rgb(43, 30, 219);
+            padding: 10px;
+            text-align: center;
+        }
+
+        img {
+            max-width: 100%;
+            margin: 0 auto;
+            display: block;
+        }
+
+        nav a {
+            color: white;
+            text-decoration: none;
+            margin: 0 15px;
+        }
+
+        .container {
+            max-width: 400px;
+            margin: 50px auto;
+            background-color: #3f4246;
+            padding: 20px;
+            border-radius: 5px;
+            box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
+            color: white;
+        }
+
+        label {
+            display: block;
+            margin-bottom: 8px;
+        }
+
+        input {
+            width: 100%;
+            padding: 8px;
+            margin-bottom: 15px;
+            box-sizing: border-box;
+        }
+
+        button {
+            background-color: #333;
+            color: white;
+            padding: 10px;
+            border: none;
+            border-radius: 3px;
+            cursor: pointer;
+            position: relative; 
+            margin: 0 auto;
+            display: block;
+        }

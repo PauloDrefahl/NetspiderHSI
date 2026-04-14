@@ -1,0 +1,77 @@
+/* SCRAPER SETTINGS BOX */
+
+#scraperTextbox{
+    width: 90%;
+    max-height: 2%;
+    padding: 15px;
+    border: 2px solid #09558B;
+    border-radius: 0px;
+    background-color: #fff;
+    transition: background-color 0.3s, color 0.3s, border-color 0.3s;
+    box-shadow: 0 6px 8px 0 rgba(0,0,0,0.24),0 8.5px 25px 0 rgba(0,0,0,0.19);
+    cursor: pointer;
+}
+
+textarea {
+    resize: none; /* Prevents textbox expansion */
+}
+
+.checkboxes{
+    text-align: left ;
+    margin-right: 2%;
+    margin-bottom: 8%;
+}
+
+#startButton,
+#stopButton {
+    display: flex;
+    flex-direction: column;
+    text-align: center;
+    gap: 12px;
+    background-color: #09558B;
+    color: #fff;
+    margin: 10px;
+    border: #080b0f 2px solid;
+    cursor: pointer;
+    transition: background-color 0.3s, transform 0.3s, box-shadow 0.3s;
+}
+
+#startButton:hover,
+#stopButton:hover {
+    background-color: #0a6fc1;
+    transform: scale(1.05);
+    box-shadow: 0 8px 16px rgba(0, 0, 0, 0.2);
+}
+
+#additionalDiv {
+    display: flex;
+    justify-content: space-between;
+    margin-top: 20px;
+}
+
+#additionalDiv .column-s {
+    flex: 1;
+    height: fit-content;
+    justify-self: center;
+    padding: 5%;
+    border: 1px solid #ddd;
+    background-color: #fff;
+    text-align: center;
+    border-radius: 12px;
+    box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+    transition: transform 0.3s, box-shadow 0.3s;
+
+}
+
+#additionalDiv .column-s:hover {
+    box-shadow: 0 8px 16px rgba(0, 0, 0, 0.2);
+    transform: scale(1.05);
+}
+
+#additionalDiv .column-s h2 {
+    margin: 0 auto; 
+    text-align: center;
+    justify-content: center;
+    color: #09558B;
+    height: fit-content;
+}

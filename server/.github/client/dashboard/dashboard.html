@@ -1,0 +1,299 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>DHS Netspider</title>
+    <link rel="icon" type="icons" href="icons/spider-solid.svg"> 
+    <link rel="stylesheet" href="css/dashboard.css">    
+    <link rel="stylesheet" href="css/icons.css">
+    <link rel="stylesheet" href="css/fileInput.css">
+    <link rel="stylesheet" href="css/help.css">
+    <link rel="stylesheet" href="css/navbar.css">
+    <link rel="stylesheet" href="css/scrapersettings.css">
+    <link rel="stylesheet" href="css/website.css">
+    <link rel="stylesheet" href="css/editKeywords.css">
+    <link rel="stylesheet" href="css/selectKeywords.css">
+    <link rel="stylesheet" href="css/resultManager.css">
+
+    
+    <script src="scripts/files.js" defer></script>
+    <script src="scripts/keywords.js" defer></script>
+    <script src="scripts/nav.js" defer></script>
+    <script src="scripts/scraper.js" defer></script>
+
+    <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.6.0/jquery.min.js"></script>
+    
+</head>
+
+<body>
+
+<div id="navbar">
+    <img src="photos/logo-hsi.png">
+    <h1>Homeland Security Netspider</h1>
+    
+    <a href="#" id="settings-link"  ><img src="./icons/gear-solid.svg" class="icon"/>Settings</a>
+    <a href="#" id="netspider-link"><img src="./icons/spider-solid.svg" class="icon"/>Netspider</a>
+    <a href="#med-box" id="keyword-link"><img src="./icons/key-solid.svg" class="icon"/>Keyword</a>
+    <a href="#small-box" id="help-link"><img src="./icons/circle-question-solid.svg" class="icon"/>Help</a>
+    <a href="#big-box-2" id="results-link"><img src="./icons/box-archive-solid.svg" class="icon"/>Results</a>
+    <a href="../index.html" id="logout-link" class="last-child-divider"><img src="./icons/right-from-bracket-solid.svg" class="icon"/>Logout</a>
+    <img src="photos/fgcu-logo.png" class="fgcu-logo">
+    <div class="divider"></div>
+</div>
+
+<div id="wrapper">
+<div id="content">
+    <div id="content-wrapper">
+        <div class="box" id="keyword-box">
+            <h2><img src="./icons/file-regular.svg" class="icon"/> Select Keywords File</h2>
+            <input type="file" id="file1" name="file1" class="file-input">
+        </div>
+        <div class="box" id="keyword-box">
+            <h2><img src="./icons/book-solid.svg" class="icon"/> Select Keysets File</h2>
+            <input type="file" id="file2" name="file2" class="file-input">
+        </div> 
+        <div class="box" id="folder-box">
+            <h2><img src="./icons/folder-open-regular.svg" class="icon"/> Select Results Folder</h2>
+            <input class="file-input" type="file" id="folderInput" webkitdirectory directory multiple style="display: none;">
+            <button class="select-folder" id="folder-input-btn" >Select Folder</button>
+        </div>
+        <!-- Big box under the three existing boxes -->
+        <div id="big-box">
+            <div class="column">
+                <h2><img src="./icons/pager-solid.svg" class="icon"/>Select Website:</h2>
+                <div class="radio-buttons">
+                    <input type="radio" id="website1" name="website" value="Escort Alligator" onclick="updateDropdown()">
+                    <label for="website1">Escort Alligator</label>
+
+                    <input type="radio" id="website2" name="website" value="Mega Personals" onclick="updateDropdown()">
+                    <label for="website2">Mega Personals</label>
+
+                    <input type="radio" id="website3" name="website" value="Skip The Games" onclick="updateDropdown()">
+                    <label for="website3">Skip The Games</label>
+
+                    <input type="radio" id="website4" name="website" value="Yes Back Page" onclick="updateDropdown()">
+                    <label for="website4">Yes Back Page</label>
+
+                    <input type="radio" id="website5" name="website" value="Eros" onclick="updateDropdown()">
+                    <label for="website5">Eros</label>
+                    <div class="divider"></div>
+                </div>
+                <h2 style="margin-top: 25px; margin-bottom: 7px;"><img src="./icons/location-arrow-solid.svg" class="icon"/>Select Location:</h2>
+                <!-- Add the following within the #navbar div, after the last <a> tag -->
+                    <div class="dropdown">
+                        <a href="#" class="dropdown-item">Select Location</a>
+                        <div class="dropdown-content">
+                            
+                        </div>
+                    </div>
+
+                    <h2 style="margin-top: 30px; margin-bottom: 7px;"><img src="./icons/book-solid.svg" class="icon"/>Select Keyset:</h2>
+                <!-- Add the following within the #navbar div, after the last <a> tag -->
+                    <div class="dropdown">
+                        <a href="#" class="dropdown-item-keyset" >Select Keyset</a>
+                        <div class="dropdown-content-keyset">
+                        </div>
+                    </div>
+                
+            </div>
+            <div class="column">
+                <h2><img src="./icons/key-solid.svg" class="icon" id="blueIcon"/>Select Keywords:</h2>
+                <!-- Add content for column 2 here -->
+                <div class="listbox-area">
+                    <select id="itemList" multiple="multiple"></select>
+                </div>
+                <button id="select-all-btn">Select All</button>
+                <button id="open-results-folder-btn" onclick="this.classList.toggle('clicked')">Open Results Folder</button>
+            </div>
+            <div class="column">
+
+                <h2><img src="./icons/gear-solid.svg" class="icon" id="blueIcon2"/> Scraper Settings:</h2>
+                <!-- Add content for column 3 here -->
+                <p>Enter Text to Scrape:</p>
+                <textarea id="scraperTextbox" name="scraperTextbox"></textarea>
+
+                <div class="checkboxes" style="margin-top: 10px;">
+                    <p> <input type="checkbox" id="all_keywords" name="all_keywords"> Search For Page with all Keywords Included</p>
+                    <p> <input type="checkbox" id="payment_method" name="payment_method"> Find Posts Only with Payment Methods</p>
+                    <p> <input type="checkbox" id="hide_browser" name="hide_browser">Hide Browser while Running</p>
+                    <div class="divider"></div>
+                </div>
+                <h2><img src="./icons/play-solid.svg" class="icon"/>Start Scraper:</h2>
+                <div>
+                    <label onclick="StartScraper(selectedWebsite, selectedLocation)" id="startButton">Start</label>
+                    <label onclick="StopScraper()" id="stopButton">Stop</label>
+                </div>
+
+                <div id="additionalDiv">
+                    <div style="margin-right: 5%; min-height: 28px;" class="column-s">
+                        <!-- Content for the first column -->
+                        <h2 id='status' style="font-size: 20px;">Status: OFF</h2>
+                    </div>
+                    <div class="column-s">
+                        <!-- Content for the second column -->
+                        <h2><div id="clock"></div></h2>
+                        <h2><div id="clock"></div></h2>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <div id="med-box">
+            <div id="box-header">
+                <h2 style="color: #09558B;"><img src="./icons/pen-to-square-solid.svg" class="icon"/>Edit Keywords & Sets:</h2>
+            </div>
+            <div class="column">
+                <h3>Enter New Keyword:</h3>
+                <div class="input-container">
+                    <input type="text" class="setname-input" placeholder="Type new keyword" id="addKeywordText">
+                    <button class="create-set-btn" id="addKeyword">Add Keyword</button>
+                </div>
+                <div class="listbox-area2">
+                    <select id="itemListKeywords" multiple="multiple"></select>
+                </div>
+                <div class="button-container">
+                    <button class="deleteButton" id="deleteKeyword" style="width: 60%; display: inline-block; white-space: nowrap; padding-right: 10px;">Delete Keyword<img style="height: 12px; margin-left: 5%;" src="./icons/trash-solid.svg"/> </button>
+                </div>
+            </div>
+            <div class="column">
+                <h3>Enter Set Name:</h3>
+                <div class="input-container">
+                    <input type="text" class="setname-input" placeholder="Type new set name" id="setname">
+                    <button class="create-set-btn" id="create-set">Create Set</button>
+                </div>
+                <div class="listbox-area2">
+                    <select id="itemListSet" multiple="multiple"></select>
+                </div>
+                <div class="button-container">
+                    <button class="deleteButton" id="delete-set">Delete Set <img style="height: 12px; margin-left: 5%;" src="./icons/trash-solid.svg"/> </button>
+                </div>
+            </div>
+        </div>
+        
+        
+        <div id="small-box" style="width: 30%; margin-left: 4%;">
+            <div id="box-header"  style="margin-bottom: 12%">
+                <h2 style="color: #09558B;"><img style="height: 20px; margin-right: 10px;" src="./icons/circle-question-solid.svg" class="blueIcon2">Resources and Support:</h2>
+            </div>
+            <button onclick="window.open('../netspider.pdf', '_blank');" class="button-hp">User Guide</button>
+            <button onclick="window.open('https://github.com/PauloDrefahl/NetspiderHSI', '_blank');" class="button-hp">Github Repository</button>
+            <button onclick="window.open('../NetSpider_user_manual_v1.1.pdf', '_blank');" class="button-hp">Developers Guide</button>
+            <button onclick="window.open('../APP LICENSE', '_blank');" class="button-hp">Licensing Agreement</button>
+        </div>
+
+        <div id="big-box-2">
+            <div id="box-header">
+                <h2 style="color: #09558B;"><img src="./icons/box-archive-solid_old.svg" class="icon"/>Result Manager</h2>
+            </div>
+            <div class = "result-list-col">
+                <div id="contentContainer"> <!-- Container to hold both the list and the grid of buttons -->
+                    <div id="listSection"> <!-- Section for the list -->
+                        <div>
+                            <button id="refreshListButton" class="button-app-sub">Refresh List</button>
+                        </div>
+                        <div id="listContainer">
+                            <ol id="list"></ol>
+                        </div>
+                        <div id="appendButtons">
+                            <button id="appendButton" class="button-app-append">Append</button> <!-- Removed space from ID for better practice -->
+                            <button id="cancelButton" class="button-app-cancel">Cancel</button>
+                            <button id="submitButton" class="button-app-submit">Submit</button>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            <div class = "result-button-col">
+                <div id="buttonArea"> <!-- Grid for 6 buttons -->
+                    <button id="viewPdfButton" class="button-result-ops">View PDF</button>
+                    <button id="viewSsButton" class="button-result-ops">View Screenshot Directory</button>
+                    <button id="viewRawDataButton" class="button-result-ops">View RAW Data</button>
+                    <button id="viewCleanDataButton" class="button-result-ops">View CLEAN Data</button>
+                    <button id="viewDiagramButton" class="button-result-ops">View Diagram Directory</button>
+<!--                    <button id="generateKeywordsButton" class="button-hp">Generate New Keywords</button>-->
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+</div>
+
+
+<!-- ????? what is this -->
+
+
+<script>
+    // function selectFolder() {
+    //         document.getElementById('folderInput').click();
+    //     }
+    //
+    //     function handleFolderSelection(event) {
+    //         const files = event.target.files;
+    //         if (files.length > 0) {
+    //             const folderName = files[0].webkitRelativePath.split('/')[0];
+    //             let button = document.getElementById('folder-input-btn');
+    //             button.textContent = "Netspider/" + folderName;
+    //         }
+    //     }
+    //
+    //     // Add event listener after the DOM has loaded
+    //     window.onload = function() {
+    //         document.getElementById('folderInput').addEventListener('change', handleFolderSelection);
+    //     };
+    // $(document).ready(function() {
+    //     $('#itemList').on('mousedown', 'option', function(e) {
+    //         e.preventDefault();
+    //         e.stopImmediatePropagation()
+    //         // var originalScrollTop = $(this).parent().scrollTop();
+    //         // console.log(originalScrollTop);
+    //         $(this).prop('selected', !$(this).prop('selected'));
+    //         // var self = this;
+    //         $(this).parent().focus();
+    //         // setTimeout(function() {
+    //         //     $(self).parent().scrollTop(originalScrollTop);
+    //         // }, 0);
+    //         return false;
+    //     });
+    // });
+
+
+    // $(document).ready(function() {
+    //     $('#itemListSet').on('mousedown', 'option', function(e) {
+    //         e.preventDefault();
+    //         e.stopPropagation();
+    //         var originalScrollTop = $(this).parent().scrollTop();
+    //         console.log(originalScrollTop);
+    //         $(this).prop('selected', !$(this).prop('selected'));
+    //         var self = this;
+    //         $(this).parent().focus();
+    //         setTimeout(function() {
+    //             $(self).parent().scrollTop(originalScrollTop);
+    //         }, 0);
+    //         return false;
+    //     });
+    // });
+
+    // $(document).ready(function() {
+    //     $('#itemListKeywords').on('mousedown', 'option', function(e) {
+    //         e.preventDefault();
+    //         var originalScrollTop = $(this).parent().scrollTop();
+    //         console.log(originalScrollTop);
+    //         $(this).prop('selected', !$(this).prop('selected'));
+    //         var self = this;
+    //         $(this).parent().focus();
+    //         setTimeout(function() {
+    //             $(self).parent().scrollTop(originalScrollTop);
+    //         }, 0);
+    //         return false;
+    //     });
+    // });
+    
+    function FocusON() {
+        document.getElementById("settings-link").focus();
+    }
+</script>
+
+<script src="scripts/resultManager.js"></script>
+
+</body>
+</html>

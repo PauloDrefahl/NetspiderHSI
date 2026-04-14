@@ -1,0 +1,63 @@
+/* EDIT KEYWORDS AND SETS BOX */
+
+.column-edit-keywords {
+    grid-column: 1 / span 2; /* Span both columns */
+    position: relative; /* Ensure positioning context for absolute positioning */
+    width: fit-content;
+    height:  fit-content;
+}
+
+.deleteButton{
+    width: 50%;
+    margin-top: 10px;
+    padding: 6px;
+    border: 2px solid #09558B;
+    border-radius: 8px;
+    background-color: #09558B;
+    color: #fff;
+    transition: background-color 0.3s, color 0.3s, border-color 0.3s;
+    box-shadow: 0 6px 8px 0 rgba(0,0,0,0.24),0 8.5px 25px 0 rgba(0,0,0,0.19);
+    cursor: pointer;
+    transition: box-shadow 0.3s, transform 0.3s;
+    font: 15px "Plus Jakarta Sans", sans-serif;
+
+}
+
+.deleteButton:hover{
+    transform: scale(1.05);
+    box-shadow: 0 8px 16px rgba(0, 0, 0, 0.2);
+}
+
+.column-edit-keywords {
+    grid-column: 1 / span 2; /* Span both columns */
+    position: relative; /* Ensure positioning context for absolute positioning */
+    width: fit-content;
+    height:  fit-content;
+}
+
+
+.create-set-btn{
+    width: 100%;
+    margin-left: 8px;
+    margin-top: 0px;
+    height: fit-content;
+    text-align: center;
+    padding: 8PX;
+    border: 2px solid #000000;
+    border-radius: 4px; /* Rounded corners */
+    background-color: #09558B;
+    color: #fff;
+    font: 15px "Plus Jakarta Sans", sans-serif;
+    transition: background-color 0.3s, color 0.3s, border-color 0.3s;
+    box-shadow: 0 6px 8px 0 rgba(0,0,0,0.24),0 8.5px 25px 0 rgba(0,0,0,0.19);
+    cursor: pointer;
+    max-height: 40px;
+    overflow: hidden;
+    transition: box-shadow 0.3s, transform 0.3s;
+
+}
+
+.create-set-btn:hover{
+        transform: scale(1.05);
+        box-shadow: 0 8px 16px rgba(0, 0, 0, 0.2);
+}

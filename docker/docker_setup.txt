@@ -1,0 +1,43 @@
+Docker PostgreSQL Setup Instructions
+
+This document provides instructions for setting up and managing a PostgreSQL database using Docker. 
+Using Docker ensures consistent environments for all developers and simplifies database management.
+
+Prerequisites
+- Ensure Docker Desktop is installed and running on your machine.
+- Navigate to the directory containing the `docker-compose.yml` file before running the commands below.
+
+Commands
+
+Starting the Database
+To start the PostgreSQL container, run:
+
+docker-compose up -d
+
+
+Stopping and Removing the Database
+To stop and remove the PostgreSQL container, run:
+
+docker-compose down -v
+
+
+Viewing Logs
+To view the logs of the PostgreSQL container, run:
+
+docker logs netspider_postgres_db
+
+Accessing the Database
+To access the PostgreSQL database using `psql`, run:
+
+docker exec -it netspider_postgres_db psql -U postgres -d netspider
+
+
+Explanation of Commands
+- `docker exec` is used to execute commands in the container.
+- `netspider_postgres_db` is the container name.
+- `psql` is the PostgreSQL CLI tool.
+- `-U postgres` specifies the default user.
+- `-d netspider` specifies the database to connect to.
+
+Using the above instructions, you should be able to have a Docker PostgreSQL container up, running, and manageable. 
+The reason for using Docker is to ensure consistent environments for all developers and to gain experience with Docker, which is beneficial for your resume.

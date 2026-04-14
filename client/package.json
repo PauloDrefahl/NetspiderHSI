@@ -1,0 +1,21 @@
+{
+  "name": "netspiderhsi",
+  "version": "3.0.2",
+  "description": "",
+  "license": "MIT",
+  "author": "",
+  "type": "commonjs",
+  "main": "index.js",
+  "scripts": {
+    "start": "electron .",
+    "package-win": "electron-packager . netspiderhsi --platform=win32 --arch=x64 --out=dist --overwrite --app-version=3.0.2 --description=\"NetSpider Web Scraper\" --icon=download-removebg-preview.ico --extra-resource=NetSpiderServer.exe"
+  },
+  "dependencies": {
+    "electron-squirrel-startup": "^1.0.0",
+    "socket.io-client": "^4.7.4"
+  },
+  "devDependencies": {
+    "@electron/packager": "^18.3.6",
+    "electron": "^29.4.6"
+  }
+}

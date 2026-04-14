@@ -1,0 +1,171 @@
+/* SELECT KEYWORDS BOX */
+
+/* CSS for Select All button */
+#select-all-btn {
+    width: 100%;
+    margin-top: 20px;
+    text-align: center;
+    padding: 15px;
+    border: 2px solid #000000;
+    border-radius: 4px; /* Rounded corners */
+    background-color: #09558B;
+    color: #fff;
+    transition: background-color 0.3s, color 0.3s, border-color 0.3s;
+    box-shadow: 0 6px 8px 0 rgba(0,0,0,0.24),0 8.5px 25px 0 rgba(0,0,0,0.19);
+    cursor: pointer;
+}
+
+
+/* Hover effect for Select All button */
+.select-all-btn:hover {
+    color: #09558B;
+    color: white;
+    border-color: #09558B;
+    transition: background-color 0.3s, color 0.3s, border-color 0.3s;
+}
+
+.select-all-btn.clicked {
+    background-color: #0a6fc1;
+    color: white;
+    border-color: #09558B;
+}
+
+/* Adjust hover effect to make it smoother */
+#select-all-btn:hover {
+    transition: background-color 0.3s, color 0.3s, border-color 0.3s;
+    background-color: #0a6fc1;
+}
+
+/* Override background color for deselected state of "Select All" button */
+button#select-all-button[aria-expanded="true"]::after {
+    border-top-color: #09558be1;
+}
+
+button#select-all-button[aria-expanded="false"]::after {
+    border-bottom-color: #09558be1;
+}
+
+/* Additional CSS rules to handle deselected state of "Select All" button */
+button#select-all-button:not([aria-expanded="true"])::after {
+    border-top-color: transparent;
+}
+
+button#select-all-button[aria-expanded="true"]:not(:hover)::after {
+    border-top-color: #09558be1;
+}
+
+button#select-all-button[aria-expanded="false"]:not(:hover)::after {
+    border-bottom-color: #09558be1;
+}
+
+/* CSS for Open Results Folder button */
+#open-results-folder-btn {
+    width: 100%;
+    margin-top: 20px;
+    margin-bottom: 10px;
+    text-align: center;
+    padding: 5px;
+    border: 2px solid #000000;
+    border-radius: 5px; /* Rounded corners */
+    background-color: #09558B;
+    color: #fff;
+    transition: background-color 0.3s, color 0.3s, border-color 0.3s;
+    box-shadow: 0 6px 8px 0 rgba(0,0,0,0.24),0 8.5px 25px 0 rgba(0,0,0,0.19);
+    cursor: pointer;
+}
+
+/* Hover effect for Open Results Folder button */
+#open-results-folder-btn:hover {
+    background-color: #0a6fc1;
+    color: white;
+    border-color: #09558B;
+    transition: background-color 0.3s, color 0.3s, border-color 0.3s;
+}
+
+#open-results-folder-btn:hover {
+    transition: background-color 0.3s, color 0.3s, border-color 0.3s;
+}
+
+#itemList{
+    width: 100%;
+    height: 320px;
+    padding: 10px;
+    text-align: center;
+    box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+    transition: transform 0.3s, box-shadow 0.3s;
+    font-size: 24px;
+    display: block;
+    
+}
+
+#itemListSet{
+    width: 100%;
+    height: 320px;
+    padding: 10px;
+    text-align: center;
+    box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+    transition: transform 0.3s, box-shadow 0.3s;
+    font-size: 24px;
+    display: block;
+}
+
+#itemListKeywords{
+    width: 100%;
+    height: 320px;
+    padding: 10px;
+    text-align: center;
+    box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+    transition: transform 0.3s, box-shadow 0.3s;
+    font-size: 24px;
+    display: block;
+}
+
+#header-keywords{
+    margin: 0 auto;
+    border: 1px solid #ddd;
+    background-color: #fff;
+    text-align: center;
+    width: 80%;
+    border-radius: 7px;
+    box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+    transition: transform 0.3s, box-shadow 0.3s;
+    grid-column: span 2;
+    
+}
+
+#header-keywords h2 {
+    margin: 0 auto;
+}
+
+.listbox-area {
+    border: 10px solid #09558B; /* Border with the color #09558B */
+    padding: 10px; /* Optional: Add padding to the listbox area */
+    border-radius: 12px;
+}
+
+.listbox-area2 {
+    border: 10px solid #09558B; /* Border with the color #09558B */
+    padding: 10px; /* Optional: Add padding to the listbox area */
+    border-radius: 12px;
+}
+
+option.selected {
+    background-color: #50b8ff; /* Change to the color you want */
+}
+
+option.flagged {
+    background-color: #ff0000;
+}
+
+.select-folder{
+    width: 100%;
+    padding: 10px;
+    margin-top: 20px;
+    border: 2px solid #09558B;
+    border-radius: 8px;
+    border-style: dashed;
+    height: 50%;
+    background-color: #fff;
+    transition: background-color 0.3s, color 0.3s, border-color 0.3s;
+    cursor: pointer;
+}
