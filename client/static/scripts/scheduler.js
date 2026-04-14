@@ -1,15 +1,21 @@
-function saveScheduledScraper(name, duration, frequency) {
-    const scraperName = name.value.trim();  // Name should be a string
-    const scraperFrequency = frequency.value.trim();  // Get the selected frequency (should be a string)
-    const scraperDuration = parseInt(duration.value, 10);  // Get the duration (should be a number)
+function saveScheduledScraper(name, frequency) {
+    const scraperName = name.value.trim();
+    const scraperFrequency = frequency.value.trim();
+    const schedulerDay = document.getElementById('dayOfWeek').value;
+    const schedulerTime = document.getElementById('addRunTime').value;
+    const schedulerDate = document.getElementById('addRunDate').value; // YYYY-MM-DD
 
     try {
-
-        // Make sure inputs are valid
-        if (!scraperName || !scraperDuration) {
+        if (!scraperName || !schedulerTime) {
             console.error('Please fill all AutoScraper fields');
             return;
         }
+
+        const [hour, minute] = schedulerTime.split(':').map(x => parseInt(x, 10));
+
+        const isWeekly = scraperFrequency === 'weekly' && !schedulerDate;
+        const isDaily = scraperFrequency === 'daily' && !schedulerDate;
+        const isOneTime = !!schedulerDate;
 
         const scraperData = {
             [scraperName]: {
@@ -25,7 +31,14 @@ function saveScheduledScraper(name, duration, frequency) {
                     path: resultFolder
                 },
                 frequency: scraperFrequency,
-                duration: scraperDuration,
+                daily: isDaily,
+                weekly: isWeekly,
+                one_time: isOneTime,
+                run_date: schedulerDate || "",
+                day_to_run: isWeekly ? schedulerDay : "",
+                hour: hour,
+                minute: minute,
+                job_id: "",
                 last_run: "None"
             }
         };
@@ -91,7 +104,11 @@ function displaySchedules(schedules) {
         const listItem = document.createElement('li'); // Create a <li> element
 
         // Set the text content for each list item
-        listItem.textContent = `Schedule: ${scraperName}, Frequency: ${schedule.frequency}, Duration: ${schedule.duration} days`;
+        const repeatType = schedule.one_time ? 'One-time' : schedule.weekly ? 'Weekly' : schedule.daily ? 'Daily' : schedule.frequency;
+        const oneTimeText = schedule.one_time && schedule.run_date ? `, Date: ${schedule.run_date}` : '';
+        const dayText = schedule.weekly ? `, Day: ${schedule.day_to_run}` : '';
+        const timeText = schedule.hour !== undefined && schedule.minute !== undefined ? `, Time: ${String(schedule.hour).padStart(2,'0')}:${String(schedule.minute).padStart(2,'0')}` : '';
+        listItem.textContent = `Schedule: ${scraperName}, Type: ${repeatType}${oneTimeText}${dayText}${timeText}`;
 
         // Append the <li> to the <ul>
         scheduleList.appendChild(listItem);

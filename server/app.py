@@ -800,23 +800,38 @@ def load_autoscraper_jobs():
 
         for scraper_config_name, scraper_settings in config.items():
 
-            run_weekly = scraper_settings["weekly"]
-            run_daily  = scraper_settings["daily"]
-            job_id = scraper_settings["job_id"]
-            runs_left = scraper_settings["runs_left"]
-            
+            run_weekly = scraper_settings.get("weekly", scraper_settings.get("frequency") == "weekly")
+            run_daily = scraper_settings.get("daily", scraper_settings.get("frequency") == "daily")
+            one_time = scraper_settings.get("one_time", False)
+            job_id = scraper_settings.get("job_id", "")
+            day_to_run = scraper_settings.get("day_to_run", scraper_settings.get("day", "mon"))
+            hour = scraper_settings.get("hour", 0)
+            minute = scraper_settings.get("minute", 0)
+            run_date = scraper_settings.get("run_date", "")
+
             # If the scraper doesn't have a job id and needs to be ran
-            if job_id == "" and runs_left > 0:
-                if run_weekly:
-                    weekly_cron_trigger = CronTrigger(day=scraper_settings["day_to_run"], hour=scraper_settings["hour"], minute=scraper_settings["minute"])
-                    job_object = scheduler.add_job(run_scheduled_scraper, weekly_cron_trigger, misfire_grace_time= scraper_grace_period, args=[scraper_config_name, "scrap"] )
+            if job_id == "":
+                if one_time and run_date:
+                    try:
+                        dt = datetime.strptime(run_date, "%Y-%m-%d")
+                        one_time_trigger = CronTrigger(year=dt.year, month=dt.month, day=dt.day, hour=hour, minute=minute)
+                        job_object = scheduler.add_job(run_scheduled_scraper, one_time_trigger, misfire_grace_time=scraper_grace_period, args=[scraper_config_name, "scrap"])
+                        logger.info("One-time scraper loaded: %s (ID: %s)", scraper_config_name, job_object.id)
+                        config[scraper_config_name]["job_id"] = job_object.id
+                        save_json(config, file_path)
+                    except ValueError:
+                        logger.error("Invalid one-time date format for %s: %s", scraper_config_name, run_date)
+
+                elif run_weekly:
+                    weekly_cron_trigger = CronTrigger(day_of_week=day_to_run, hour=hour, minute=minute)
+                    job_object = scheduler.add_job(run_scheduled_scraper, weekly_cron_trigger, misfire_grace_time=scraper_grace_period, args=[scraper_config_name, "scrap"])
                     logger.info("Scraper loaded: %s (ID: %s)", scraper_config_name, job_object.id)
                     config[scraper_config_name]["job_id"] = job_object.id
                     save_json(config, file_path)
 
                 elif run_daily:
-                    daily_cron_trigger = CronTrigger(hour=scraper_settings["hour"], minute=scraper_settings["minute"])
-                    job_object = scheduler.add_job(run_scheduled_scraper, trigger=daily_cron_trigger, misfire_grace_time= scraper_grace_period, args=[scraper_config_name, "scrap"] )
+                    daily_cron_trigger = CronTrigger(hour=hour, minute=minute)
+                    job_object = scheduler.add_job(run_scheduled_scraper, trigger=daily_cron_trigger, misfire_grace_time=scraper_grace_period, args=[scraper_config_name, "scrap"])
                     logger.info("Scraper loaded: %s (ID: %s)", scraper_config_name, job_object.id)
                     config[scraper_config_name]["job_id"] = job_object.id
                     save_json(config, file_path)
@@ -825,20 +840,8 @@ def delete_autoscraper_jobs():
     file_path = "server/scheduled_scrapers.json" 
     config = load_json(file_path)
 
-    for scraper_config_name, scraper_settings in config.items():
-        runs_left = scraper_settings["runs_left"]
-        scraper_id = scraper_settings["job_id"]
-        
-        # Deletes job from scraper if it has no runs left
-        if runs_left <= 0 and scraper_id != "":
-            logger.info("Deleting scraper %s (finished all runs)", scraper_config_name)
-            job_id = scraper_settings["job_id"]
-            scheduler.remove_job(job_id)
-            
-            scraper_settings["job_id"] = ""
-            scraper_settings["runs_left"] = 0
-        
-            save_json(config, file_path)
+    # No runs_left logic for daily/weekly (runs indefinitely until canceled)
+    # The scheduler entries are cleaned/reenabled below based on stored job_id and config
 
     # Deletes scrapers if they have be rename,deleted, modified
     current_schedules = scheduler.get_jobs()
@@ -882,20 +885,21 @@ def run_scheduled_scraper(scraper_name, function_name):
     logger.debug("Checking scraper: %s, task: %s", scraper_name, function_name)
     if scraper_name in config:
         scraper_config = config[scraper_name]
-        runs_left = scraper_config["runs_left"]
+        one_time = scraper_config.get("one_time", False)
 
-        # if a scraper was to run before getting deleted by the manager
-        # The if statement would stop it
-        if runs_left > 0:
-            
-            last_run = datetime.now().strftime('%Y-%m-%d %H:%M:%S')
-            scraper_config["last_run"] = last_run  # Updates last run time value
-            scraper_config["runs_left"] -= 1  # Updates count of days/weeks left
+        last_run = datetime.now().strftime('%Y-%m-%d %H:%M:%S')
+        scraper_config["last_run"] = last_run
 
-            logger.info("Running scraper: %s (runs left: %d)", scraper_name, scraper_config['runs_left'])
-            process_scraper(scraper_name, scraper_config)
-            logger.info("Scraper finished: %s", scraper_name)
-            save_json(config, file_path)  
+        if one_time:
+            # One-time schedule runs once and then gets disabled
+            scraper_config["one_time"] = False
+            scraper_config["run_date"] = ""
+            scraper_config["job_id"] = ""
+
+        logger.info("Running scraper: %s", scraper_name)
+        process_scraper(scraper_name, scraper_config)
+        logger.info("Scraper finished: %s", scraper_name)
+        save_json(config, file_path)
     
 # Start of main code
 # Test for later(Will put process on multiple cpus):

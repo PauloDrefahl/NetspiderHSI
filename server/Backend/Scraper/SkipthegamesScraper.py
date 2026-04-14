@@ -17,26 +17,26 @@ class SkipthegamesScraper(ScraperPrototype):
         self.path = None
         self.driver = None
         self.cities = {
-            "bonita springs": 'https://skipthegames.com/posts/bonita-springs-fl',
-            "bradenton": 'https://skipthegames.com/posts/bradenton',
-            "cape coral": 'https://skipthegames.com/posts/cape-coral-fl',
-            "fort myers": 'https://skipthegames.com/posts/fort-myers',
-            "ocala": 'https://skipthegames.com/posts/ocala',
-            "okaloosa": 'https://skipthegames.com/posts/okaloosa',
-            "orlando": 'https://skipthegames.com/posts/orlando',
-            "palm bay": 'https://skipthegames.com/posts/palmbay',
-            "gainesville": 'https://skipthegames.com/posts/gainesville',
-            "jacksonville": 'https://skipthegames.com/posts/jacksonville',
-            "keys": 'https://skipthegames.com/posts/keys',
-            "miami": 'https://skipthegames.com/posts/miami',
-            "naples": 'https://skipthegames.com/posts/naples-fl',
-            "st. augustine": 'https://skipthegames.com/posts/st-augustine',
-            "tallahassee": 'https://skipthegames.com/posts/tallahassee',
-            "tampa": 'https://skipthegames.com/posts/tampa',
-            "sarasota": 'https://skipthegames.com/posts/sarasota',
-            "space coast": 'https://skipthegames.com/posts/space-coast',
-            "venice": 'https://skipthegames.com/posts/venice-fl',
-            "west palm beach": 'https://skipthegames.com/posts/west-palm-beach'
+            "bonita springs": 'https://skipthegames.com/posts/bonita-springs-fl/',
+            "bradenton": 'https://skipthegames.com/posts/bradenton/',
+            "cape coral": 'https://skipthegames.com/posts/cape-coral-fl/',
+            "fort myers": 'https://skipthegames.com/posts/fort-myers/',
+            "ocala": 'https://skipthegames.com/posts/ocala/',
+            "okaloosa": 'https://skipthegames.com/posts/okaloosa/',
+            "orlando": 'https://skipthegames.com/posts/orlando/',
+            "palm bay": 'https://skipthegames.com/posts/palmbay/',
+            "gainesville": 'https://skipthegames.com/posts/gainesville/',
+            "jacksonville": 'https://skipthegames.com/posts/jacksonville/',
+            "keys": 'https://skipthegames.com/posts/keys/',
+            "miami": 'https://skipthegames.com/posts/miami/',
+            "naples": 'https://skipthegames.com/posts/naples-fl/',
+            "st. augustine": 'https://skipthegames.com/posts/st-augustine/',
+            "tallahassee": 'https://skipthegames.com/posts/tallahassee/',
+            "tampa": 'https://skipthegames.com/posts/tampa/',
+            "sarasota": 'https://skipthegames.com/posts/sarasota/',
+            "space coast": 'https://skipthegames.com/posts/space-coast/',
+            "venice": 'https://skipthegames.com/posts/venice-fl/',
+            "west palm beach": 'https://skipthegames.com/posts/west-palm-beach/'
         }
         self.city = ''
         self.url = ''
@@ -115,6 +115,7 @@ class SkipthegamesScraper(ScraperPrototype):
         # Format website URL based on state and city
         self.get_formatted_url()
 
+        self._report_progress("opening_browser", "Launching browser…")
         self.driver = Driver(
             driver_version="mlatest",
             undetectable=True,
@@ -125,9 +126,11 @@ class SkipthegamesScraper(ScraperPrototype):
         )
 
         # Open Webpage with URL
+        self._report_progress("loading_page", "Loading website…")
         self.open_webpage()
 
         # Find links of posts
+        self._report_progress("collecting_links", "Finding listing links…")
         links = self.get_links()
 
         # create directories for screenshot and excel
@@ -137,6 +140,7 @@ class SkipthegamesScraper(ScraperPrototype):
         self.pdf_filename = f'{self.screenshot_directory}/skipthegames-{self.city}-{self.date_time}.pdf'
         os.mkdir(self.screenshot_directory)
 
+        self._report_progress("processing_posts", f"0/{len(links)} links")
         self.get_data(links)
         self.close_webpage()
         self.reset_variables()
@@ -182,6 +186,7 @@ class SkipthegamesScraper(ScraperPrototype):
         counter = 1
 
         for link in links:
+            self._report_progress("processing_posts", f"{counter}/{len(links)} links")
             print(f"Processing link {counter}/{len(links)}: {link}")
             if not self.completed:
                 self.driver.get(link)

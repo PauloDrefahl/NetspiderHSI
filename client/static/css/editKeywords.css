@@ -88,3 +88,40 @@
         transform: scale(1.05);
         box-shadow: 0 8px 16px rgba(0, 0, 0, 0.2);
 }
+
+/* Precise layout for the keyword/set input row */
+#med-box .input-container {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 8px;
+}
+
+#med-box .input-container > input.setname-input {
+    flex: 1 1 auto;
+    min-width: 170px;
+    max-width: calc(100% - 130px);
+}
+
+#med-box .input-container > .create-set-btn {
+    flex: 0 0 auto;
+    width: auto;
+    min-width: 120px;
+    margin-left: 0;
+    padding: 10px 16px;
+}
+
+#med-box .button-container .deleteButton {
+    width: 75%;
+    display: inline-flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    white-space: normal;
+}
+
+#med-box .button-container .deleteButton .delete-icon {
+    width: 16px;
+    height: 16px;
+    margin-top: 4px;
+}

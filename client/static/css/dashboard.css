@@ -35,8 +35,8 @@ body {
     border-radius: 12px; /* Rounded corners */
     display: flex;
     justify-content: space-between;
-    align-items: center;
-    height: 670px;
+    align-items: stretch;
+    min-height: 760px;
     transition: box-shadow 0.3s, transform 0.3s;
     box-shadow: 0 8px 16px rgba(0, 0, 0, 0.1); /* Improved box shadow */
 }

@@ -162,21 +162,36 @@
                 <div class="input-container">
                     <input type="text" class="setScrp-input setname-input" placeholder="Type Scraper Name" id="addScraperText">
                 </div>
-                <h3>Number of Days to Scrape:</h3>
-                <div class="input-container">
-                    <input type="number" class="auto-days-input setname-input" placeholder="Number of Days" id="addLengthNumber" min="1">
-                </div>
-                <h3>Scraper Frequency:</h3>
-                <h4> 
+                <h3>Run Frequency:</h3>
+                <h4>
                     <select id="frequency" name="frequency">
                         <option value="daily">Daily</option>
                         <option value="weekly">Weekly</option>
                     </select>
                 </h4>
+                <h3>Run Day (Weekly):</h3>
+                <h4>
+                    <select id="dayOfWeek" name="dayOfWeek">
+                        <option value="mon">Monday</option>
+                        <option value="tue">Tuesday</option>
+                        <option value="wed">Wednesday</option>
+                        <option value="thu">Thursday</option>
+                        <option value="fri">Friday</option>
+                        <option value="sat">Saturday</option>
+                        <option value="sun">Sunday</option>
+                    </select>
+                </h4>
+                <h3>Run Time:</h3>
+                <div class="input-container">
+                    <input type="time" class="auto-time-input setname-input" id="addRunTime" value="12:00" required>
+                </div>
+                <h3>Run Date (Optional):</h3>
+                <div class="input-container">
+                    <input type="date" class="auto-date-input setname-input" id="addRunDate">
+                </div>
                 <div>
                     <label onclick="saveScheduledScraper(
                         document.getElementById('addScraperText'),
-                        document.getElementById('addLengthNumber'),
                         document.getElementById('frequency'),
                     )" id="addScheduleButton">Schedule Scraper</label>
                 </div>
@@ -217,7 +232,7 @@
                     <select id="itemListKeywords" multiple="multiple"></select>
                 </div>
                 <div class="button-container">
-                    <button class="deleteButton" id="deleteKeyword" style="width: 60%; display: inline-block; white-space: nowrap; padding-right: 10px;">Delete Keyword<img style="height: 12px; margin-left: 5%;" src="../static/icons/trash-solid.svg"/> </button>
+                    <button class="deleteButton" id="deleteKeyword">Delete Keyword<br><img class="delete-icon" src="../static/icons/trash-solid.svg" alt="Trash"/></button>
                 </div>
             </div>
             <div class="column">
@@ -230,7 +245,7 @@
                     <select id="itemListSet" multiple="multiple"></select>
                 </div>
                 <div class="button-container">
-                    <button class="deleteButton" id="delete-set">Delete Set <img style="height: 12px; margin-left: 5%;" src="../static/icons/trash-solid.svg"/> </button>
+                    <button class="deleteButton" id="delete-set">Delete Set<br><img class="delete-icon" src="../static/icons/trash-solid.svg" alt="Trash"/></button>
                 </div>
             </div>
         </div>

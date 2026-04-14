@@ -116,6 +116,7 @@ class MegapersonalsScraper(ScraperPrototype):
         # format date
         self.date_time = str(datetime.today())[0:19].replace(' ', '_').replace(':', '-')
 
+        self._report_progress("opening_browser", "Launching browser…")
         self.driver = Driver(
             driver_version="mlatest",
             undetectable=True,
@@ -126,13 +127,14 @@ class MegapersonalsScraper(ScraperPrototype):
         )
 
         # Open Webpage with URL
+        self._report_progress("loading_page", "Loading website…")
         self.open_webpage()
 
         # Format website URL based on state and city
         self.get_formatted_url()
 
-
         # Find links of posts
+        self._report_progress("collecting_links", "Finding listing links…")
         links = self.get_links()
 
         # create directories for screenshot and excel
@@ -143,6 +145,7 @@ class MegapersonalsScraper(ScraperPrototype):
         self.pdf_filename = f'{self.screenshot_directory}/megapersonals-{self.city}-{self.date_time}.pdf'
         os.mkdir(self.screenshot_directory)
 
+        self._report_progress("processing_posts", f"0/{len(links)} links")
         self.get_data(links)
         self.close_webpage()
         self.reset_variables()
@@ -195,6 +198,7 @@ class MegapersonalsScraper(ScraperPrototype):
         counter = 1
 
         for link in links:
+            self._report_progress("processing_posts", f"{counter}/{len(links)} links")
             print(f"Processing link {counter}/{len(links)}: {link}")
             if not self.completed:
                 self.driver.get(link)
