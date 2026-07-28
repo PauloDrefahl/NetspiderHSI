@@ -23,7 +23,6 @@ NetSpider is a web scraping tool developed by students from FGCU – Florida Gul
 - [Installation](#installation)
 - [Usage](#usage)
 - [How to Use](#how-to-use)
-- [Security Considerations](#security-considerations)
 - [Troubleshooting](#troubleshooting)
 - [Evolution of Netspider](#evolution-of-netspider)
 - [Future Development](#future-development)
@@ -31,7 +30,6 @@ NetSpider is a web scraping tool developed by students from FGCU – Florida Gul
 - [Team](#team)
 - [Sponsors and Mentors](#sponsors-and-mentors)
 - [License](#license)
-- [Contact](#contact)
 - [Disclaimer](#disclaimer)
 
 ## Overview
