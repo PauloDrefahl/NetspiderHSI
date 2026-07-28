@@ -1,26 +1,19 @@
-# Netspider: Web Scraping Tool for Cybercrime Investigation
-NetSpider is a web scraping tool designed to assist in the investigation of cybercrimes by automating the process of data collection from various websites. The tool helps investigators by extracting relevant information and saving it for later analysis, making it easier to track and gather leads. 
+## Disclaimer
 
-[![HSI Web Scraper](https://github.com/dfgrisales5078/HSI-Web-Scraper/actions/workflows/python-app.yml/badge.svg?branch=main)](https://github.com/dfgrisales5078/HSI-Web-Scraper/actions/workflows/python-app.yml)
+Netspider is a school project developed as part of a senior capstone course at Florida Gulf Coast University (FGCU), created in partnership with the HSI Fort Myers office.
+
+This is an open-source educational tool, freely available for anyone to use, study, or build upon. It does not carry any security clearance, official certification, or endorsement, and it has no direct affiliation, partnership, or relationship with any government agency or institution other than FGCU.
+
+Any mentions of HSI or law enforcement usage refer strictly to the academic collaboration context of this capstone project and do not imply ongoing institutional support, sponsorship, or operational deployment by HSI or any other agency.
+
+Use of this software is at the user's own discretion and risk. The authors make no warranties regarding its fitness for any particular purpose, including investigative or law enforcement use.
+
+
+# Netspider: Web Scraping Tool
+NetSpider is a web scraping tool develpoped by students from FGCU - Florida Gulf Coast University as part of their required activities for course completion. The tool os designed to assist on scraping the internet looking for bad actors by automating the process of data collection from various websites. This open source tool helps community members and investigators by extracting relevant information and saving it for later analysis, making it easier to track and gather leads. 
+
 [![License: MIT](https://img.shields.io/badge/License-MIT-yellow.svg)](https://opensource.org/licenses/MIT)
 [![Python 3.8+](https://img.shields.io/badge/python-3.8+-blue.svg)](https://www.python.org/downloads/)
-
-Software Overview Document: <a href="Netspider Final Report.pdf">Final Report 2023-2024</a>
-
-# Project Overview Presentation
-<p align="center">
-  <a href="https://docs.google.com/presentation/d/1tBXKREY9hA72LFQHfF9SY9RlOABc-vO6arp6WOSfq2M/edit?usp=sharing">Project Overview Presentation</a>
-</p>
-
-
-[![AltText](Images/Screenshot%202024-09-20%20113707.png)](https://docs.google.com/presentation/d/1tBXKREY9hA72LFQHfF9SY9RlOABc-vO6arp6WOSfq2M/edit?usp=sharing)
-
-# Censored Demo
-<p align="center">
-   <a href="https://drive.google.com/file/d/1DItKe31nMTbkqE_HVSeL2_9LD99FNy4W/view?resourcekey">Censored DEMO 3.1v</a></h2>
-</p>
-
-[![AltText](Images/Screenshot%202024-09-20%20114023.png)](https://drive.google.com/file/d/1DItKe31nMTbkqE_HVSeL2_9LD99FNy4W/view?resourcekey)
 
 
 ## Table of Contents
@@ -124,6 +117,7 @@ Follow the prompts in the UI to configure your keyword sets and begin scraping.
 5. **Analyze**: To view the results, navigate to the "Open Results Folder" and select the relevant scrape to see the data collected.
 
 ## Security Considerations
+- This is an open source software and FGCU is not responsible for its use.
 - Always use Netspider on a secure, isolated network.
 - Regularly update the tool and its dependencies to ensure you have the latest security patches.
 - Use strong, unique passwords for authentication.
@@ -160,7 +154,7 @@ Contributions to the project are welcome! If you would like to suggest a feature
 
 Please read our [Contributing Guidelines](link-to-contributing-guidelines) for more information.
 
-## Netspider 23-24 Team
+## Students on the Netspider 23-24 Team
 
 * **Paulo Drefahl** - Full Stack Developer
 * **Zach Sutton** - Full Stack Developer
@@ -170,14 +164,14 @@ Please read our [Contributing Guidelines](link-to-contributing-guidelines) for m
 * **Corey Record** - Backend Developer
 * **Dylan Garcia** - Frontend Developer
 
-## Netspider 24-25 Team
+## Students on the Netspider 24-25 Team
 
 * **William Murphy** - Full Stack Developer
 * **Caleb Newman** - Full Stack Developer
 * **William Ward** - Full Stack Developer
 * **Daniel Kareh** - Backend Developer
 
-## Netspider 25-26 Team
+## Students on the Netspider 25-26 Team
 * **Aaron Cole** - Full Stack and Backend Developer
 * **Martin Patterson** - Full Stack and Backend Developer
 
@@ -193,13 +187,3 @@ Please read our [Contributing Guidelines](link-to-contributing-guidelines) for m
 ## License
 
 This project is licensed under the MIT License. See the [LICENSE](LICENSE) file for details.
-
-## Contact
-
-* **Paulo Drefahl** - pdrefahl@fgcu.edu
-* **Zachary Sutton** - zesutton2619@eagle.fgcu.edu
-* **Kevin Kostage** - kskostage9457@eagle.fgcu.edu
-
-## Disclaimer
-
-The complete version of Netspider can only be used by authorized cybercrime investigators, this open source version does not include any sensitive data or exclusive features. Users are responsible for ensuring their use of this tool complies with all applicable laws and regulations. The developers of Netspider are not responsible for any misuse or illegal application of this tool.
