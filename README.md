@@ -10,7 +10,7 @@ Use of this software is at the user's own discretion and risk. The authors make 
 
 
 # Netspider: Web Scraping Tool
-NetSpider is a web scraping tool develpoped by students from FGCU - Florida Gulf Coast University as part of their required activities for course completion. The tool os designed to assist on scraping the internet looking for bad actors by automating the process of data collection from various websites. This open source tool helps community members and investigators by extracting relevant information and saving it for later analysis, making it easier to track and gather leads. 
+NetSpider is a web scraping tool developed by students from FGCU – Florida Gulf Coast University as part of their senior capstone course requirements. The tool is designed to assist in scraping the internet for signs of suspicious or harmful activity by automating the collection of data from various websites. This open-source tool helps community members, researchers, and investigators extract relevant information and save it for later analysis — making it easier to track patterns and gather leads.
 
 [![License: MIT](https://img.shields.io/badge/License-MIT-yellow.svg)](https://opensource.org/licenses/MIT)
 [![Python 3.8+](https://img.shields.io/badge/python-3.8+-blue.svg)](https://www.python.org/downloads/)
