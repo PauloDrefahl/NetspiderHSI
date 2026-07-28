@@ -4,7 +4,7 @@ Netspider is a school project developed as part of a senior capstone course at F
 
 This is an open-source educational tool, freely available for anyone to use, study, or build upon. It does not carry any security clearance, official certification, or endorsement, and it has no direct affiliation, partnership, or relationship with any government agency or institution other than FGCU.
 
-Any mentions of HSI or law enforcement usage refer strictly to the academic collaboration context of this capstone project and do not imply ongoing institutional support, sponsorship, or operational deployment by HSI or any other agency.
+Any mentions of HSI or law enforcement usage refer strictly to the academic collaboration context of this capstone project and do not imply ongoing institutional support, sponsorship, or operational deployment by any agency.
 
 Use of this software is at the user's own discretion and risk. The authors make no warranties regarding its fitness for any particular purpose, including investigative or law enforcement use.
 
