@@ -9,23 +9,18 @@
 /client/open_ports.txt
 /server/open_ports.txt
 
-# Cached bytecode and DLLs
+# Python-generated files
 __pycache__/
-*.py[cd]
-
-# Virtual environments
-.env
-.venv
-env/
-venv/
-ENV/
-env.bak/
-venv.bak/
-
-# General Python packaging
+*.py[oc]
 build/
 build-*/
 dist/
+wheels/
+*.egg-info
+
+# Virtual environments
+.venv
+venv/
 
 # PyInstaller
 *.manifest
