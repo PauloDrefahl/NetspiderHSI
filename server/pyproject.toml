@@ -26,3 +26,6 @@ dependencies = [
   'seleniumbase',
   'typing-extensions',
 ]
+classifiers = [
+  'Private :: Do Not Upload',
+]

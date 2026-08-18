@@ -2,6 +2,7 @@
   "name": "netspiderhsi",
   "version": "3.0.2",
   "main": "index.js",
+  "private": true,
   "devDependencies": {
     "@electron/packager": "^18.3.6",
     "electron": "^29.4.6"
