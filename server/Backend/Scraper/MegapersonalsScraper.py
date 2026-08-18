@@ -155,9 +155,8 @@ class MegapersonalsScraper(ScraperPrototype):
         self.driver.implicitly_wait(10)
         self.driver.get(self.url)
         print(self.driver.current_url)
-        
         # NOTE: Maximizing the window in headless mode makes it too big:
-        # https://chromium.googlesource.com/chromium/src.git/+/f2bdeab65/ui/views/win/hwnd_message_handler_headless.cc#264
+        # https://chromium.googlesource.com/chromium/src.git/+/130.0.6723.117/ui/views/win/hwnd_message_handler_headless.cc#27
         if not self.search_mode:
             self.driver.maximize_window()
         assert "Page not found" not in self.driver.page_source
